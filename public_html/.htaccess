@@ -1,5 +1,23 @@
 RewriteEngine On
+
+#IP Restrict Adminer
+<FilesMatch "adminer.php">
+    Order deny,allow
+    Deny from all
+    Allow from 73.43.18.145 [L]
+</FilesMatch>
+
+#Redirect all to index.php except certain filetypes (static and .ajax.php, .script.php) and adminer.php
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteRule ^(.*)$ /index.php?path=$1 [NC,QSA]
+RewriteCond %{REQUEST_URI} !(\.png|\.jpg|\.gif|\.ico|\.jpeg|\.bmp|\.css|\.js|\.json|\.ajax.php|\.script.php)$
+RewriteCond %{REQUEST_URI} !^/adminer.php
+RewriteRule (.*) index.php?path=$1 [NC,QSA]
+
+
+
+#Redirect non-www to www
 RewriteBase /
 RewriteCond %{HTTP_HOST} !^www\. [NC]
-RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R=301,L]
-
+RewriteRule ^(.*)$ https://www.%{HTTP_HOST} [R=301]

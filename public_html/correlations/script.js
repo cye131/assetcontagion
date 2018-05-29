@@ -155,16 +155,20 @@ $(document).ready(function() {
         }
     }
     
-    
+    $( "#stock" ).autocomplete({
+        source: autofill,
+        minLength: 2
+    });
+
     //AJAX call on load
-    $.ajax({
-        url: 'correlations/getstocks.php',
+    /*$.ajax({
+        url: 'correlations/getstocks.ajax.php',
         dataType: 'html',
         cache: true,
         timeout: 2000,
         success: function(data){
             data = JSON.parse(data);
-            //console.log (data[0]);
+            console.log (data[0]);
             $( "#stock" ).autocomplete({
                 source: data[1],
                 minLength: 2
@@ -175,7 +179,7 @@ $(document).ready(function() {
             console.log('AJAX Error 001');
         }
     });
-
+    */
     
     /*
     function getSector(stock){
@@ -209,7 +213,7 @@ $(document).ready(function() {
         editSpinner("Pulling data...");
         
         $.ajax({
-            url: 'correlations/getetfs.php',
+            url: 'correlations/getetfs.ajax.php',
             type: 'POST',
             data: data,
             dataType: 'html',
@@ -243,7 +247,7 @@ $(document).ready(function() {
         editSpinner("Running calculations...");
 
         $.ajax({
-            url: 'correlations/gethistorical3.php',
+            url: 'correlations/gethistorical3.ajax.php',
             type: 'POST',
             data: data,
             dataType: 'html',
