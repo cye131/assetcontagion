@@ -3,81 +3,8 @@
 function ucFirst(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
 }
-/*
-function prepCSV () {
-    var csvObj = [];
-    var keys = [], i = 0; for (keys[i++] in results[0].csv_data) {}
-    console.log(keys);
-    
-    for (i = 0; i < keys.length; i++) {
-        console.log(keys[i]);
-        var datekey = keys[i];
-        csvObj[i] = [];
-        csvObj[i][0] = datekey;
-        
-        if (typeof results[0].csv_data[datekey]['data1_roi'] != 'undefined') {
-            csvObj[i][1] = results[0].csv_data[datekey]['data1_roi'];
-        } else {
-            csvObj[i][1] = 'N/A';
-        }
 
-        if (typeof results[0].csv_data[datekey]['data2_roi'] != 'undefined') {
-            csvObj[i][2] = results[0].csv_data[datekey]['data2_roi'];
-        } else {
-            csvObj[i][2] = 'N/A';
-        }
 
-        if (typeof results[0].csv_data[datekey]['correlation'] != 'undefined') {
-            csvObj[i][3] = results[0].csv_data[datekey]['correlation'];
-        } else {
-            csvObj[i][3] = 'N/A';
-        }
-    }
-    console.log(csvObj);
-    exportToCsv('export.csv', csvObj);
-}
-
-function exportToCsv(filename, rows) {
-        var processRow = function (row) {
-            var finalVal = '';
-            for (var j = 0; j < row.length; j++) {
-                var innerValue = row[j] === null ? '' : row[j].toString();
-                if (row[j] instanceof Date) {
-                    innerValue = row[j].toLocaleString();
-                }
-                var result = innerValue.replace(/"/g, '""');
-                if (result.search(/("|,|\n)/g) >= 0)
-                    result = '"' + result + '"';
-                if (j > 0)
-                    finalVal += ',';
-                finalVal += result;
-            }
-            return finalVal + '\n';
-        };
-
-        var csvFile = '';
-        for (var i = 0; i < rows.length; i++) {
-            csvFile += processRow(rows[i]);
-        }
-
-    var blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
-    if (navigator.msSaveBlob) { // IE 10+
-        navigator.msSaveBlob(blob, filename);
-    } else {
-        var link = document.createElement("a");
-        if (link.download !== undefined) { // feature detection
-            // Browsers that support HTML5 download attribute
-            var url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", filename);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-    }
-}
-*/
 
 $(document).ready(function() {
     /* UI Elements */
@@ -118,6 +45,12 @@ $(document).ready(function() {
         }
     });
     
+    /** Autocomplete **/    
+    $( "#stock" ).autocomplete({
+        source: autofill,
+        minLength: 2
+    });
+
     
     /** Calculations **/
 
@@ -129,6 +62,7 @@ $(document).ready(function() {
         $('#stock').addClass('is-invalid');
         $( ".invalid-feedback" ).show();
         $( ".invalid-feedback" ).text(str);
+        endSpinner();
     }
     
     function emptyCheck(){
@@ -149,71 +83,18 @@ $(document).ready(function() {
         } else {
             $('#stock').addClass('is-valid');
             var data = window.stockjson[ticker];
-            //console.log(data);
+            console.log(data);
             getETF(data);
             startSpinner();
         }
     }
-    
-    $( "#stock" ).autocomplete({
-        source: autofill,
-        minLength: 2
-    });
-
-    //AJAX call on load
-    /*$.ajax({
-        url: 'correlations/getstocks.ajax.php',
-        dataType: 'html',
-        cache: true,
-        timeout: 2000,
-        success: function(data){
-            data = JSON.parse(data);
-            console.log (data[0]);
-            $( "#stock" ).autocomplete({
-                source: data[1],
-                minLength: 2
-            });
-            window.stockjson = data[0];
-        },
-        error:function(){
-            console.log('AJAX Error 001');
-        }
-    });
-    */
-    
-    /*
-    function getSector(stock){
-        var data = {};
-        data.stock = stock;  //<=> data["stock"] = stock;
-        $.ajax({
-            url: 'correlations/getsector.php',
-            type: 'POST',
-            data: data,
-            dataType: 'json',
-            cache: false, //Turn off caching or the AJAX returns the same value each time
-            timeout: 2000,
-            success: function(sectordata){
-                console.log(sectordata);
-                //if (sectordata.ms_sector === undefined || sectordata.ms_industry === undefined || sectordata.length == 0) {
-                //    $("#maincontent").html("Ticker not found.");
-                //} else {
-                    getETF(sectordata);
-                //}
-            },
-            error:function(){
-                console.log('AJAX Error');
-                $("#maincontent").html("Ticker not found.");
-            }
-        });
-    }
-    */
-    
+        
     function getETF(data){
         startSpinner();
         editSpinner("Pulling data...");
         
         $.ajax({
-            url: 'correlations/getetfs.ajax.php',
+            url: '/correlations/getetfs.ajax.php',
             type: 'POST',
             data: data,
             dataType: 'html',
@@ -221,62 +102,74 @@ $(document).ready(function() {
             timeout: 2000,
             success: function(etfdata){
                 //console.log("ETF Data: ");
+                //console.log(etfdata);
                 etfdata = JSON.parse(etfdata);
-                setTimeout(function() { getHistorical(etfdata); }, 2000);
-                //getHistorical(etfdata);
+                setTimeout(function() { getHistorical(etfdata); }, 1000);
             },
             error:function(){
-                $("#maincontent").html("Sector information not found.");
+                validateFail('Sector information not found.');
             }
         });
     }
     
     
     function getHistorical(etfinfo) {
-        /*var data = {
-                    stock: etfinfo.stock.type_name,
-                    stock_ticker: etfinfo.stock.ticker,
-                    sec: etfinfo.sector.type_name,
-                    sec_ticker: etfinfo.sector.classification_code,
-                    ind: etfinfo.industry.type_name,
-                    ind_ticker: etfinfo.industry.classification_code
-        };*/
         var data = etfinfo;
         //console.log(data);
         
-        editSpinner("Running calculations...");
-
         $.ajax({
-            url: 'correlations/gethistorical3.ajax.php',
+            url: '/correlations/gethistorical.ajax.php',
             type: 'POST',
             data: data,
             dataType: 'html',
             cache: false,
             timeout: 10000,
-            success: function(results){
-                results = JSON.parse(results);
-                console.log(results);
-                
-                editSpinner("Finalizing...");
-
-                $(".successmsg").html('The stock <strong>' + results.index[0].lookup_codes[0] + '</strong> belongs to the industry group <strong><em>' + results.index[0].names[1] + '</em> (' + results.index[0].lookup_codes[1] + ')</strong> and the sector group <strong><em>' + results.index[1].names[1] + '</em> (' + results.index[1].lookup_codes[1] + ')</strong>.');
-                makeHeatMap(results);
-
-                makeChart(results[0],results.index[0],0);
-                makeChart(results[1],results.index[1],1);
-                makeChart(results[2],results.index[2],2);
-                generateTable(results[0],results.index[0],0);
-                generateTable(results[1],results.index[1],1);
-                generateTable(results[2],results.index[2],2);
-                
-                endSpinner();
+            success: function(data){
+                //console.log(data);
+                //data = JSON.parse(data);
+                calculateCorrelation(data);
             },
-            error:function(results){
-                //console.log(results);
+            error:function(){
                 validateFail('Historical data not found.');
             }
         });
         
+    }
+    
+    function calculateCorrelation(data) {
+        editSpinner("Running calculations...");
+
+        $.ajax({
+            url: '/correlations/calculatecorrelation.ajax.php',
+            type: 'POST',
+            data: {ajax: data},
+            dataType: 'html',
+            cache: false,
+            timeout: 5000,
+            success: function(results){
+                results = JSON.parse(results);
+                callGraphs(results);
+            },
+            error:function(){
+                validateFail('Correlation Calculation Failed.');
+            }
+        });
+    }
+    
+    
+    function callGraphs(results) {
+        editSpinner("Finalizing...");
+        $(".successmsg").html('The stock <strong>' + results.index[0].lookup_codes[0] + '</strong> belongs to the industry group <strong><em>' + results.index[0].names[1] + '</em> (' + results.index[0].lookup_codes[1] + ')</strong> and the sector group <strong><em>' + results.index[1].names[1] + '</em> (' + results.index[1].lookup_codes[1] + ')</strong>.');
+        makeHeatMap(results);
+
+        makeChart(results[0],results.index[0],0);
+        makeChart(results[1],results.index[1],1);
+        makeChart(results[2],results.index[2],2);
+        generateTable(results[0],results.index[0],0);
+        generateTable(results[1],results.index[1],1);
+        generateTable(results[2],results.index[2],2);
+        
+        endSpinner();
     }
     
     function makeHeatMap(results) {
@@ -640,6 +533,7 @@ $(document).ready(function() {
             }
         });
 
+        
         //Add "download data" message
         var tablewrapperid = tableid + '_wrapper';
         $( '#' + tablewrapperid + ' ' + 'div.dt-buttons' ).prepend('<span style="font-weight:bold">Download data: </span>');
@@ -649,7 +543,7 @@ $(document).ready(function() {
         
         $( '#' + tableid +' thead' ).prepend(trstring);
         
-        $( '#' + tableid ).append('<tfoot><tr><td colspan="6"></td></tr></tfoot>');
+        //$( '#' + tableid ).append('<tfoot><tr><td colspan="6"></td></tr></tfoot>');
 
     }
     

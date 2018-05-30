@@ -32,7 +32,12 @@ if ($request == 'index') {
   $requestvars['script'] = $script;
 }
 
-//elseif 
+elseif ($request == 'stock') {
+  $requestvars['title'] = 'Stock-to-Stock Correlation Lookup';
+  require_once('correlations/getstocks.script.php');
+  $requestvars['script'] = $script;
+}
+
 
 
 

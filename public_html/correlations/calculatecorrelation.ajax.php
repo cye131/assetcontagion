@@ -1,143 +1,16 @@
 <?php
-function __autoload($class_name) {
-    require_once "classes/" . $class_name . '.class.php';
-}
 require_once('functions.php');
-
-require_once(dirname(dirname(__FILE__)).'/../config/db.php'); //Single Nest: include(dirname(__FILE__). '/../config/db.php'); //Double Nest: require_once(dirname(dirname(__FILE__)).'/../config/db.php');
-
-
-
-/** STORES POST VARIABLES INTO $NAMEANDTICKERS
- *
- *
- *
- */
-$namesandtickers = array();
-$sqllookuplist = array();
-$questionmarks = array();
-$classification_type = (string) 'gics';
-
-foreach($_POST as $key => $row){
-    $namesandtickers[$key] = $row;
-    if ($key !== 'stock') {
-        if ($key !== 'market') $sqllookuplist[] = $classification_type.'_'.$row['lookup_code'];
-        else $sqllookuplist[] = $row['lookup_code'];
-        $questionmarks[] = '?';
-    }
-}
-//print_r($namesandtickers);
-
-
-
-
-
-/** PULLS STOCK DATA FROM FIDELITY WEBSITE
- *
- *
- *
- */
-$ch = curl_init();
-
-curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
-curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-curl_setopt($ch, CURLOPT_POST, 0);
-
-$headers = array(
-    'Host: fastquote.fidelity.com',
-    'Referer: https://eresearch.fidelity.com/eresearch/markets_sectors/sectors/sectors_in_market.jhtml',
-    'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36'
-);
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-$url = 'https://fastquote.fidelity.com/service/historical/chart/lite/json?productid=research&symbols='.$namesandtickers['stock']['lookup_code'].'&dateMin=2010/01/01:00:00:00&dateMax='.date('Y-m-d').':00:00:00&intraday=n&granularity=1&incextendedhours=n&dd=y';
-//echo $url;
-
-curl_setopt($ch, CURLOPT_URL, $url);
-$html = curl_exec($ch);
-curl_close($ch);
-
-//echo $html;
-
-$clean = substr($html,0,-2); //remove opening and closing ( in data
-$clean = substr($clean,2);
-$data = json_decode($clean,true);
-$data = $data['SYMBOL'][0];
-
-
-if (!isset($data)) exit();
-//print_r($data);
-
-$firststockdate = fid_date($data['BARS']['CB'][0]['lt']);
-
-
-
-
-
-/** PULLS HISTORICAL DATA FOR INDICES OF RELEVANT SECTORS FROM DATABASE
- *
- *
- *
- */
-
-$sql = new MyPDO('mysql:dbname='.DB_DATABASE,DB_USER,DB_PASSWORD);
-//include the extra question mark for the $firststockdate
-$stmt = $sql->prepare("
-                   SELECT * FROM `sector_indexhistoricaldata` WHERE `classification_id` IN 
-                   (".implode(',',$questionmarks).") 
-                   AND `date` >= ?
-                   ORDER BY `classification_id`,`date`
-                  ");
-
-$i = (int) 0;
-$sqllookuplist[] = $firststockdate; //Add firststockdate to list of binded variables
-foreach($sqllookuplist as $bind){
-   $stmt->bindValue(++$i, $bind);
-}
-
-
-$stmt->execute();
-
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    if (strpos($row['classification_id'], '_') === false) $classification_id = (string) $row['classification_id']; //leaves .SPX alone
-    else $classification_id = (string) substr($row['classification_id'],strpos($row['classification_id'],'_')+1); //strips gics from gics_.GSPCT
-    
-    $historicaldata[$classification_id][$row['date']] = array (
-        'close' => $row['close'],
-        'roi' => $row['roi'],
-    );
-}
-
-if (empty($historicaldata)) (New SendJsonErrorAndExit('Error 0403: SQL Historical Data Lookup is Empty'))->sendJsonErrorAndExit();
-
-
-
-
-
-/** MOVES CURL DATA INTO SAME FORMAT AND ARRAY AS SQL DATA AND CALCULATES ROI
- *
- *
- *
- */
-foreach ($data['BARS']['CB'] as $key => $row) {
-    $date = (string) fid_date($row['lt']);
-    $historicaldata[$data['IDENTIFIER']][$date]['close'] = $row['cl'];
-    
-    if ($key > 0) $historicaldata[$data['IDENTIFIER']][$date]['roi'] = (float) round(($row['cl']-$lastprice)/$lastprice,4);
-    else $historicaldata[$data['IDENTIFIER']][$date]['roi'] = (float) 0;
-    $lastprice = (float) $row['cl']; 
-}
- 
-unset($data);
-//print_r($historicaldata);
-
-
 
 /** CREATES FINAL ARRAY FOR BOTH CSV AND JSON FEED
  * $correlation -> comparison='stock-industry','historicaldata'->...
  * 
  *
  */
+ //print_r($_POST);
+ $data = json_decode($_POST['ajax'],true);
+ $historicaldata = ($data['historicaldata']);
+ //print_r($historicaldata);
+ $namesandtickers = $data['namesandtickers'];
 
  $correlation = array('index' => array());
  
@@ -248,12 +121,10 @@ createCorrelArray('market','sector',5);
 
 //print_r($correlation);
 
-echo json_encode($correlation);    
+echo json_encode($correlation);
 
  
 //file_put_contents('debug.json',json_encode($correlation));    
 
 
-
- 
 ?>

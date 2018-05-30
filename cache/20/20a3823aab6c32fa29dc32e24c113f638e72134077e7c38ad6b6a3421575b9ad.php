@@ -37,7 +37,7 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
     <meta name=description content=\"Content.\" />
     <meta name=keywords content=\"sectors, gics sectors, gics groups, gics lookup, stock sector correlation, correlation\" />
     
-    <link rel=\"stylesheet\" href=\"correlations/style.css\">
+    <link rel=\"stylesheet\" href=\"static/style.css\">
     <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css\" integrity=\"sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB\" crossorigin=\"anonymous\">
     <link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css\"/>
 
@@ -56,8 +56,16 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
     <script src=\"//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js\"></script>
     <script src=\"//cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js\"></script>
 
-    <script src=\"correlations/script-ui.js\"></script>
-    <script src=\"correlations/script.js\"></script>
+    <script src=\"static/script-ui.js\"></script>
+    <script src=\"static/script.js\"></script>
+    
+    <script async src=\"//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js\"></script>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: \"ca-pub-9558447444041339\",
+        enable_page_level_ads: true
+      });
+    </script>
 </head>
 <body>
     <header class=\"clearfix\">
@@ -90,9 +98,9 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
         
     </header>    
     ";
-        // line 66
+        // line 74
         $this->displayBlock('content', $context, $blocks);
-        // line 68
+        // line 76
         echo "
 <footer class=\"page-footer font-small pt-4 mt-5\" style=\"background: rgba(10, 24, 66,1);\">
 
@@ -144,7 +152,7 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
 
 <script>
   ";
-        // line 118
+        // line 126
         echo ($context["script"] ?? null);
         echo "
 </script>
@@ -154,10 +162,10 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
 </html>";
     }
 
-    // line 66
+    // line 74
     public function block_content($context, array $blocks = array())
     {
-        // line 67
+        // line 75
         echo "    ";
     }
 
@@ -173,7 +181,7 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
 
     public function getDebugInfo()
     {
-        return array (  161 => 67,  158 => 66,  148 => 118,  96 => 68,  94 => 66,  33 => 8,  24 => 1,);
+        return array (  169 => 75,  166 => 74,  156 => 126,  104 => 76,  102 => 74,  33 => 8,  24 => 1,);
     }
 
     public function getSourceContext()
@@ -191,7 +199,7 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
     <meta name=description content=\"Content.\" />
     <meta name=keywords content=\"sectors, gics sectors, gics groups, gics lookup, stock sector correlation, correlation\" />
     
-    <link rel=\"stylesheet\" href=\"correlations/style.css\">
+    <link rel=\"stylesheet\" href=\"static/style.css\">
     <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css\" integrity=\"sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB\" crossorigin=\"anonymous\">
     <link rel=\"stylesheet\" type=\"text/css\" href=\"https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css\"/>
 
@@ -210,8 +218,16 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
     <script src=\"//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js\"></script>
     <script src=\"//cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js\"></script>
 
-    <script src=\"correlations/script-ui.js\"></script>
-    <script src=\"correlations/script.js\"></script>
+    <script src=\"static/script-ui.js\"></script>
+    <script src=\"static/script.js\"></script>
+    
+    <script async src=\"//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js\"></script>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: \"ca-pub-9558447444041339\",
+        enable_page_level_ads: true
+      });
+    </script>
 </head>
 <body>
     <header class=\"clearfix\">

@@ -1,178 +1,220 @@
 <?php
-    require_once('functions.php');
-    
-    function exitMsg($message){
-        //echo message;
-        exit();
-    }
-    
-    //{"stock":"AAPL","sec":"Technology","sec_ticker":"XLK","ind":"Computer Hardware","ind_ticker":"XTH"}
-    $arr = array();
-    foreach($_POST as $k => $v){
-        $arr[$k] = $v;
-    }
-    
-    //print_r($arr);
-    $url = "https://api.iextrading.com/1.0/stock/market/batch?symbols=".$arr['stock'].",".$arr['sec_ticker'].",".$arr['ind_ticker'].",SPY&types=chart&range=5y";
+ spl_autoload_register('myAutoloader');
+ function myAutoloader($classname) {
+   require_once "/var/www/correlation/public_html/correlations/classes/" . $classname . '.class.php';
+ }
+require_once('functions.php');
 
-    $ch = curl_init();
-    
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 60);
 
-    $json = curl_exec($ch);
-    curl_close($ch);
+/** STORES POST VARIABLES INTO $NAMEANDTICKERS
+ *
+ *
+ *
+ */
+$namesandtickers = array();
+$sqllookuplist = array();
+$questionmarks = array();
+
+foreach($_POST as $key => $row){
+    $namesandtickers[$key] = $row;
+    if ($key !== 'stock') {
+        if ($key !== 'market') $sqllookuplist[] = $row['lookup_code'];
+        else $sqllookuplist[] = $row['lookup_code'];
+        $questionmarks[] = '?';
+    }
+}
+//print_r($namesandtickers);
+
+
+
+
+/** PULLS STOCK DATA FROM FIDELITY WEBSITE
+ *
+ *
+ *
+ */
+
+$fid = new FidData(FALSE);
+$fid -> fetchData($namesandtickers['stock']['lookup_code'],'1980/01/01',NULL);
+$fid -> cleanAndDecodeData();
+$fid -> createTSArrayFromJsonArray();
+$fid -> getFirstDate();
+
+
+/** PULLS HISTORICAL DATA FOR INDICES OF RELEVANT SECTORS FROM DATABASE
+ *
+ *
+ *
+ */
+
+$sql = new MyPDO();
+//include the extra question mark for the $firststockdate
+$stmt = $sql->prepare("
+                   SELECT * FROM `fid_hist_sectors` WHERE `classification_id` IN 
+                   (".implode(',',$questionmarks).") 
+                   AND `date` >= ?
+                   ORDER BY `classification_id`,`date`
+                  ");
+
+$i = (int) 0;
+$sqllookuplist[] = $fid->firstdate; //Add firststockdate to list of binded variables
+foreach($sqllookuplist as $bind){
+   $stmt->bindValue(++$i, $bind);
+}
+
+
+$stmt->execute();
+
+if ($stmt->rowCount() == 0) {
+  echo json_encode("{Error - no historical data on relevant sectors.}");
+}
+
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $classification_id = (string) $row['classification_id'];
     
-    $data = json_decode($json, true);
-    if (!isset($data)) exit();
+    $historicaldata[$classification_id][$row['date']] = array (
+        'close' => (float) $row['close'],
+        'roi' => (float) $row['roi'],
+    );
+}
+
+
+
+/** MOVES CURL DATA INTO SAME FORMAT AND ARRAY AS SQL DATA
+ *
+ *
+ *
+ */
+$historicaldata = array_merge_recursive($historicaldata,$fid->tsarray);
+$returnarray = array(
+  'namesandtickers' => $namesandtickers,
+ 'historicaldata' => $historicaldata
+ );
+echo json_encode($returnarray);
+
+exit();
+
+/** CREATES FINAL ARRAY FOR BOTH CSV AND JSON FEED
+ * $correlation -> comparison='stock-industry','historicaldata'->...
+ * 
+ *
+ */
+
+ $correlation = array('index' => array());
+ 
+ function createCorrelArray($type1 = 'stock',$type2 = 'market',$index = 0) {
     
+    global $correlation;
+    global $historicaldata;
+    global $namesandtickers;
     
+    $lookup_codes = array($namesandtickers[$type1]['lookup_code'],$namesandtickers[$type2]['lookup_code']);
+
     
-    
-    
-    //First shared index (pairs: stock-sector,sector-industry,stock-market,stock-sector-industry-market)    
-    $minindexcount = min(
-        count($data[$arr['stock']]['chart']),
-        count($data[$arr['sec_ticker']]['chart']),
-        count($data[$arr['ind_ticker']]['chart'])
+    //creates the index sub-array
+    $correlation['index'][$index] = array(
+        'types' => array($type1,$type2),
+        'names' => array($namesandtickers[$type1]['name'],$namesandtickers[$type2]['name']),
+        'lookup_codes' => $lookup_codes
     );
     
-    function firstSharedDate($data,$name1,$name2,$i) {
-        return date("Y-m-d",max(
-            strtotime($data[$name1]['chart'][$i]['date']),
-            strtotime($data[$name2]['chart'][$i]['date'])
-        ));
+    //calculates first shared date shared date between the 2 data sets
+    $firstdates = array();
+    $thirtiethdates = array();
+    $types = array($type1,$type2);
+    for ($i = 0; $i <= 1; $i++) {
+        $firstdates[] = strtotime(array_keys($historicaldata[$lookup_codes[$i]])[0]);
     }
-    
-    $ssfirstdate = firstSharedDate($data,$arr['stock'],$arr['sec_ticker'],0);
-    $sifirstdate = firstSharedDate($data,$arr['stock'],$arr['ind_ticker'],0);
-    $ss30date = firstSharedDate($data,$arr['stock'],$arr['sec_ticker'],29);
-    $si30date = firstSharedDate($data,$arr['stock'],$arr['ind_ticker'],29);
-
-    
-    //echo $minindexcount.'|';
-    //echo $ssfirstdate;
-    //echo $sifirstdate; echo $si30date;
+    $correlation['index'][$index]['firstshareddate'] = date('Y-m-d',max($firstdates));
 
 
-    if ($minindexcount < 40) exitMsg("Not enough observations.");
-    
-    
-    //Create final array with dates as keys to second-level arrays
-    //Note - Sector-ssv would mean the sector ETF's value, starting at $100 on the first day where data was recorded for both the stock and the sector
-    //Sector-siv and Industry-ssv are meaningless!
-    function portfolioMake($data,$type,$typename) {
-        $pf = array();
-        $retname = $typename."-r";
+    //creates the historical data sub-arrays
+    $correlation[$index]['json_data1'] = array();
+    $correlation[$index]['json_data2'] = array();
+    $correlation[$index]['json_correlation'] = array();
+
+    $correlation[$index]['csv_data'] = array(); //this will index both data1 and data2 under the same date to allow us to check if both data points exist on the same days
+
+    foreach ($historicaldata as $id => $tsdata) {
+        if (!in_array($id,$lookup_codes)) continue;
         
-        global $ssfirstdate;
-        global $sifirstdate;
+        if ($id === $lookup_codes[0]) $datalevel = 'data1';
+        elseif ($id === $lookup_codes[1]) $datalevel = 'data2';
         
-        $ssval = $typename."-ssv";
-        $sival = $typename."-siv";
+        //$datalevel_l30 = (string) $datalevel.'_l30';
+
+
+        $i = (int) 0;
         
-        $ss = 0;
-        $si = 0;
-        
-        foreach ($data[$type]['chart'] as $row) {
-            $date = $row['date'];
-            $pf[$date] = array();
-            $pf[$date][$typename] = $row['close'];
-            $pf[$date][$retname] = $row['changePercent'];
-            
-            if (strtotime($date) >= strtotime($ssfirstdate)) {
-                if ($ss == 0) $ss = 100;
-                else $ss = number_format(($row['changePercent']/100 + 1)*$ss,2);
-                $pf[$date][$ssval] = $ss;
-            }
-            
-            if (strtotime($date) >= strtotime($sifirstdate)) {
-                if ($si == 0) $si = 100;
-                else $si = number_format(($row['changePercent']/100 + 1)*$si,2);
-                $pf[$date][$sival] = $si;
-            }
+        //puts the data into the sub-arrays
+        foreach ($tsdata as $tsdate => $tsrow) {
+            $correlation[$index]['json_'.$datalevel][$i][0] = (integer) strtotime($tsdate) * 1000; //Needs to be *1000 for Javascript to read
+            $correlation[$index]['json_'.$datalevel][$i][1] = (float) $tsrow['close'];
+
+            $correlation[$index]['csv_data'][$tsdate]['date'] = (string) $tsdate;
+            $correlation[$index]['csv_data'][$tsdate][$datalevel.'_price'] = (float) $tsrow['close'];
+
+            $correlation[$index]['csv_data'][$tsdate][$datalevel.'_roi'] = (float) $tsrow['roi'];
+                        
+            $i++;
         }
-        return $pf;
-    }
-    
-    $portfolio = array_merge_recursive(
-                portfolioMake($data,$arr['stock'],"Stock"),
-                portfolioMake($data,$arr['sec_ticker'],"Sector"),
-                portfolioMake($data,$arr['ind_ticker'],"Industry")
-            );
-    
-    //Correlation Calculations
-    $ss_s_correl_array = array();
-    $ss_sec_correl_array = array();
-    
-    $si_s_correl_array = array();
-    $si_ind_correl_array = array();
-
-    foreach ($portfolio as $k => $row) {
-        $date = $k;
-
-        if ((strtotime($date) >= strtotime ($ss30date)) && isset($row['Stock-r']) && isset($row['Sector-r']) ) { //If already 30 obs stored
-            array_shift($ss_s_correl_array);
-            array_push($ss_s_correl_array,$row['Stock-r']);
-            array_shift($ss_sec_correl_array);
-            array_push($ss_sec_correl_array,$row['Sector-r']);
-            
-            $portfolio[$date]['ss_s_correl_str'] = implode(",",$ss_s_correl_array);
-            $portfolio[$date]['ss_se_correl_str'] = implode(",",$ss_sec_correl_array);
-
-            $portfolio[$date]['ss_correl'] = correlation($ss_s_correl_array,$ss_sec_correl_array);
-        } elseif ((strtotime($date) >= strtotime ($ssfirstdate)) && isset($row['Stock-r']) && isset($row['Sector-r']) ){ //If not already 30 obs stored
-            $ss_s_correl_array[] = $row['Stock-r'];
-            $ss_sec_correl_array[] = $row['Sector-r'];
-        }
-        
-        
-        
-        if ((strtotime($date) >= strtotime ($si30date)) && isset($row['Stock-r']) && isset($row['Industry-r']) ) { //If already 30 obs stored
-            array_shift($si_s_correl_array);
-            array_push($si_s_correl_array,$row['Stock-r']);
-            array_shift($si_ind_correl_array);
-            array_push($si_ind_correl_array,$row['Industry-r']);
-            
-            $portfolio[$date]['si_s_correl_str'] = implode(",",$si_s_correl_array);
-            $portfolio[$date]['si_ind_correl_str'] = implode(",",$si_ind_correl_array);
-
-            $portfolio[$date]['si_correl'] = correlation($si_s_correl_array,$si_ind_correl_array);
-        } elseif ((strtotime($date) >= strtotime ($sifirstdate)) && isset($row['Stock-r']) && isset($row['Industry-r']) ){ //If not already 30 obs stored
-            $si_s_correl_array[] = $row['Stock-r'];
-            $si_ind_correl_array[] = $row['Industry-r'];
-        }
-
-    
         
     }
     
-    $array = array();
-    $i = 0;
-    $j = 0;
-    foreach($portfolio as $k=>$row){   //LOOPS TO GET UTC TIME SERIES
-        
-        if (isset($row['Stock-ssv'])) {
-            $array['stockss'][$i][0] = strtotime($k) * 1000; //Javascript needs microtime instead of seconds
-            $array['stockss'][$i][1] = (float)$row['Stock-ssv'];
-        }
-        
-        if (isset($row['Sector-ssv'])) {
-            $array['sectorss'][$i][0] = strtotime($k) * 1000;
-            $array['sectorss'][$i][1] = (float)$row['Sector-ssv'];
-        }
-        if (isset($row['ss_correl'])) {
-            $array['correlss'][$j][0] = strtotime($k) * 1000;
-            $array['correlss'][$j][1] = (float)$row['ss_correl']*100;
-            $j++;
-        }
-        $i++;
-    }
-    //$res['chartstr'] = rtrim($var1, ",");
-
-    $json = json_encode($array);
-    echo $json;
     
-    //file_put_contents('test.json',$json);    
+    //calculates correlation checking that both data points exist using the csv_data subarray
+    $i = (int) 0;
+    $data1_l30 = array();
+    $data2_l30 = array();
+
+    foreach ($correlation[$index]['csv_data'] as $date => $csvrow) {
+        if (!isset($csvrow['data1_roi']) || !isset($csvrow['data2_roi'])) continue;
+                
+        $data1_l30[] = $csvrow['data1_roi'];
+        $data2_l30[] = $csvrow['data2_roi'];
+
+        if  (count($data1_l30) > 30) {
+            array_shift($data1_l30);
+            array_shift($data2_l30);
+        }
+        
+        if  (count($data1_l30) === 30) { //adds correlation to buy csv and json data
+            $correlation[$index]['csv_data'][$date]['correlation'] = (float) round(correlation($data1_l30,$data2_l30),4);
+            $correlation[$index]['json_correlation'][$i][0] = (integer) strtotime($date) * 1000; 
+            $correlation[$index]['json_correlation'][$i][1] = $correlation[$index]['csv_data'][$date]['correlation'];
+            
+            $mostrecentcorrelation = (float) $correlation[$index]['csv_data'][$date]['correlation'];
+            
+            $i++;
+        }
+        
+        /* For debugging
+        $correlation[$index]['csv_data'][$date]['data1_l30'] = $data1_l30;
+        $correlation[$index]['csv_data'][$date]['data2_l30'] = $data2_l30;
+        */
+    }
+    
+    //Add most recent correlation to the index
+    $correlation['index'][$index]['lastcorrelation'] = $mostrecentcorrelation;
+    
+
+ }
+ 
+createCorrelArray('stock','industry',0);
+createCorrelArray('stock','sector',1);
+createCorrelArray('stock','market',2);
+createCorrelArray('industry','sector',3);
+createCorrelArray('industry','market',4);
+createCorrelArray('market','sector',5);
+
+//print_r($correlation);
+
+echo json_encode($correlation);
+
+ 
+file_put_contents('debug.json',json_encode($correlation));    
+
+
+
+ 
 ?>
