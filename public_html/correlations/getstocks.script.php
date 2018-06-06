@@ -43,5 +43,5 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 }
 
 
-$script = 'stockjson = '.json_encode($data[0]).';autofill = '.json_encode($data[1]).'';
+$modeldata['script'] = 'stockjson = '.json_encode($data[0]).';autofill = '.json_encode($data[1]).'';
 ?>

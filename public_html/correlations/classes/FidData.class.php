@@ -1,7 +1,9 @@
 <?php
 class FidData {
         
-    public function __construct($dev_mode = TRUE) {
+    public function __construct($data,$dev_mode = TRUE) {
+        $this->tickers = array_column($data,'lookup_code');
+        $this->data = $data;
         $this->dev_mode = (boolean) $dev_mode;
         $this->html = '';
         $this->tsarray = array();
@@ -13,23 +15,24 @@ class FidData {
      *
      *
      */
-    public function fetchData($tickers,string $mindate = NULL,string $maxdate = NULL) {
+    public function fetchData(string $mindate = NULL,string $maxdate = NULL) {
         echo $this->dev_mode;
-                
-        if (is_null($mindate)) $mindate = date('Y/m/d',strtotime('-1 week'));
+        print_r( $this->tickers );
+        
+        if (is_null($mindate)) $mindate = date('Y/m/d',strtotime('-1 month'));
         if (is_null($maxdate)) $maxdate = date('Y/m/d');
         
-        if (is_array($tickers) === TRUE) {
-            $tickerstring = implode($tickers,",");
-            $this->tickercount = count($tickers);
+        if (is_array($this->tickers) === TRUE) {
+            $tickerstring = implode($this->tickers,",");
+            $this->tickercount = count($this->tickers);
         }
-        elseif (is_string($tickers) === TRUE) {
-            $tickerstring = $tickers;
+        elseif (is_string($this->tickers) === TRUE) {
+            $tickerstring = $this->tickers;
             $this->tickercount = 1;
         }
         else {
             echo 'Error: Tickerstring not string or array';
-            exit();
+            return;
         }
 
         
@@ -86,23 +89,30 @@ class FidData {
     public function createTSArrayFromJsonArray() {
         
         $tsarray = array();
-        
         foreach ($this->json as $row) {
             if (!isset($row['IDENTIFIER']) || !isset($row['BARS']['CB'])) {
                 if ($this->dev_mode === TRUE) echo 'Error: Missing Identifier or Historical Data';
                 continue;
             }
+            
             $identifier = $row['IDENTIFIER'];
+            $fk_tags_id = $this->data[array_search($identifier,$this->tickers)]['id'];
             
             foreach ($row['BARS']['CB'] as $k => $point) {
-                $date = (string) fid_date($point['lt']);                
-                $tsarray[$identifier][$date] = array(
-                                                     'close' => (float) $point['cl'],
-                                                     );
+                $date = (string) $this->fid_date($point['lt']);
+                $id = str_replace('-','',$date).'.'.$fk_tags_id;
+                $tsarray[$id] = array('id' => $id,
+                                        'date' => str_replace('-','',$date),
+                                        'value' => (float) $point['cl'],
+                                        'chg' => null,
+                                        'fk_tags_id' => null
+                                    );
                 
-                if ($k > 0) $tsarray[$identifier][$date]['roi'] = (float) round(($point['cl']-$lastprice)/$lastprice,4);
-                else $tsarray[$identifier][$date]['roi'] = (float) 0;
-                $lastprice = (float) $point['cl']; 
+                if ($k > 0) $tsarray[$id]['chg'] = (float) round(($point['cl']-$lastprice)/$lastprice,4);
+                else $tsarray[$id]['chg'] = (float) 0;
+                $lastprice = (float) $point['cl'];
+                
+                $tsarray[$id]['fk_tags_id'] = $fk_tags_id;
             }
         }
         
@@ -121,7 +131,7 @@ class FidData {
      */
     public function getFirstDate() {
         if ($this->tickercount === 1) {
-            $this->firstdate = fid_date($this->json[0]['BARS']['CB'][0]['lt']);
+            $this->firstdate = $this->fid_date($this->json[0]['BARS']['CB'][0]['lt']);
         } else {
             if ($this->dev_mode === TRUE) echo 'Function not yet implemented for multiple securities';
             return;
@@ -131,6 +141,14 @@ class FidData {
         return $this->firstdate;
 
     }
+    
+    
+    private function fid_date($str) {
+        $timestamp = new DateTime();
+        $timestamp = DateTime::createFromFormat('!m-d-Y::H:i:s',$str)->getTimestamp();
+        return (string) date('Y-m-d',$timestamp);
+    }
+
 
     
 }

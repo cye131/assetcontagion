@@ -1,7 +1,7 @@
 <?php
 
-/* layout-correlation.html */
-class __TwigTemplate_fc4feb29211a1a4b1880818c1a7c17e4ee2a08a892d386ef7245193b20985e2a extends Twig_Template
+/* layout-fincontagion.html */
+class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334eb9e49 extends Twig_Template
 {
     private $source;
 
@@ -12,7 +12,7 @@ class __TwigTemplate_fc4feb29211a1a4b1880818c1a7c17e4ee2a08a892d386ef7245193b209
         $this->source = $this->getSourceContext();
 
         // line 1
-        $this->parent = $this->loadTemplate("layout.html", "layout-correlation.html", 1);
+        $this->parent = $this->loadTemplate("layout.html", "layout-fincontagion.html", 1);
         $this->blocks = array(
             'staticlinks' => array($this, 'block_staticlinks'),
             'content' => array($this, 'block_content'),
@@ -34,33 +34,23 @@ class __TwigTemplate_fc4feb29211a1a4b1880818c1a7c17e4ee2a08a892d386ef7245193b209
     public function block_staticlinks($context, array $blocks = array())
     {
         // line 4
-        echo "    <script src=\"//code.jquery.com/ui/1.12.1/jquery-ui.min.js\"></script>
+        echo "<script src=\"//code.highcharts.com/stock/highstock.js\"></script>
+<script src=\"//code.highcharts.com/modules/heatmap.js\"></script>
 
-    <script src=\"//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js\"></script>
-    <script src=\"//cdn.datatables.net/buttons/1.5.1/js/dataTables.buttons.min.js\"></script>
-    <script src=\"//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js\"></script>
-    <script src=\"//cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js\"></script>
-    <link rel=\"stylesheet\" type=\"text/css\" href=\"//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css\"/>
-
-    
-    <script src=\"//code.highcharts.com/stock/highstock.js\"></script>
-    <script src=\"//code.highcharts.com/modules/heatmap.js\"></script>
-
-    <script src=\"static/script.js\"></script>
-
+<script src=\"static/script-fincontagion.js\"></script>
 ";
     }
 
-    // line 21
+    // line 10
     public function block_content($context, array $blocks = array())
     {
-        // line 22
+        // line 11
         echo "
     <section class=\"container\">
         ";
-        // line 24
+        // line 13
         $this->displayBlock('description', $context, $blocks);
-        // line 25
+        // line 14
         echo "    </section>
     
     <section class=\"container\" style=\"margin-bottom:20px\">
@@ -71,7 +61,7 @@ class __TwigTemplate_fc4feb29211a1a4b1880818c1a7c17e4ee2a08a892d386ef7245193b209
                 <button class=\"btn btn-primary btn-sm\" type=\"button\" id=\"submit\">Submit</button>
                 <div id=\"errormessage\" class=\"invalid-feedback\">Error Message!</div>
             </div>
-        </form>        
+        </form>
     </section>
     
     <section class=\"container\" id=\"spinnercontainer\" style=\"display:none\">
@@ -119,10 +109,7 @@ class __TwigTemplate_fc4feb29211a1a4b1880818c1a7c17e4ee2a08a892d386ef7245193b209
           <div class=\"tab-pane fade show active\" id=\"heatmaptab\" role=\"tabpanel\">
             <div class=\"container\">    
                 <div class=\"row\">
-                    <div class=\"col-lg-4\">
-                        <div class=\"container successmsg\"></div>
-                    </div>
-                    <div class=\"col-lg-8\">
+                    <div class=\"col-lg-12\">
                         <div id=\"heatmap\"></div>
                     </div>
                 </div>
@@ -144,14 +131,14 @@ class __TwigTemplate_fc4feb29211a1a4b1880818c1a7c17e4ee2a08a892d386ef7245193b209
     ";
     }
 
-    // line 24
+    // line 13
     public function block_description($context, array $blocks = array())
     {
     }
 
     public function getTemplateName()
     {
-        return "layout-correlation.html";
+        return "layout-fincontagion.html";
     }
 
     public function isTraitable()
@@ -161,7 +148,7 @@ class __TwigTemplate_fc4feb29211a1a4b1880818c1a7c17e4ee2a08a892d386ef7245193b209
 
     public function getDebugInfo()
     {
-        return array (  148 => 24,  64 => 25,  62 => 24,  58 => 22,  55 => 21,  37 => 4,  34 => 3,  15 => 1,);
+        return array (  135 => 13,  54 => 14,  52 => 13,  48 => 11,  45 => 10,  37 => 4,  34 => 3,  15 => 1,);
     }
 
     public function getSourceContext()
@@ -169,22 +156,11 @@ class __TwigTemplate_fc4feb29211a1a4b1880818c1a7c17e4ee2a08a892d386ef7245193b209
         return new Twig_Source("{% extends \"layout.html\" %}
 
 {% block staticlinks %}
-    <script src=\"//code.jquery.com/ui/1.12.1/jquery-ui.min.js\"></script>
+<script src=\"//code.highcharts.com/stock/highstock.js\"></script>
+<script src=\"//code.highcharts.com/modules/heatmap.js\"></script>
 
-    <script src=\"//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js\"></script>
-    <script src=\"//cdn.datatables.net/buttons/1.5.1/js/dataTables.buttons.min.js\"></script>
-    <script src=\"//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js\"></script>
-    <script src=\"//cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js\"></script>
-    <link rel=\"stylesheet\" type=\"text/css\" href=\"//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css\"/>
-
-    
-    <script src=\"//code.highcharts.com/stock/highstock.js\"></script>
-    <script src=\"//code.highcharts.com/modules/heatmap.js\"></script>
-
-    <script src=\"static/script.js\"></script>
-
+<script src=\"static/script-fincontagion.js\"></script>
 {% endblock %}
-
 
 {% block content %}
 
@@ -200,7 +176,7 @@ class __TwigTemplate_fc4feb29211a1a4b1880818c1a7c17e4ee2a08a892d386ef7245193b209
                 <button class=\"btn btn-primary btn-sm\" type=\"button\" id=\"submit\">Submit</button>
                 <div id=\"errormessage\" class=\"invalid-feedback\">Error Message!</div>
             </div>
-        </form>        
+        </form>
     </section>
     
     <section class=\"container\" id=\"spinnercontainer\" style=\"display:none\">
@@ -248,10 +224,7 @@ class __TwigTemplate_fc4feb29211a1a4b1880818c1a7c17e4ee2a08a892d386ef7245193b209
           <div class=\"tab-pane fade show active\" id=\"heatmaptab\" role=\"tabpanel\">
             <div class=\"container\">    
                 <div class=\"row\">
-                    <div class=\"col-lg-4\">
-                        <div class=\"container successmsg\"></div>
-                    </div>
-                    <div class=\"col-lg-8\">
+                    <div class=\"col-lg-12\">
                         <div id=\"heatmap\"></div>
                     </div>
                 </div>
@@ -270,6 +243,6 @@ class __TwigTemplate_fc4feb29211a1a4b1880818c1a7c17e4ee2a08a892d386ef7245193b209
           </div>
         </div>
     </section>
-    {% endblock %}", "layout-correlation.html", "/var/www/correlation/public_html/templates/layout-correlation.html");
+    {% endblock %}", "layout-fincontagion.html", "/var/www/correlation/public_html/templates/layout-fincontagion.html");
     }
 }

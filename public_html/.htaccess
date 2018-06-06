@@ -13,7 +13,7 @@ RewriteEngine On
 #RewriteRule ^(.*)$ /index.php?path=$1 [NC,QSA]
 RewriteCond %{REQUEST_URI} !(\.png|\.jpg|\.gif|\.ico|\.jpeg|\.bmp|\.css|\.js|\.json|\.ajax.php|\.script.php)$
 RewriteCond %{REQUEST_URI} !^/adminer.php
-RewriteRule (.*) index.php?path=$1 [NC,QSA]
+RewriteRule (.*) router.php?path=$1 [NC,QSA]
 
 
 

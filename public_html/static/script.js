@@ -6,8 +6,7 @@ function ucFirst(string) {
 
 
 
-$(document).ready(function() {
-    /* UI Elements */
+$(document).ready(function() {        
     
     /* Highlights navigation bar menu item if it's active */
     $(".nav-item").each(function(){
@@ -51,7 +50,14 @@ $(document).ready(function() {
         minLength: 2
     });
 
-    
+    /** Clean stock entry **/
+
+    $( "#stock" ).keyup(function() {
+        var str = $(this).val();
+        str = str.replace(/[^a-zA-Z .-]+/g, '');
+        $("#stock").val(str);
+    });
+
     /** Calculations **/
 
     $("#submit").click(function(){
@@ -173,6 +179,7 @@ $(document).ready(function() {
     }
     
     function makeHeatMap(results) {
+        console.log(results);
         //prep data for heatmap
         var indexdata = results.index;
         heatmapdata = [];
@@ -208,7 +215,7 @@ $(document).ready(function() {
             valuearray[j+i] = 1;
         }
         
-        //console.log(heatmapdata);
+        console.log(heatmapdata);
         //console.log(valuearray);
         
         var max = Math.max.apply(Math, valuearray);
