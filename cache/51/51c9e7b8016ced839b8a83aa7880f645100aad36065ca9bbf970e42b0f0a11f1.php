@@ -72,9 +72,9 @@ class __TwigTemplate_73a7adbdf821daf19a96776913c138b786b23fd8e98c9a282c2f1c02f42
 
         function curlData(i) {    
             \$.ajax({
-                url: '/test/update_hist_series.ajax.php',
+                url: 'routerAjax.php',
                 type: 'POST',
-                data: {ajax: tagsSeries[i]},
+                data: {req:'update_hist_series.ajax.php',ajax: tagsSeries[i]},
                 dataType: 'html',
                 cache: false,
                 timeout: 10000,
@@ -167,9 +167,9 @@ class __TwigTemplate_73a7adbdf821daf19a96776913c138b786b23fd8e98c9a282c2f1c02f42
 
         function curlData(i) {    
             \$.ajax({
-                url: '/test/update_hist_series.ajax.php',
+                url: 'routerAjax.php',
                 type: 'POST',
-                data: {ajax: tagsSeries[i]},
+                data: {req:'update_hist_series.ajax.php',ajax: tagsSeries[i]},
                 dataType: 'html',
                 cache: false,
                 timeout: 10000,

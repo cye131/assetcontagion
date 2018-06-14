@@ -38,9 +38,9 @@
 
         function curlData(i) {    
             $.ajax({
-                url: '/test/update_hist_series.ajax.php',
+                url: 'routerAjax.php',
                 type: 'POST',
-                data: {ajax: tagsSeries[i]},
+                data: {req:'update_hist_series.ajax.php',ajax: tagsSeries[i]},
                 dataType: 'html',
                 cache: false,
                 timeout: 10000,

@@ -1,7 +1,7 @@
 <?php
 spl_autoload_register('myAutoloader');
 function myAutoloader($classname) {
-  require_once "/var/www/correlation/public_html/correlations/classes/" . $classname . '.class.php';
+  require_once "/var/www/correlation/classes/" . $classname . '.class.php';
 }
 
 
@@ -31,7 +31,7 @@ $requestvars = array(
  *
  */
   
-//Routes
+//Routes - Main Sites
 if ($request == 'stocksectorcorrelation') {
   $title = 'Stock Sector Industry Correlation Lookup';
   $model = 'correlations/getstocks.script.php';
@@ -43,31 +43,45 @@ elseif ($request == 'stock') {
 
 elseif ($request == 'financialcontagion') {
   $title = 'Financial Contagion Index';
-    $model = 'test/get_hist_correl.script.php';
-  //$model = 'test/get_hist_corr.script.php';
+  $model[0] = 'get_tags_series';
+  $model[1] = 'get_tags_correl';
+  $logic = 'heatmap';
 }
+
+
+
+
+//Routes - Update Sites
 
 elseif ($request == 'updatehistseries') {
   $title = 'Historical Series Updater';
-  $model = 'test/get_tags_series.script.php';
+  $model[0] = 'get_tags_series';
 }
 
 elseif ($request == 'updatetagscorrel') {
   $title = 'Correlation Tags Updater';
-  $model = 'test/get_tags_series.script.php';
+  $model[0] = 'get_tags_series';
+  $model[1] = 'get_tags_correl';
+  $model[2] = 'update_tags_correl';
 }
 
 elseif ($request == 'updatehistcorrel') {
   $title = 'Correlation History Updater';
-  $model = 'test/get_tags_series.script.php';
+  $model[0] = 'get_tags_correl';
 }
 
 
 
 
-
+$modeldata['script'] = '';
 //Send request
-if (isset($model)) require_once($model);
+if (isset($model)) {
+  $sql = new MyPDO();
+  foreach ($model as $m) {
+    require_once("/var/www/correlation/models/$m.model.php");
+  }
+}
+if (isset($logic)) require_once("/var/www/correlation/models/$logic.logic.php");
 
 if (isset($modeldata['script'])) {
   $script = new StaticFile('js',$modeldata['script']);

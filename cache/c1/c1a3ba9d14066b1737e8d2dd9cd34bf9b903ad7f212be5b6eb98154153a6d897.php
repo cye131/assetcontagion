@@ -59,64 +59,11 @@ class __TwigTemplate_177deded1185abd80afdd552083fc22b83a3ed5001a6e75b91c3b561dd8
     </section>
 
     <script>
-        
-        
+        console.log(window.data);
+        /*
         \$(\"#update\").click(function(){
             console.log(tagsSeries);
             curlData();
-/*            tagsSeriesByFreq = {};
-            for(i=0;i<tagsSeries.length;i++) {
-                if (typeof  tagsSeriesByFreq[tagsSeries[i].freq] == \"undefined\")  tagsSeriesByFreq[tagsSeries[i].freq] = [];
-                tagsSeriesByFreq[tagsSeries[i].freq].push (tagsSeries[i]);
-            }
-            
-            console.log(tagsSeriesByFreq);
-            
-            combinations = [];
-            //codes = tagsSeries.map(function(value) { return value.lookup_code; });
-            //console.log(codes);
-            
-            keys = Object.keys(tagsSeriesByFreq);
-            for(n=0;n<keys.length;n++) {
-                console.log(keys[n]);
-                var tagsThisFreq = tagsSeriesByFreq[keys[n]];
-                var codes = tagsThisFreq.map(function(value) { return value.lookup_code; });
-                k = 0;
-                
-                for (i=0;i<codes.length;i++) {
-                    for (j=i+1;j<codes.length;j++) {
-                        if (tagsSeries[i].freq === tagsSeries[j].freq) console.log(\"ERR\");
-    
-                        combinations[k]={};
-                        combinations[k][0] = codes[i];
-                        combinations[k][1] = codes[j];
-                        combinations[k].freq = tagsSeries[i].freq;
-                    k++;
-                    }
-                    
-                }
-                console.log(combinations);
-
-                
-            }*/
-            
-            /*
-            k = 0;
-            
-            for (i=0;i<codes.length;i++) {
-                for (j=i+1;j<codes.length;j++) {
-                    if (tagsSeries[i].freq === tagsSeries[j].freq) continue;
-
-                    combinations[k]=[];
-                    combinations[k][0] = codes[i];
-                    combinations[k][1] = codes[j];
-                k++;
-                }
-                
-            }
-            console.log(combinations);
-*/
-            //curlData(0);
         });
 
         function curlData() {    
@@ -135,7 +82,7 @@ class __TwigTemplate_177deded1185abd80afdd552083fc22b83a3ed5001a6e75b91c3b561dd8
                 error:function(){
                 }
             });
-        }
+        }*/
 
     </script>
     
@@ -186,64 +133,11 @@ class __TwigTemplate_177deded1185abd80afdd552083fc22b83a3ed5001a6e75b91c3b561dd8
     </section>
 
     <script>
-        
-        
+        console.log(window.data);
+        /*
         \$(\"#update\").click(function(){
             console.log(tagsSeries);
             curlData();
-/*            tagsSeriesByFreq = {};
-            for(i=0;i<tagsSeries.length;i++) {
-                if (typeof  tagsSeriesByFreq[tagsSeries[i].freq] == \"undefined\")  tagsSeriesByFreq[tagsSeries[i].freq] = [];
-                tagsSeriesByFreq[tagsSeries[i].freq].push (tagsSeries[i]);
-            }
-            
-            console.log(tagsSeriesByFreq);
-            
-            combinations = [];
-            //codes = tagsSeries.map(function(value) { return value.lookup_code; });
-            //console.log(codes);
-            
-            keys = Object.keys(tagsSeriesByFreq);
-            for(n=0;n<keys.length;n++) {
-                console.log(keys[n]);
-                var tagsThisFreq = tagsSeriesByFreq[keys[n]];
-                var codes = tagsThisFreq.map(function(value) { return value.lookup_code; });
-                k = 0;
-                
-                for (i=0;i<codes.length;i++) {
-                    for (j=i+1;j<codes.length;j++) {
-                        if (tagsSeries[i].freq === tagsSeries[j].freq) console.log(\"ERR\");
-    
-                        combinations[k]={};
-                        combinations[k][0] = codes[i];
-                        combinations[k][1] = codes[j];
-                        combinations[k].freq = tagsSeries[i].freq;
-                    k++;
-                    }
-                    
-                }
-                console.log(combinations);
-
-                
-            }*/
-            
-            /*
-            k = 0;
-            
-            for (i=0;i<codes.length;i++) {
-                for (j=i+1;j<codes.length;j++) {
-                    if (tagsSeries[i].freq === tagsSeries[j].freq) continue;
-
-                    combinations[k]=[];
-                    combinations[k][0] = codes[i];
-                    combinations[k][1] = codes[j];
-                k++;
-                }
-                
-            }
-            console.log(combinations);
-*/
-            //curlData(0);
         });
 
         function curlData() {    
@@ -262,7 +156,7 @@ class __TwigTemplate_177deded1185abd80afdd552083fc22b83a3ed5001a6e75b91c3b561dd8
                 error:function(){
                 }
             });
-        }
+        }*/
 
     </script>
     

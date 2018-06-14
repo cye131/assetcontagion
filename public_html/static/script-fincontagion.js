@@ -1,11 +1,9 @@
 $(document).ready(function() {
     
-    
-
     makeHeatMap(heatMapData,tags);
     drawHeatMapUnderlines(heatMapData,tags);
 
-    function makeHeatMap(heatMapData) {        
+    function makeHeatMap(heatMapData,tags) {        
         //Convert obj to array
         var data = Object.keys(heatMapData.data).map(function(e) {
           return heatMapData.data[e];
@@ -114,7 +112,7 @@ $(document).ready(function() {
             series: [{
                 name: 'Correlation',
                 borderWidth: 1,
-                data: data,
+                data: heatMapData.data,
                 dataLabels: {
                     enabled: true,
                     formatter:  function() {
@@ -126,7 +124,8 @@ $(document).ready(function() {
                             return false;
                         }
                     }
-                }
+                },
+                turboThreshold: 5000 // #3404, remove after 4.0.5 release
             }]
         });
         

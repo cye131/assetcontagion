@@ -67,14 +67,15 @@ class __TwigTemplate_bf26b55b0cf4d5a89835611b47e2e439983c7691db325f713eba15439bd
                     
             console.log(tagsCorrel);
             calcCorrel(0);
+            //calcCorrel(28);
 
         });
 
         function calcCorrel(i) {    
             \$.ajax({
-                url: '/test/update_hist_correl.ajax.php',
+                url: 'routerAjax.php',
                 type: 'POST',
-                data: {ajax: tagsCorrel[i]},
+                data: {req:'update_hist_correl.ajax.php',ajax: tagsCorrel[i]},
                 dataType: 'html',
                 cache: false,
                 timeout: 10000,
@@ -159,14 +160,15 @@ class __TwigTemplate_bf26b55b0cf4d5a89835611b47e2e439983c7691db325f713eba15439bd
                     
             console.log(tagsCorrel);
             calcCorrel(0);
+            //calcCorrel(28);
 
         });
 
         function calcCorrel(i) {    
             \$.ajax({
-                url: '/test/update_hist_correl.ajax.php',
+                url: 'routerAjax.php',
                 type: 'POST',
-                data: {ajax: tagsCorrel[i]},
+                data: {req:'update_hist_correl.ajax.php',ajax: tagsCorrel[i]},
                 dataType: 'html',
                 cache: false,
                 timeout: 10000,

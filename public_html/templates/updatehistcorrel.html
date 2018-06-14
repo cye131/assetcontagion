@@ -33,14 +33,15 @@
                     
             console.log(tagsCorrel);
             calcCorrel(0);
+            //calcCorrel(28);
 
         });
 
         function calcCorrel(i) {    
             $.ajax({
-                url: '/test/update_hist_correl.ajax.php',
+                url: 'routerAjax.php',
                 type: 'POST',
-                data: {ajax: tagsCorrel[i]},
+                data: {req:'update_hist_correl.ajax.php',ajax: tagsCorrel[i]},
                 dataType: 'html',
                 cache: false,
                 timeout: 10000,
