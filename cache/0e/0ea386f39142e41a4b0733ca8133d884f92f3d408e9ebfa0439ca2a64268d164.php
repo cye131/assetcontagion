@@ -36,21 +36,22 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
         // line 4
         echo "<script src=\"//code.highcharts.com/stock/highstock.js\"></script>
 <script src=\"//code.highcharts.com/modules/heatmap.js\"></script>
+<script src=\"//code.highcharts.com/modules/treemap.js\"></script>
 
 <script src=\"static/script-fincontagion.js\"></script>
 ";
     }
 
-    // line 10
+    // line 11
     public function block_content($context, array $blocks = array())
     {
-        // line 11
+        // line 12
         echo "
     <section class=\"container\">
         ";
-        // line 13
-        $this->displayBlock('description', $context, $blocks);
         // line 14
+        $this->displayBlock('description', $context, $blocks);
+        // line 15
         echo "    </section>
     
     <section class=\"container\" style=\"margin-bottom:20px\">
@@ -131,7 +132,7 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
     ";
     }
 
-    // line 13
+    // line 14
     public function block_description($context, array $blocks = array())
     {
     }
@@ -148,7 +149,7 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
 
     public function getDebugInfo()
     {
-        return array (  135 => 13,  54 => 14,  52 => 13,  48 => 11,  45 => 10,  37 => 4,  34 => 3,  15 => 1,);
+        return array (  136 => 14,  55 => 15,  53 => 14,  49 => 12,  46 => 11,  37 => 4,  34 => 3,  15 => 1,);
     }
 
     public function getSourceContext()
@@ -158,6 +159,7 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
 {% block staticlinks %}
 <script src=\"//code.highcharts.com/stock/highstock.js\"></script>
 <script src=\"//code.highcharts.com/modules/heatmap.js\"></script>
+<script src=\"//code.highcharts.com/modules/treemap.js\"></script>
 
 <script src=\"static/script-fincontagion.js\"></script>
 {% endblock %}

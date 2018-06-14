@@ -1,0 +1,108 @@
+{% extends "layout.html" %}
+
+{% block staticlinks %}
+{% endblock %}
+
+{% block content %}
+
+    <section class="container">
+    </section>
+    
+    <section class="container" style="margin-bottom:20px">
+        <form class="form-inline">
+            <div class = "form-group">
+                <label for="stock" >Stock Ticker:</label>
+                <input type="text" class="form-control form-control-sm" id="stock" value="" placeholder="e.g., AAPL" title="Test">
+                <button class="btn btn-primary btn-sm" type="button" id="update">Update</button>
+                <div id="errormessage" class="invalid-feedback">Error Message!</div>
+            </div>
+        </form>        
+    </section>
+    
+    <section class="container">
+        <div class="container" id="info">
+        </div>
+    </section>
+
+    <script>
+        
+        
+        $("#update").click(function(){
+            console.log(tagsSeries);
+            curlData();
+/*            tagsSeriesByFreq = {};
+            for(i=0;i<tagsSeries.length;i++) {
+                if (typeof  tagsSeriesByFreq[tagsSeries[i].freq] == "undefined")  tagsSeriesByFreq[tagsSeries[i].freq] = [];
+                tagsSeriesByFreq[tagsSeries[i].freq].push (tagsSeries[i]);
+            }
+            
+            console.log(tagsSeriesByFreq);
+            
+            combinations = [];
+            //codes = tagsSeries.map(function(value) { return value.lookup_code; });
+            //console.log(codes);
+            
+            keys = Object.keys(tagsSeriesByFreq);
+            for(n=0;n<keys.length;n++) {
+                console.log(keys[n]);
+                var tagsThisFreq = tagsSeriesByFreq[keys[n]];
+                var codes = tagsThisFreq.map(function(value) { return value.lookup_code; });
+                k = 0;
+                
+                for (i=0;i<codes.length;i++) {
+                    for (j=i+1;j<codes.length;j++) {
+                        if (tagsSeries[i].freq === tagsSeries[j].freq) console.log("ERR");
+    
+                        combinations[k]={};
+                        combinations[k][0] = codes[i];
+                        combinations[k][1] = codes[j];
+                        combinations[k].freq = tagsSeries[i].freq;
+                    k++;
+                    }
+                    
+                }
+                console.log(combinations);
+
+                
+            }*/
+            
+            /*
+            k = 0;
+            
+            for (i=0;i<codes.length;i++) {
+                for (j=i+1;j<codes.length;j++) {
+                    if (tagsSeries[i].freq === tagsSeries[j].freq) continue;
+
+                    combinations[k]=[];
+                    combinations[k][0] = codes[i];
+                    combinations[k][1] = codes[j];
+                k++;
+                }
+                
+            }
+            console.log(combinations);
+*/
+            //curlData(0);
+        });
+
+        function curlData() {    
+            $.ajax({
+                url: '/test/update_tags_correl.ajax.php',
+                type: 'POST',
+                data: {ajax: tagsSeries},
+                dataType: 'html',
+                cache: false,
+                timeout: 20000,
+                success: function(results){
+                    console.log(results);
+                    results = JSON.parse(results);
+                    console.log(results);                    
+                },
+                error:function(){
+                }
+            });
+        }
+
+    </script>
+    
+{% endblock %}

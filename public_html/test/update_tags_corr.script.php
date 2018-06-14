@@ -1,36 +1,48 @@
-<?php
-spl_autoload_register('myAutoloader');
-function myAutoloader($classname) {
-  require_once "/var/www/correlation/public_html/correlations/classes/" . $classname . '.class.php';
+<?PHP
+if (!function_exists('myAutoloader')) {
+    function myAutoloader($classname) {
+      require_once "/var/www/correlation/public_html/correlations/classes/" . $classname . '.class.php';
+    }
+    spl_autoload_register('myAutoloader');
 }
 $sql = new MyPDO();
 
-//Get existing doubles
+
+/* Get existing correlation-pairs
+ *
+ */
 $existingdoubles = $sql -> selectToAssoc("
 SELECT id,CONCAT(sc1,IFNULL(fk_fred_id1,''),IFNULL(fk_fid_id1,'')) AS concatid1,CONCAT(sc2,IFNULL(fk_fred_id2,''),IFNULL(fk_fid_id2,'')) AS concatid2
 FROM tags_corr
-",'');
+",'','');
+
 (new TestOutput($existingdoubles))->print();
 
 
-//Get tags
-$fredseries = $sql -> selectToAssoc("
+/* Get raw series with which to find correlation-pairs with
+ *
+ */
+$series = $sql -> selectToAssoc("
 SELECT t1.*,'fred' AS source,CONCAT('fred',id) AS concatid
 FROM tags_fred AS t1
-",'naturalid');
+
+UNION
+
+SELECT t2.*,'fid' AS source,CONCAT('fid',id) AS concatid
+FROM tags_fid AS t2
+",'','naturalid');
                                     
-$series = $fredseries;
-ksort($series); //DOUBLES ALWAYS NEED TO BE ALPHABETICALLY ORDERED!!
+ksort($series); //Need to be alphabetically-ordered
 (new TestOutput($series))->print();
 
 
-
-//Calculate doubles
+/* Calculates correlation-pairs and places it into $sqldata
+ *
+ */
 $serieskeys = array_column($series,'naturalid');
 $doubles = (array) CorrelationData::getDupletCombinations($serieskeys); //Preserves alphabetical ordering
 
 $sqldata = array();
-//Move into new array for SQL
 $i = (int) 0;
 foreach ($doubles as $double) {
     if ($series[$double[0]]['freq'] !== $series[$double[1]]['freq']) continue; //Skip if the two series have disequal frequencies
@@ -76,6 +88,11 @@ foreach ($doubles as $double) {
 
     $i++;
 }
+
+
+/* Insert into SQL
+ *
+ */
 
 
 if ( count($sqldata) > 0) {

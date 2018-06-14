@@ -2,19 +2,27 @@
 
 class CorrelationData {
     
-    public function __construct($series1,$series2,$seriesnames) {
-        $this->series1 = $series1;
-        $this->series2 = $series2;
-        $this->seriesnames = $seriesnames;
-        $this->correlationdata = array();
-        $this->correlationindex = array();
+    public function __construct($combinedSeries,$corrTag) {
+        //$combinedSeries takes 2 series together in a multidimensional array
+        //$corrTag is a one-dimensional keyed array with 'freq','trail','val_type_1','val_type_2' mandatory
+        $this->combinedSeries = $combinedSeries;
+        $this->seriesNames = array_keys($combinedSeries);
+        $this->freq = '';
+        $this->trail = (int) 30;
+        $this->val_type_1 = 'chg';
+        $this->val_type_2 = 'chg';
+        
+        foreach ($corrTag as $k=>$v) {
+            $this->$k = $v;
+        }
+        $this->correlData = array();
+        $this->correlIndex = array();
     }
     
     
     public static function getDupletCombinations($array) {
         //takes array [a,b,c] returns [[ab],[ac],[bc]]
         $combinations = array();
-        sort($array);
         
         $k = (int) 0;
         
@@ -54,53 +62,41 @@ class CorrelationData {
 
     
     
-    public function calculateCorrelation($colNames,$freqCount) {
-    //Takes data of the form array->date->roi/value/etc
-        ksort($this->series1);
-        ksort($this->series2);
+    public function calculateCorrelation() {
+    //Takes data of the form array->date->roi/value/etc        
+        $this->calculateCorrelationData();
+        $this->calculateCorrelationIndex();
         
-        $correlation = array('index'=>array(),
-                             'data'=>array()
-                             );
-        
-        $combinedseries = array($this->seriesnames[0] => $this->series1, $this->seriesnames[1] => $this->series2);
-        
-        $this->calculateCorrelationData($combinedseries,$colNames,$freqCount);
-        $this->calculateCorrelationIndex($combinedseries,$colNames,$freqCount);
-
+        return ['data' => $this->correlData,'index' => $this->correlIndex];
     }
     
     
-    private function calculateCorrelationData ($combinedseries,$colNames,$freqCount) {
-        //creates the historical data sub-arrays
-        //$data['json_0'] = array();
-        //$data['json_1'] = array();
-        //$data['json_correlation'] = array();
+    private function calculateCorrelationData () {
+        $data = ['timeseries' =>array()]; //this will index both data1 and data2 under the same date to allow us to check if both data points exist on the same days
     
-        $data['timeseries'] = array(); //this will index both data1 and data2 under the same date to allow us to check if both data points exist on the same days
-    
-        foreach ($combinedseries as $code => $tsdata) {
-            if (!in_array($code,$this->seriesnames)) continue;
+        foreach ($this->combinedSeries as $code => $seriesData) {
+            if (!in_array($code,$this->seriesNames)) continue;
             
-            if ($code === $this->seriesnames[0]) $level = (int) 0;
-            elseif ($code === $this->seriesnames[1]) $level = (int) 1;
-            $colUsed = $colNames[$level];
+            if ($code === $this->seriesNames[0]) $level = (int) 1;
+            elseif ($code === $this->seriesNames[1]) $level = (int) 2;
+            else {echo $code;print_r( $this->seriesNames );exit();}
             
-            //$datalevel_l30 = (string) $datalevel.'_l30';
+            //echo $level;
+            //echo $this->freq;echo $this->trail;
+            $colUsed = $this->{'val_type_'.$level};
+            
                 
             $i = (int) 0;
             //puts the data into the sub-arrays
-            foreach ($tsdata as $tsdate => $tsrow) {
-                
+            foreach ($seriesData as $tsDate => $tsRow) {
                 //$data['json_'.$level][$i][0] = (integer) strtotime($tsdate) * 1000; //Needs to be *1000 for Javascript to read
                 //$data['json_'.$level][$i][1] = (float) number_format($tsrow[$colUsed],6);
                 
-                
-                $data['timeseries'][$tsdate]['date'] = (string) $tsdate;
-                if (isset($tsrow[$colUsed]) && !is_null($tsrow[$colUsed])) {
-                    $data['timeseries'][$tsdate][$level] = (float) number_format($tsrow[$colUsed],6);
+                $data['timeseries'][$tsDate]['date'] = (string) $tsDate;
+                if (isset($tsRow[$colUsed]) && !is_null($tsRow[$colUsed])) {
+                    $data['timeseries'][$tsDate][$level] = (float) number_format($tsRow[$colUsed],6);
                 } else {
-                    $data['timeseries'][$tsdate][$level] = NULL;
+                    $data['timeseries'][$tsDate][$level] = NULL;
                 }
     
                 //$data['timeseries'][$tsdate][$datalevel.'_'.{$colUsed}] = (float) $tsrow['roi'];
@@ -117,79 +113,79 @@ class CorrelationData {
         $data1_l = array();
         $data2_l = array();
         $dates_l = array();
-        foreach ($data['timeseries'] as $date => $tsrow) {
-            if (!isset($tsrow[0]) || !isset($tsrow[1]) || is_null($tsrow[0]) || is_null($tsrow[1]) ) continue;
-
-            $data1_l[] = $tsrow[0];
-            $data2_l[] = $tsrow[1];
+        foreach ($data['timeseries'] as $date => $tsRow) {
+            if (!isset($tsRow[1]) || !isset($tsRow[2]) || is_null($tsRow[1]) || is_null($tsRow[2]) ) {
+                continue;
+            }
+            
+            $data1_l[] = $tsRow[1];
+            $data2_l[] = $tsRow[2];
             $dates_l[] = $date;
             
-            if  (count($data1_l) > $freqCount) {
+            if  (count($data1_l) > $this->trail) {
                 array_shift($data1_l);
                 array_shift($data2_l);
                 array_shift($dates_l);
+                //$data['timeseries'][$date]['array_shifted'] = (int) 1;
+                //$data['timeseries'][$date]['data_count'] = count($data1_l);
             }
             
-            if  (count($data1_l) === $freqCount) {
+            if  (count($data1_l) === (int) $this->trail) {
+
                 $corr = $this::pearsonCorrelation($data1_l,$data2_l);
-                if (!is_null($corr)) $data['timeseries'][$date]['correlation'] = (float) round($corr,4);
-                else $data['timeseries'][$date]['correlation'] = NULL;
+                $data['timeseries'][$date]['correlation'] = !is_null($corr) ? (float) round($corr,4) : NULL;
                 
                 $data['timeseries'][$date]['inputs_used'] = count($dates_l);
                 $data['timeseries'][$date]['earliest_input'] = $dates_l[0];
             }
             
         }
-        return $this->correlationdata = $data;
+        return $this->correlData = $data;
 
     }
     
-    private function calculateCorrelationIndex($combinedseries,$colNames,$freqCount) {
+    private function calculateCorrelationIndex() {
         $index = array();
-        $index['codes'] = array($this->seriesnames[0],$this->seriesnames[1]);
-        $index['valuestocorrelate'] = $colNames;
-
-        //calculates first (non-necessarily shared) date for each data sets
-        for ($i = 0; $i <= 1; $i++) $index['firstdatadates'][$i] = array_keys($combinedseries[$this->seriesnames[$i]])[0];
+        $index['codes'] = $this->seriesNames;
+        $index['valuestocorrelate'] = [$this->val_type_1,$this->val_type_2];
         
         //calculates first shared date
-        foreach ($this->series1 as $date=>$row) $dates1[] = $date;
-        foreach ($this->series2 as $date=>$row) {
+        foreach ($this->combinedSeries[$this->seriesNames[0]] as $date=>$row) $dates1[] = $date;
+        foreach ($this->combinedSeries[$this->seriesNames[1]] as $date=>$row) {
             if (in_array($date,$dates1)) {$index['firstshareddatadate'] = $date;break;}
         }
         
         //calculates most recent correlation and date of; also calculates # of data points w/correlation non-null
         $countcorrelation = (int) 0;
-        $reverseddatearray = $this->correlationdata['timeseries'];
+        $reverseddatearray = $this->correlData['timeseries'];
         krsort($reverseddatearray);
-        foreach ($reverseddatearray as $date=>$row) {
+        foreach ($reverseddatearray as $prettyDate=>$row) {
             if ( isset($row['correlation']) && !is_null($row['correlation']) ) {
                 $countcorrelation ++;
                 if ($countcorrelation === 1) {
-                    $index['correl_mostrecent_date'] = $date;
-                    $index['correl_mostrecent_val'] = $row['correlation'];
-                    $index['correl_mostrecent_earliestinput_date'] = $date;
-                } elseif ($countcorrelation === $freqCount) {
-                    $index['correl_freqago_date'] = $date;
+                    $index['correl_last_date'] = $prettyDate;
+                    $index['correl_last_val'] = $row['correlation'];
+                    $index['correl_last_earliestinput_date'] = $row['earliest_input'];
+                } elseif ($countcorrelation === $this->trail) {
+                    $index['correl_trail_date'] = $prettyDate;
                 }
+                
+                $firstCorrelDate = $prettyDate;
             }
         }
         
-        $index['countcorrelationdata'] = $countcorrelation;
+        $index['correl_first_date'] = $firstCorrelDate ?? NULL;
+
+        
+        
+        $index['correl_count'] = $countcorrelation;
         if ($countcorrelation >= 1) {
             $index['UPDATED'] = (bool) TRUE;
         } else {
             $index['UPDATED'] = (bool) FALSE;
         }
         
-        
-        //returns "sources of data"
-        for ($i = 0; $i <= 1; $i++) {
-            //$index['sources'][$i] = $combinedseries[$this->seriesnames[$i]][$index['firstdatadates'][$i]]['source'];
-            //$index['fk_ids'][$i] = $combinedseries[$this->seriesnames[$i]][$index['firstdatadates'][$i]]['fk_tags_id'];
-        }
-        
-        return $this->correlationindex = $index;
+        return $this->correlIndex = $index;
     
     }
 

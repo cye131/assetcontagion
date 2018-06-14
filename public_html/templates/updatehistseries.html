@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block staticlinks %}
+{% endblock %}
+
+{% block content %}
+
+    <section class="container">
+    </section>
+    
+    <section class="container" style="margin-bottom:20px">
+        <form class="form-inline">
+            <div class = "form-group">
+                <label for="category" >Category:</label>
+                <input type="text" class="form-control form-control-sm" id="category" value="" placeholder="e.g., reg">
+                <button class="btn btn-primary btn-sm" type="button" id="update">Update</button>
+                <div id="errormessage" class="invalid-feedback">Error Message!</div>
+            </div>
+        </form>        
+    </section>
+    
+    <section class="container">
+        <div class="container" id="info">
+        </div>
+    </section>
+
+    <script>
+        
+        
+        $("#update").click(function(){
+            var category = $("#category").val();
+            console.log(category);
+                    
+            console.log(tagsSeries);
+            curlData(0);
+                        
+        });
+
+        function curlData(i) {    
+            $.ajax({
+                url: '/test/update_hist_series.ajax.php',
+                type: 'POST',
+                data: {ajax: tagsSeries[i]},
+                dataType: 'html',
+                cache: false,
+                timeout: 10000,
+                success: function(results){
+                    console.log("Success");
+                    console.log(results);
+                    results = JSON.parse(results);
+                    console.log(results);
+                    if (results.info.insertedHistData === true) {
+                        $("#info").append('<br><span>Successfully updated #' + i  + ': ' + tagsSeries[i].name + '(' + tagsSeries[i].freq + ') with ' + results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')</span>');
+                    }
+                    else {
+                        $("#info").append('<br><span><b>Failed</b> to update #' + i  + ': ' + tagsSeries[i].name +  ' | ' + results.info.errorMsg + '</span>');
+                    }
+                    
+                    $("#info").append(' <a href="' + results.info.url + '">URL</a>');
+                    i ++;
+                    if (i<tagsSeries.length) curlData(i);
+                    
+                    //historicalData[i] = JSON.parse(results);
+                    //results = JSON.parse(results);
+                },
+                error:function(e, ts, et){
+                        $("#info").append('<br><span style="font-weight:bold">AJAX ERROR ON #' + i  + ': ' + tagsSeries[i].name +  ' | ' + ts +  ' (s_id: ' + tagsSeries[i].s_id +  ')</span>');
+                        i ++;
+                        if (i<tagsSeries.length) curlData(i);
+                }
+            });
+        }
+
+    </script>
+    
+{% endblock %}

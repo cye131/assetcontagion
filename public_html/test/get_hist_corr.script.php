@@ -9,36 +9,70 @@ $sql = new MyPDO();
 
 
 /*  Overlap the table w/ other data sources
-                      fid1.id as 1_id, fid1.lookup_code as 1_lookup_code,fid1.class as 1_class,fid1.title as 1_title,fid1.subtitle as 1_subtitle,fid1.freq as 1_freq,fid1.units as 1_units,fid1.obs_start as 1_obs_start,fid1.obs_end as 1_obs_end,
-                      
-                      fred2.id as 2_id, fred2.lookup_code as 2_lookup_code,fred2.class as 2_class,fred2.title as 2_title,fred2.subtitle as 2_subtitle,fred2.freq as 2_freq,fred2.units as 2_units,fred2.obs_start as 2_obs_start,fred2.obs_end as 2_obs_end,
-                      
-                      LEFT JOIN tags_fid fid1
-                      ON CONCAT(t0.sc1,IFNULL(t0.fk_fred_id1,''),IFNULL(t0.fk_fid_id1,''))= CONCAT('fid',fid1.id)
-                      
-                      LEFT JOIN tags_fred fid2
-                      ON CONCAT(t0.sc2,IFNULL(t0.fk_fred_id2,''),IFNULL(t0.fk_fid_id2,''))= CONCAT('fid',fid2.id)
+  SELECT
+  t0.id,t0.naturalid,t0.added_on,t0.lastupdated,t0.obs_start,t0.obs_end,t0.obs_end_val,t0.obs_end_input_min,t0.freq,CONCAT(t0.sc1,IFNULL(t0.fk_fred_id1,''),IFNULL(t0.fk_fid_id1,'')) AS concatid1, CONCAT(sc2,IFNULL(fk_fred_id2,''),IFNULL(fk_fid_id2,'')) AS concatid2,
+  
+  CONCAT(IFNULL(fred1.id,''),IFNULL(fid1.id,'')) AS 1_id,
+  CONCAT(IFNULL(fred2.id,''),IFNULL(fid2.id,'')) AS 2_id,
+  
+  CONCAT(IFNULL(fred1.lookup_code,''),IFNULL(fid1.lookup_code,'')) AS 1_lookup_code,
+  CONCAT(IFNULL(fred2.lookup_code,''),IFNULL(fid2.lookup_code,'')) AS 2_lookup_code,
+  
+  CONCAT(IFNULL(fred1.class,''),IFNULL(fid1.class,'')) AS 1_class,
+  CONCAT(IFNULL(fred2.class,''),IFNULL(fid2.class,'')) AS 2_class,
+  
+  CONCAT(IFNULL(fred1.title,''),IFNULL(fid1.title,'')) AS 1_title,
+  CONCAT(IFNULL(fred2.title,''),IFNULL(fid2.title,'')) AS 2_title,
+  
+  CONCAT(IFNULL(fred1.subtitle,''),IFNULL(fid1.subtitle,'')) AS 1_subtitle,
+  CONCAT(IFNULL(fred2.subtitle,''),IFNULL(fid2.subtitle,'')) AS 2_subtitle,
+  
+  CONCAT(IFNULL(fred1.freq,''),IFNULL(fid1.freq,'')) AS 1_freq,
+  CONCAT(IFNULL(fred2.freq,''),IFNULL(fid2.freq,'')) AS 2_freq,
+  
+  CONCAT(IFNULL(fred1.units,''),IFNULL(fid1.units,'')) AS 1_units,
+  CONCAT(IFNULL(fred2.units,''),IFNULL(fid2.units,'')) AS 2_units,
+  
+  CONCAT(IFNULL(fred1.units,''),IFNULL(fid1.units,'')) AS 1_units,
+  CONCAT(IFNULL(fred2.units,''),IFNULL(fid2.units,'')) AS 2_units,
+  
+  CONCAT(IFNULL(fred1.units,''),IFNULL(fid1.units,'')) AS 1_units,
+  CONCAT(IFNULL(fred2.units,''),IFNULL(fid2.units,'')) AS 2_units
+  
+  FROM `tags_corr` t0
+  
+  LEFT JOIN tags_fred fred1
+  ON CONCAT(t0.sc1,IFNULL(t0.fk_fred_id1,''),IFNULL(t0.fk_fid_id1,''))= CONCAT('fred',fred1.id)
+  
+  LEFT JOIN tags_fred fred2
+  ON CONCAT(t0.sc2,IFNULL(t0.fk_fred_id2,''),IFNULL(t0.fk_fid_id2,''))= CONCAT('fred',fred2.id)
+  
+  LEFT JOIN tags_fid fid1
+  ON CONCAT(t0.sc1,IFNULL(t0.fk_fred_id1,''),IFNULL(t0.fk_fid_id1,''))= CONCAT('fid',fid1.id)
+  
+  LEFT JOIN tags_fid fid2
+  ON CONCAT(t0.sc2,IFNULL(t0.fk_fred_id2,''),IFNULL(t0.fk_fid_id2,''))= CONCAT('fid',fid2.id)
+
+  ORDER BY 1_class,t0.id
 */
 
-$tagsCorrRaw = $sql->selectToAssoc("
+$freq = $_GET['freq'] ?? 'd';
+
+$colSel = ['id','lookup_code','class','title','subtitle','freq','units','obs_start','obs_end'];
+$sources = ['fred','fid'];
+$q = MyPDO::makeQueryTagsCorr($colSel,$sources);
+
+$query = "
 SELECT
-t0.id,t0.naturalid,t0.added_on,t0.lastupdated,t0.obs_start,t0.obs_end,t0.obs_end_val,t0.obs_end_input_min,t0.freq,CONCAT(t0.sc1,IFNULL(t0.fk_fred_id1,''),IFNULL(t0.fk_fid_id1,'')) AS concatid1, CONCAT(sc2,IFNULL(fk_fred_id2,''),IFNULL(fk_fid_id2,'')) AS concatid2,
-
-fred1.id as 1_id, fred1.lookup_code as 1_lookup_code,fred1.class as 1_class,fred1.title as 1_title,fred1.subtitle as 1_subtitle,fred1.freq as 1_freq,fred1.units as 1_units,fred1.obs_start as 1_obs_start,fred1.obs_end as 1_obs_end,
-
-fred2.id as 2_id, fred2.lookup_code as 2_lookup_code,fred2.class as 2_class,fred2.title as 2_title,fred2.subtitle as 2_subtitle,fred2.freq as 2_freq,fred2.units as 2_units,fred2.obs_start as 2_obs_start,fred2.obs_end as 2_obs_end
-
+t0.id,t0.naturalid,t0.added_on,t0.lastupdated,t0.obs_start,t0.obs_end,t0.obs_end_val,t0.obs_end_input_min,t0.freq,{$q['selSel']}
+{$q['querySel']}
 FROM `tags_corr` t0
-
-LEFT JOIN tags_fred fred1
-ON CONCAT(t0.sc1,IFNULL(t0.fk_fred_id1,''),IFNULL(t0.fk_fid_id1,''))= CONCAT('fred',fred1.id)
-
-LEFT JOIN tags_fred fred2
-ON CONCAT(t0.sc2,IFNULL(t0.fk_fred_id2,''),IFNULL(t0.fk_fid_id2,''))= CONCAT('fred',fred2.id)
-
+{$q['joinSel']}
+WHERE t0.freq = :freq
 ORDER BY 1_class,t0.id
+";
 
-",'');
+$tagsCorrRaw = $sql->selectToAssoc($query,array('freq'=>$freq),'');
 
 $tagsCorr = array();
 
@@ -57,11 +91,22 @@ foreach ($tagsCorrRaw as $tagName => $tagRow) {
 
 
 
-
 $tagsDataRaw= $sql->selectToAssoc("
-SELECT *,CONCAT('fred',id) AS concatid
-FROM `tags_fred` ORDER BY `class`,`id` ASC;
-",'');
+SELECT * FROM (
+
+SELECT t1.*,'fred' AS source,CONCAT('fred',id) AS concatid
+FROM tags_fred AS t1
+
+UNION
+
+SELECT t2.*,'fid' AS source,CONCAT('fid',id) AS concatid
+FROM tags_fid AS t2
+
+) AS a
+
+WHERE a.freq = :freq
+ORDER BY a.class ASC
+",array('freq'=>$freq),'');
 
 
 (new TestOutput($tagsDataRaw))->print();
@@ -101,9 +146,15 @@ for ($y=0;$y<count($tagsDataRaw);$y++) {
 
 //creates colors + tooltip info for heatmap points
 function colorFormat($v) {
-  $o = round(sqrt(abs($v)),1);
-  if ($v <= 0) $rgba = [0,0,255,$o];
-  else $rgba = [255,0,0,$o];
+  //$o = round(sqrt(abs($v)),1);
+  if ($v <= 0) $maxColor = [0,0,255,1];
+  else $maxColor = [255,0,0,1];
+  $minColor = [251,250,182,0];
+
+  for($i=0;$i<=3;$i++) {
+    $rgba[$i] = round(($maxColor[$i] - $minColor[$i]) * abs($v),2) + $minColor[$i];
+  }
+
   
   return 'rgba('.implode(',',$rgba).')';
 }

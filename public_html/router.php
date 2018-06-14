@@ -43,8 +43,25 @@ elseif ($request == 'stock') {
 
 elseif ($request == 'financialcontagion') {
   $title = 'Financial Contagion Index';
-  $model = 'test/get_correlation_hist.script.php';
+    $model = 'test/get_hist_correl.script.php';
+  //$model = 'test/get_hist_corr.script.php';
 }
+
+elseif ($request == 'updatehistseries') {
+  $title = 'Historical Series Updater';
+  $model = 'test/get_tags_series.script.php';
+}
+
+elseif ($request == 'updatetagscorrel') {
+  $title = 'Correlation Tags Updater';
+  $model = 'test/get_tags_series.script.php';
+}
+
+elseif ($request == 'updatehistcorrel') {
+  $title = 'Correlation History Updater';
+  $model = 'test/get_tags_series.script.php';
+}
+
 
 
 

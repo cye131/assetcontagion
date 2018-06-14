@@ -14,6 +14,7 @@ Class TestOutput {
         $file_parts = pathinfo($_SERVER['REQUEST_URI']); 
         if (!isset($file_parts['extension']) ) return;
         
+        echo '<hr>';
         if (is_array($this->input)) {
             echo '<div style="max-height:400px;overflow-y: scroll"><pre>';
             print_r($this->input);

@@ -1,34 +1,61 @@
 <?php
-class FidData {
+class ScraperFid {
         
-    public function __construct($data,$dev_mode = TRUE) {
-        $this->tickers = array_column($data,'lookup_code');
-        $this->data = $data;
-        $this->dev_mode = (boolean) $dev_mode;
-        $this->html = '';
-        $this->tsarray = array();
-        $this->tickercount = (int) 1;
+    public function __construct($tickersAndInfo) {
+        $this->tickersAndInfo = (array) $tickersAndInfo;
+        $this->maxCurlAmount = (int) 5;
     }
+    
+    
+    public function return_results () {
+        //Seperate by every 5 rows
+        $i = (int) 0; $j = (int) 0;
+        $groupsOfFive = array();
+        
+        foreach ($this->tickersAndInfo as $tickerInfo) {
+            if ( ($i%($this->maxCurlAmount)) === 0 && $i!== 0) {//every 5th row, create a new $urlstr subarray
+                $j++;
+            }
+            $groupsOfFive[$j][] = array('lookup_code' => $tickerInfo['lookup_code'],
+                                                        'id' => $tickerInfo['id'],
+                                                        'last_updated' => !is_null($tickerInfo['last_updated']) ? strtotime($tickerInfo['last_updated']) : strtotime('1980-01-01')
+                                                        );
+            $i++;
+        }
+        //(new TestOutput($groupsOfFive)) -> print();
+
+        //Pulls data via curl
+        $results = array();
+        foreach ($groupsOfFive as $fiveSecurities) {
+            $minDate = date('Y/m/d', min(array_column($fiveSecurities,'last_updated')) );
+            $html = $this->fetchData(array_column($fiveSecurities,'lookup_code'),$minDate,NULL);
+            $json = $this->cleanAndDecodeData($html);
+            $fidData = $this->createTSArrayFromJsonArray($json);
+            
+            $results = array_merge_recursive($results,$fidData);
+        }
+        
+        return $results;
+    }
+    
+    
     
     /* Pulls data from Fidelity website
      *
      *
      *
      */
-    public function fetchData(string $mindate = NULL,string $maxdate = NULL) {
-        echo $this->dev_mode;
-        print_r( $this->tickers );
+    public function fetchData($tickers,$mindate = NULL,$maxdate = NULL) {
+        //print_r( $tickers );
         
         if (is_null($mindate)) $mindate = date('Y/m/d',strtotime('-1 month'));
         if (is_null($maxdate)) $maxdate = date('Y/m/d');
         
-        if (is_array($this->tickers) === TRUE) {
-            $tickerstring = implode($this->tickers,",");
-            $this->tickercount = count($this->tickers);
+        if (is_array($tickers) === TRUE) {
+            $tickerstring = implode($tickers,",");
         }
-        elseif (is_string($this->tickers) === TRUE) {
-            $tickerstring = $this->tickers;
-            $this->tickercount = 1;
+        elseif (is_string($tickers) === TRUE) {
+            $tickerstring = $tickers;
         }
         else {
             echo 'Error: Tickerstring not string or array';
@@ -49,34 +76,35 @@ class FidData {
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         
         $url = 'https://fastquote.fidelity.com/service/historical/chart/lite/json?productid=research&symbols='.$tickerstring.'&dateMin='.$mindate.':00:00:00&dateMax='.$maxdate.':00:00:00&intraday=n&granularity=1&incextendedhours=n&dd=y';
-        
-        if ($this->dev_mode === TRUE) echo $url;
+        echo $url;
         
         curl_setopt($ch, CURLOPT_URL, $url);
         $html = curl_exec($ch);
         curl_close($ch);
         
-        return $this->html = $html;
+        return $html;
     }
+    
+    
     
     /* Parses data into array
      *
      *
      *
      */
-    public function cleanAndDecodeData() {
+    public function cleanAndDecodeData($html) {
         
-        if (strlen($this->html) == 0) {
-            if ($this->dev_mode === TRUE) echo 'No HTML entered.';
+        if (strlen($html) == 0) {
+            echo 'No HTML entered.';
             exit();
         } else {
-            $clean = substr($this->html,0,-2); //remove opening and closing ( in data
+            $clean = substr($html,0,-2); //remove opening and closing ( in data
             $clean = substr($clean,2);
             $clean = json_decode($clean,true);
-            $this->json = $clean['SYMBOL'];
+            $json = $clean['SYMBOL'];
             
-            if ($this->dev_mode === TRUE) print_r ($this->json);
-            return $this->json;
+            //print_r ($json);
+            return $json;
         }
 
     }
@@ -86,17 +114,17 @@ class FidData {
      *
      *
      */
-    public function createTSArrayFromJsonArray() {
+    public function createTSArrayFromJsonArray($json) {
         
         $tsarray = array();
-        foreach ($this->json as $row) {
+        foreach ($json as $row) {
             if (!isset($row['IDENTIFIER']) || !isset($row['BARS']['CB'])) {
-                if ($this->dev_mode === TRUE) echo 'Error: Missing Identifier or Historical Data';
+                echo 'Error: Missing Identifier or Historical Data';
                 continue;
             }
             
             $identifier = $row['IDENTIFIER'];
-            $fk_tags_id = $this->data[array_search($identifier,$this->tickers)]['id'];
+            $fk_tags_id = $this->tickersAndInfo[array_search($identifier,$this->tickersAndInfo)]['id'];
             
             foreach ($row['BARS']['CB'] as $k => $point) {
                 $date = (string) $this->fid_date($point['lt']);
@@ -116,10 +144,7 @@ class FidData {
             }
         }
         
-        $this-> tsarray = $tsarray;
-
-        if ($this->dev_mode === TRUE) print_r ($this->tsarray);
-        return $this-> tsarray;
+        return $tsarray;
         
     }
     
@@ -129,19 +154,20 @@ class FidData {
      *
      *
      */
+    /*
     public function getFirstDate() {
         if ($this->tickercount === 1) {
             $this->firstdate = $this->fid_date($this->json[0]['BARS']['CB'][0]['lt']);
         } else {
-            if ($this->dev_mode === TRUE) echo 'Function not yet implemented for multiple securities';
+            echo 'Function not yet implemented for multiple securities';
             return;
         }
         
-        if ($this->dev_mode === TRUE) print_r ($this->firstdate);
+        //print_r ($this->firstdate);
         return $this->firstdate;
 
     }
-    
+    */
     
     private function fid_date($str) {
         $timestamp = new DateTime();
@@ -150,7 +176,4 @@ class FidData {
     }
 
 
-    
 }
-
-?>

@@ -44,9 +44,10 @@ $(document).ready(function() {
         Highcharts.chart('heatmap', {
             chart: {
                 type: 'heatmap',
-                height: 800,
+                height: 1060,
                 marginTop: 40,
-                marginBottom: 80,
+                marginRight: 40,
+                marginBottom: 200,
                 marginLeft: 200,
                 plotBorderWidth: 1,
                 backgroundColor: null
@@ -103,7 +104,7 @@ $(document).ready(function() {
             tooltip: {
                 formatter: function () {
                     if(this.point.tooltip === true) {
-                        return 'Current 30-day correlation between <b>' + this.series.xAxis.categories[this.point.x] + '</b> and <b>' + this.series.yAxis.categories[this.point.y] + '</b>/<br>Current as of <b>' +this.point.obs_end + '<b>';
+                        return 'Current 30-day correlation between <b>' + this.series.xAxis.categories[this.point.x] + '</b> and <b>' + this.series.yAxis.categories[this.point.y] + '</b>: <b>' + this.point.value + '<b><br>Current as of <b>' +this.point.obs_end + '<b>';
                     } else {
                         return false;
                     }
@@ -117,7 +118,9 @@ $(document).ready(function() {
                 dataLabels: {
                     enabled: true,
                     formatter:  function() {
-                        if(this.point.tooltip === true) {
+                        if (heatMapData.info.titles.length > 10) {
+                            return '';
+                        } else if (this.point.tooltip === true) {
                             return (this.point.value*100).toFixed(2) + '%';
                         } else {
                             return false;
@@ -131,7 +134,16 @@ $(document).ready(function() {
     
     function drawHeatMapUnderlines (heatMapData,tags) {
         var chart=$("#heatmap").highcharts();
-
+        var secwidth =  chart.xAxis[0].width/chart.xAxis[0].categories.length;
+        var origin = chart.series[0].points[0];
+        var squareH = origin.shapeArgs.height;
+        var squareW = origin.shapeArgs.width;
+        var offsetH = chart.plotSizeY + chart.plotTop;
+        var offsetW = chart.plotLeft /*+ chart.margin[3]*/;
+        
+        console.log(offsetW);
+        console.log(squareW);
+        
         //Get all different categories
         var tagskeys = Object.keys(tags);
         var classes = [];
@@ -140,17 +152,20 @@ $(document).ready(function() {
         
         for (i=0;i<tagskeys.length;i++){
             if (classes.indexOf(tags[tagskeys[i]].class) <= -1) { // if not a duplicate
-                classes[i] = tags[tagskeys[i]].class;
+                //console.log("Not duplicate");console.log(i);console.log( tags[tagskeys[i]].class);
+                classes[j] = tags[tagskeys[i]].class;
                 groups[j] = [];
                 groups[j].start = i;
                 groups[j].end = i;
                 groups[j].class = tags[tagskeys[i]].class;
                 j++;
             } else { //if duplicate, find the index it's duplicating, and set the 'end' column there
+                //console.log("Duplicate");console.log(classes);console.log(tags[tagskeys[i]].class);classes.indexOf(tags[tagskeys[i]].class);
                 index = classes.indexOf(tags[tagskeys[i]].class);
                 groups[index].end = i;
             }
         }
+        console.log(groups);
         
         //Get x-y coords of labels
         console.log(chart);
@@ -184,14 +199,22 @@ $(document).ready(function() {
         console.log('groups');console.log(groups);
         
         //Draw x
-        groups.forEach((group,index) => {            
+        groups.forEach((group,index) => {
+            chart.renderer.path(['M',group.start*squareW+offsetW+5,group.XAXISy+10,'L',(group.end+1)*squareW+offsetW-5,group.XAXISy+10])
+            .attr({
+                'stroke-width': 2,
+                stroke: group.color
+            })
+            .add();
+
+            /*
             chart.renderer.path(['M',group.XAXISxstart,group.XAXISy+10,'L',group.XAXISxend,group.XAXISy+10])
             .attr({
                 'stroke-width': 2,
                 stroke: group.color
             })
             .add();
-            
+            */
             var text = chart.renderer.text(group.class,(group.XAXISxstart+group.XAXISxend)/2,group.XAXISy+40) //(text,x,y)
             .attr({
                 zIndex: 5,
@@ -216,7 +239,7 @@ $(document).ready(function() {
 
             
             //draw Y
-            chart.renderer.path(['M',group.YAXISx+5,group.YAXISystart,'L',group.YAXISx+5,group.YAXISyend])
+            chart.renderer.path(['M',group.YAXISx+5,offsetH-group.start*squareH-5,'L',group.YAXISx+5,offsetH-(group.end+1)*squareH+5])
             .attr({
                 'stroke-width': 2,
                 stroke: group.color

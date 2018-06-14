@@ -10,7 +10,7 @@ $sql = new MyPDO();
 
 $tagsFid = $sql->selectToAssoc("
 SELECT * FROM tags_fid
-",'lookup_code');
+",'','lookup_code');
 
 (new TestOutput($tagsFid)) -> print();
 
