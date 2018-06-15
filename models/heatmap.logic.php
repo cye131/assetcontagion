@@ -1,5 +1,11 @@
 <?php
 
+/* requires $tagsSeries, $tagsCorrel;
+ * tagsCorrel can include historical data (pretty_date and value) in which case the date and obs will be set according to that, instead of the most recent obs value
+ *
+ *
+ */
+
 //Creates array for heatmap
 $hmData = array();
 $hmInfo = array();
@@ -9,8 +15,10 @@ for ($x=0;$x<count($tagsSeries);$x++) {
 for ($y=0;$y<count($tagsSeries);$y++) {
     
     $hmData[$i] = array(
-        'x-name' => $tagsSeries[$x]['name'],
-        'y-name' => $tagsSeries[$y]['name'],
+        's_id_x' => $tagsSeries[$x]['s_id'],
+        's_id_y' => $tagsSeries[$y]['s_id'],
+        /*'x-name' => $tagsSeries[$x]['name'],
+        'y-name' => $tagsSeries[$y]['name'],*/
         'x' => $x,
         'y' => $y
     );
@@ -19,19 +27,25 @@ for ($y=0;$y<count($tagsSeries);$y++) {
             ($tagRow['b_id_1'] === $tagsSeries[$x]['b_id'] && $tagRow['b_id_2'] === $tagsSeries[$y]['b_id']) ||
             ($tagRow['b_id_1'] === $tagsSeries[$y]['b_id'] && $tagRow['b_id_2'] === $tagsSeries[$x]['b_id'])
            ) {
-            
-            $hmData[$i]['value'] = (float) $tagRow['obs_end_val'];
+
+            $hmData[$i]['pretty_date'] = $tagRow['h_pretty_date'] ?? $tagRow['obs_end'];
+            $hmData[$i]['value'] = $tagRow['h_value'] ?? (float) $tagRow['obs_end_val'];
+            //$hmData[$i]['date_used'] = $tagRow['h_pretty_date'] ?? $tagRow['obs_end'];
+
+            //$hmData[$i]['value'] = (float) $tagRow['obs_end_val'];
             $hmData[$i]['obs_start'] = $tagRow['obs_start'];
             $hmData[$i]['obs_end'] = $tagRow['obs_end'];
             $hmData[$i]['freq'] = $tagRow['freq'];
+            $hmData[$i]['trail'] = $tagRow['trail'];
             $hmData[$i]['last_updated'] = $tagRow['last_updated'];
-        }
-    }
+          
+          }
+      }
 
     $i++;
 }
 }
-(new TestOutput($hmData))->print();
+//(new TestOutput($hmData))->print();
 
 
 //creates colors + tooltip info for heatmap points
@@ -51,7 +65,7 @@ function colorFormat($v) {
 
 foreach ($hmData as $i => $row) {
   if (!isset($row['value']) ) {
-    $hmData[$i]['color'] = 'grey';
+    $hmData[$i]['color'] = ' #cccccc';
     $hmData[$i]['tooltip'] = (bool) FALSE;
   } else {
     $hmData[$i]['color'] = colorFormat($row['value']);
@@ -69,20 +83,25 @@ $hmInfo['titles'] = array_column($tagsSeries,'name');
 
 //creates array indexing colors to classes
 $hmInfo['colorarray'] = array();
-$colors = ["#7cb5ec", "#434348", "#90ed7d", "#f7a35c", "#8085e9", "#f15c80", "#e4d354", "#2b908f", "#f45b5b", "#91e8e1"];
+$colors = ['#4572A7', '#AA4643', '#0ba828', '#80699B', '#3D96AE','#DB843D', '#92A8CD', '#A47D7C', '#B5CA92'];
 
 $i = (int) 0;
-foreach ($tagsSeries as $tag) {
-  if ( in_array($tag['category'],array_keys($hmInfo['colorarray'])) ) continue;
-  $hmInfo['colorarray'][$tag['category']] = $colors[$i];
+foreach ($tagsSeries as $k => $tag) {
+  $groupingFirstPart = explode('.',$tag['grouping'])[0];
+  $tagsSeries[$k]['grouping_first_part'] = $groupingFirstPart;
+  
+  if ( in_array($groupingFirstPart,array_keys($hmInfo['colorarray'])) ) continue;
+  $hmInfo['colorarray'][$groupingFirstPart] = $colors[$i];
   $i++;
 }
 
-$modeldata['script'] = ''
-                        .'var tags =' .json_encode($tagsSeries) .';'
+$heatMapData = ['data' => $hmData, 'info' => $hmInfo];
+/*
+$modeldata['script'] .= ''
+                        .'var tagsSeries =' .json_encode($tagsSeries) .';'
                         .'var tagsCorrel =' .json_encode($tagsCorrel) .';'
 
                         .'var heatMapData = new Array();'
                         .'heatMapData.data=' .json_encode($hmData).';'
                         .'heatMapData.info=' .json_encode($hmInfo).';';
-
+*/

@@ -1,6 +1,6 @@
 <?php
-$corrTag = $fromAjax ?? NULL;
-$ajax = array('data' => array(),'info' => array());
+$corrTag = $fromAjax['corrTag'] ?? NULL;
+$uHistCorrel = array('data' => array(),'info' => array());
 
 
 //print_r($series);
@@ -43,12 +43,12 @@ foreach ($data['timeseries'] as $prettyDate=>$row) {
 
 
 if (!isset($data) || count($data) === 0) {
-    $ajax['info']['errorMsg'] = 'No data was able to be calculated';
-    $ajax['info']['insertedHistData'] = (bool) FALSE;
+    $uHistCorrel['info']['errorMsg'] = 'No data was able to be calculated';
+    $uHistCorrel['info']['insertedHistData'] = (bool) FALSE;
 }
 elseif (count($dataVals) === 0) {
-    $ajax['info']['errorMsg'] = 'Not enough data for correlation calculations';
-    $ajax['info']['insertedHistData'] = (bool) FALSE;
+    $uHistCorrel['info']['errorMsg'] = 'Not enough data for correlation calculations';
+    $uHistCorrel['info']['insertedHistData'] = (bool) FALSE;
 }
 else {
     $colNames = array('h_id','pretty_date','value','fk_id');
@@ -62,16 +62,16 @@ else {
  *
  *
  */
-if ( isset($ajax['info']['insertedHistData']) && $ajax['info']['insertedHistData'] === FALSE) {
+if ( isset($uHistCorrel['info']['insertedHistData']) && $uHistCorrel['info']['insertedHistData'] === FALSE) {
 }
 elseif ( !isset($sql -> successRowsChanged) || $sql -> successRowsChanged === 0 ) {
-    $ajax['info'] = array('rowsChg' => 0,
+    $uHistCorrel['info'] = array('rowsChg' => 0,
                                     'errorMsg' => 'No new data to add',
                                     'insertedHistData' => (bool) FALSE
                                     );
 }
 else {
-    $ajax['info'] = array('rowsChg' => $sql -> successRowsChanged,
+    $uHistCorrel['info'] = array('rowsChg' => $sql -> successRowsChanged,
                                     'errorMsg' => '',
                                     'insertedHistData' => (bool) TRUE,
                                     'firstDate' => $index['correl_first_date'],
@@ -92,37 +92,37 @@ else {
  *
  *
  */
-if ($ajax['info']['insertedHistData'] === TRUE) {
+if ($uHistCorrel['info']['insertedHistData'] === TRUE) {
     
-    $queryVals = array('obs_end' => $ajax['info']['lastDate'],
-                                    'obs_end_val' => $ajax['info']['lastVal'],
-                                    'obs_end_input_min' => $ajax['info']['lastFirstInput'],
-                                    'obs_count' => $ajax['info']['obsCount'],
+    $queryVals = array('obs_end' => $uHistCorrel['info']['lastDate'],
+                                    'obs_end_val' => $uHistCorrel['info']['lastVal'],
+                                    'obs_end_input_min' => $uHistCorrel['info']['lastFirstInput'],
+                                    'obs_count' => $uHistCorrel['info']['obsCount'],
                                     's_corr_id' => $corrTag['s_corr_id']
                                     );
     
     if (is_null($corrTag['obs_start']) || strlen($corrTag['obs_start']) <= 0 ) {
         $includeObsStart = 'obs_start=:obs_start,';
-        $queryVals['obs_start'] = $ajax['info']['firstDate'];
+        $queryVals['obs_start'] = $uHistCorrel['info']['firstDate'];
     } else {
         $includeObsStart = '';
     }
     
     //print_r($series);
-    //print_r($ajax['info']);
+    //print_r($uHistCorrel['info']);
     //print_r($queryVals);
     $query = "UPDATE tags_correl SET $includeObsStart obs_end=:obs_end, obs_end_val=:obs_end_val, obs_end_input_min=:obs_end_input_min, obs_count=obs_count + :obs_count, last_updated=now() WHERE s_corr_id=:s_corr_id";
     $stmt = $sql->prepare($query);
     $stmt->execute($queryVals);
     
-    $ajax['info']['updatedTags'] = (bool) TRUE;
+    $uHistCorrel['info']['updatedTags'] = (bool) TRUE;
     
     
-    $ajax['data'] = $data;
+    $uHistCorrel['data'] = $data;
 }
 
 
-echo json_encode($ajax);
+//echo json_encode($uHistCorrel);
 
 
 

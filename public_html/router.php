@@ -43,9 +43,10 @@ elseif ($request == 'stock') {
 
 elseif ($request == 'financialcontagion') {
   $title = 'Financial Contagion Index';
-  $model[0] = 'get_tags_series';
-  $model[1] = 'get_tags_correl';
-  $logic = 'heatmap';
+  $model[] = 'get_tags_series';
+  $model[] = 'get_tags_correl';
+  $logic[] ='heatmap';
+  $toScript = ['tagsSeries','tagsCorrel','heatMapData'];
 }
 
 
@@ -55,36 +56,48 @@ elseif ($request == 'financialcontagion') {
 
 elseif ($request == 'updatehistseries') {
   $title = 'Historical Series Updater';
-  $model[0] = 'get_tags_series';
+  $model[] = 'get_tags_series';
+  $toScript = ['tagsSeries'];
 }
-
+//->fix
 elseif ($request == 'updatetagscorrel') {
   $title = 'Correlation Tags Updater';
-  $model[0] = 'get_tags_series';
-  $model[1] = 'get_tags_correl';
-  $model[2] = 'update_tags_correl';
+  $model[] = 'get_tags_series';
+  $model[] = 'get_tags_correl';
+  $model[] = 'update_tags_correl';
+  $toScript = ['tagsSeries','tagsCorrel'];
 }
 
 elseif ($request == 'updatehistcorrel') {
   $title = 'Correlation History Updater';
   $model[0] = 'get_tags_correl';
+  $toScript = ['tagsCorrel'];
 }
 
 
 
 
-$modeldata['script'] = '';
 //Send request
 if (isset($model)) {
   $sql = new MyPDO();
   foreach ($model as $m) {
     require_once("/var/www/correlation/models/$m.model.php");
+    }
+}
+
+
+if (isset($logic)) {
+  foreach ($logic as $l) {
+    require_once("/var/www/correlation/models/$l.logic.php");
   }
 }
-if (isset($logic)) require_once("/var/www/correlation/models/$logic.logic.php");
 
-if (isset($modeldata['script'])) {
-  $script = new StaticFile('js',$modeldata['script']);
+if (isset($toScript)) {
+  $scriptStr = '';
+  foreach ($toScript as $varName) {
+    $scriptStr .= "$varName = ".json_encode(${$varName}).';'; 
+  }
+  $script = new StaticFile('js',$scriptStr);
   $requestvars['script'] = $script->minify();
 }
 else $requestvars['script'] = '';
@@ -93,5 +106,3 @@ else $requestvars['script'] = '';
 if (isset($title)) $requestvars['title'] = $title; else $title = 'No Title';
 
 echo $twig->render($request.'.html', $requestvars);  
-
-?>

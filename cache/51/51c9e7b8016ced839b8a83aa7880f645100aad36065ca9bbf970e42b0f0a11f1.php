@@ -70,18 +70,26 @@ class __TwigTemplate_73a7adbdf821daf19a96776913c138b786b23fd8e98c9a282c2f1c02f42
                         
         });
 
-        function curlData(i) {    
+        function curlData(i) {
+            var model = [];
+            model[0] = 'update_hist_series';
+            toScript = ['histSeries'];
+
             \$.ajax({
                 url: 'routerAjax.php',
                 type: 'POST',
-                data: {req:'update_hist_series.ajax.php',ajax: tagsSeries[i]},
+                data: {
+                    model: model,
+                    toScript: toScript,
+                    fromAjax: {series: tagsSeries[i]}
+                    },
                 dataType: 'html',
                 cache: false,
                 timeout: 10000,
                 success: function(results){
                     console.log(\"Success\");
                     console.log(results);
-                    results = JSON.parse(results);
+                    results = JSON.parse(results).histSeries;
                     console.log(results);
                     if (results.info.insertedHistData === true) {
                         \$(\"#info\").append('<br><span>Successfully updated #' + i  + ': ' + tagsSeries[i].name + '(' + tagsSeries[i].freq + ') with ' + results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')</span>');
@@ -165,18 +173,26 @@ class __TwigTemplate_73a7adbdf821daf19a96776913c138b786b23fd8e98c9a282c2f1c02f42
                         
         });
 
-        function curlData(i) {    
+        function curlData(i) {
+            var model = [];
+            model[0] = 'update_hist_series';
+            toScript = ['histSeries'];
+
             \$.ajax({
                 url: 'routerAjax.php',
                 type: 'POST',
-                data: {req:'update_hist_series.ajax.php',ajax: tagsSeries[i]},
+                data: {
+                    model: model,
+                    toScript: toScript,
+                    fromAjax: {series: tagsSeries[i]}
+                    },
                 dataType: 'html',
                 cache: false,
                 timeout: 10000,
                 success: function(results){
                     console.log(\"Success\");
                     console.log(results);
-                    results = JSON.parse(results);
+                    results = JSON.parse(results).histSeries;
                     console.log(results);
                     if (results.info.insertedHistData === true) {
                         \$(\"#info\").append('<br><span>Successfully updated #' + i  + ': ' + tagsSeries[i].name + '(' + tagsSeries[i].freq + ') with ' + results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')</span>');

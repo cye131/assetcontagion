@@ -23,13 +23,13 @@ $lookupArray = array(); $categories = array();
                                                                    'last_updated' => $tag['last_updated'] ?? NULL
                                           );
 }*/
-
+/*
 $categories =  array_column($tagsSeries,'category');
 $categories = json_encode(array_values(array_unique($categories)));
 $json = json_encode($tagsSeries);
 
-$modeldata['script']  = "tagsSeries=$json;categories=$categories";
-
+$modeldata['script']  .= "tagsSeries=$json;categories=$categories";
+*/
 
 /* Passes an array indexed by source type with sub-elements for lookup_code and last_updated
  *

@@ -71,18 +71,26 @@ class __TwigTemplate_bf26b55b0cf4d5a89835611b47e2e439983c7691db325f713eba15439bd
 
         });
 
-        function calcCorrel(i) {    
+        function calcCorrel(i) {
+            var model = [];
+            model[0] = 'update_hist_correl';
+            toScript = ['uHistCorrel'];
+
             \$.ajax({
                 url: 'routerAjax.php',
                 type: 'POST',
-                data: {req:'update_hist_correl.ajax.php',ajax: tagsCorrel[i]},
+                data: {
+                    model: model,
+                    toScript: toScript,
+                    fromAjax: {corrTag: tagsCorrel[i]}
+                },
                 dataType: 'html',
                 cache: false,
                 timeout: 10000,
                 success: function(results){
                     console.log(\"Success\");
                     console.log(results);
-                    results = JSON.parse(results);
+                    results = JSON.parse(results).uHistCorrel;
                     console.log(results);
                     if (results.info.insertedHistData === true) {
                         \$(\"#info\").append('<br><span>Successfully updated #' + i  + ': ' + tagsCorrel[i].s_corr_nid + '(' + tagsCorrel[i].freq + ') with ' + results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')</span>');
@@ -164,18 +172,26 @@ class __TwigTemplate_bf26b55b0cf4d5a89835611b47e2e439983c7691db325f713eba15439bd
 
         });
 
-        function calcCorrel(i) {    
+        function calcCorrel(i) {
+            var model = [];
+            model[0] = 'update_hist_correl';
+            toScript = ['uHistCorrel'];
+
             \$.ajax({
                 url: 'routerAjax.php',
                 type: 'POST',
-                data: {req:'update_hist_correl.ajax.php',ajax: tagsCorrel[i]},
+                data: {
+                    model: model,
+                    toScript: toScript,
+                    fromAjax: {corrTag: tagsCorrel[i]}
+                },
                 dataType: 'html',
                 cache: false,
                 timeout: 10000,
                 success: function(results){
                     console.log(\"Success\");
                     console.log(results);
-                    results = JSON.parse(results);
+                    results = JSON.parse(results).uHistCorrel;
                     console.log(results);
                     if (results.info.insertedHistData === true) {
                         \$(\"#info\").append('<br><span>Successfully updated #' + i  + ': ' + tagsCorrel[i].s_corr_nid + '(' + tagsCorrel[i].freq + ') with ' + results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')</span>');
