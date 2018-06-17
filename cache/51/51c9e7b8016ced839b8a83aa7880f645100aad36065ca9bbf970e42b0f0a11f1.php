@@ -59,29 +59,31 @@ class __TwigTemplate_73a7adbdf821daf19a96776913c138b786b23fd8e98c9a282c2f1c02f42
     </section>
 
     <script>
-        
-        
         \$(\"#update\").click(function(){
             var category = \$(\"#category\").val();
-            console.log(category);
+            var tagsSeriesFiltered = [];
                     
             console.log(tagsSeries);
-            curlData(0);
-                        
+            j = 0;
+            for (i=0; i<tagsSeries.length; i++) {
+                if (tagsSeries[i].category.indexOf(category) !== -1) { tagsSeriesFiltered[j] = tagsSeries[i]; j++; }
+            }
+            
+            console.log(tagsSeriesFiltered);
+            curlData(category,tagsSeriesFiltered,0);
         });
 
-        function curlData(i) {
-            var model = [];
+        function curlData(category,tagsSeries,i) {
+            model = [];
             model[0] = 'update_hist_series';
             toScript = ['histSeries'];
-
             \$.ajax({
                 url: 'routerAjax.php',
                 type: 'POST',
                 data: {
                     model: model,
                     toScript: toScript,
-                    fromAjax: {series: tagsSeries[i]}
+                    fromAjax: {series: tagsSeries[i], category: category}
                     },
                 dataType: 'html',
                 cache: false,
@@ -100,15 +102,13 @@ class __TwigTemplate_73a7adbdf821daf19a96776913c138b786b23fd8e98c9a282c2f1c02f42
                     
                     \$(\"#info\").append(' <a href=\"' + results.info.url + '\">URL</a>');
                     i ++;
-                    if (i<tagsSeries.length) curlData(i);
+                    if (i<tagsSeries.length) curlData(category,tagsSeries,i);
                     
-                    //historicalData[i] = JSON.parse(results);
-                    //results = JSON.parse(results);
                 },
-                error:function(e, ts, et){
+                error: function(e, ts, et){
                         \$(\"#info\").append('<br><span style=\"font-weight:bold\">AJAX ERROR ON #' + i  + ': ' + tagsSeries[i].name +  ' | ' + ts +  ' (s_id: ' + tagsSeries[i].s_id +  ')</span>');
                         i ++;
-                        if (i<tagsSeries.length) curlData(i);
+                        if (i<tagsSeries.length) curlData(category,tagsSeries,i);
                 }
             });
         }
@@ -162,29 +162,31 @@ class __TwigTemplate_73a7adbdf821daf19a96776913c138b786b23fd8e98c9a282c2f1c02f42
     </section>
 
     <script>
-        
-        
         \$(\"#update\").click(function(){
             var category = \$(\"#category\").val();
-            console.log(category);
+            var tagsSeriesFiltered = [];
                     
             console.log(tagsSeries);
-            curlData(0);
-                        
+            j = 0;
+            for (i=0; i<tagsSeries.length; i++) {
+                if (tagsSeries[i].category.indexOf(category) !== -1) { tagsSeriesFiltered[j] = tagsSeries[i]; j++; }
+            }
+            
+            console.log(tagsSeriesFiltered);
+            curlData(category,tagsSeriesFiltered,0);
         });
 
-        function curlData(i) {
-            var model = [];
+        function curlData(category,tagsSeries,i) {
+            model = [];
             model[0] = 'update_hist_series';
             toScript = ['histSeries'];
-
             \$.ajax({
                 url: 'routerAjax.php',
                 type: 'POST',
                 data: {
                     model: model,
                     toScript: toScript,
-                    fromAjax: {series: tagsSeries[i]}
+                    fromAjax: {series: tagsSeries[i], category: category}
                     },
                 dataType: 'html',
                 cache: false,
@@ -203,15 +205,13 @@ class __TwigTemplate_73a7adbdf821daf19a96776913c138b786b23fd8e98c9a282c2f1c02f42
                     
                     \$(\"#info\").append(' <a href=\"' + results.info.url + '\">URL</a>');
                     i ++;
-                    if (i<tagsSeries.length) curlData(i);
+                    if (i<tagsSeries.length) curlData(category,tagsSeries,i);
                     
-                    //historicalData[i] = JSON.parse(results);
-                    //results = JSON.parse(results);
                 },
-                error:function(e, ts, et){
+                error: function(e, ts, et){
                         \$(\"#info\").append('<br><span style=\"font-weight:bold\">AJAX ERROR ON #' + i  + ': ' + tagsSeries[i].name +  ' | ' + ts +  ' (s_id: ' + tagsSeries[i].s_id +  ')</span>');
                         i ++;
-                        if (i<tagsSeries.length) curlData(i);
+                        if (i<tagsSeries.length) curlData(category,tagsSeries,i);
                 }
             });
         }

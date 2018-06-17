@@ -36,38 +36,36 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
         // line 4
         echo "<script src=\"//code.highcharts.com/stock/highstock.js\"></script>
 <script src=\"//code.highcharts.com/modules/heatmap.js\"></script>
-<script src=\"//code.highcharts.com/modules/treemap.js\"></script>
+
+<script src=\"//cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.6/proj4.js\"></script>
+<script src=\"//code.highcharts.com/maps/modules/map.js\"></script>
+<script src=\"//code.highcharts.com/mapdata/custom/world-robinson.js\"></script>
+<script src=\"//code.highcharts.com/mapdata/custom/europe.js\"></script>
 
 <script src=\"static/script-fincontagion.js\"></script>
+<script src=\"static/mapGenerator.js\"></script>
+
 ";
     }
 
-    // line 11
+    // line 17
     public function block_content($context, array $blocks = array())
     {
-        // line 12
-        echo "
+        // line 18
+        echo "    <div class=\"overlay\">
+    </div>
+    
     <section class=\"container\">
         ";
-        // line 14
+        // line 22
         $this->displayBlock('description', $context, $blocks);
-        // line 15
+        // line 23
         echo "    </section>
     
-    <section class=\"container\" style=\"margin-bottom:20px\">
-        <form class=\"form-inline\">
-            <div class = \"form-group\">
-                <label for=\"stock\" >Stock Ticker:</label>
-                <input type=\"text\" class=\"form-control form-control-sm\" id=\"stock\" value=\"\" placeholder=\"e.g., AAPL\" title=\"Test\">
-                <button class=\"btn btn-primary btn-sm\" type=\"button\" id=\"submit\">Submit</button>
-                <div id=\"errormessage\" class=\"invalid-feedback\">Error Message!</div>
-            </div>
-        </form>
-    </section>
     
-    <section class=\"container\" id=\"spinnercontainer\" style=\"display:none\">
+    <section class=\"container\" id=\"spinnercontainer\" style=\"\">
         <div class=\"row\">
-            <div class=\"text-center col-12\"><h4 style=\"text-align:center\" id=\"loadmessage\"><h4></div>
+            <div class=\"text-center col-12\"><h4 style=\"text-align:center\" id=\"loadmessage\">Loading data and making graphs...</h4></div>
         </div>
         <div class=\"row\">
             <div class=\"sk-circle\">
@@ -119,7 +117,7 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
 
             
           <div class=\"tab-pane fade\" id=\"tab1\" role=\"tabpanel\" aria-labelledby=\"tab-1\">
-            <div id=\"chart_1\" class=\"chart\"\"></div>
+            <div id=\"chart_1\" class=\"chart\"></div>
           </div>
           <div class=\"tab-pane fade\" id=\"tab2\" role=\"tabpanel\" aria-labelledby=\"tab-2\">
             <div id=\"chart_2\" class=\"chart\"></div>
@@ -129,10 +127,43 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
           </div>
         </div>
     </section>
+    
+    <section class=\"container\">
+        <form class=\"form-inline\">
+            <div class = \"form-group\">
+
+                <label for=\"showLines\" >Draw connections between closely correlated countries?</label>
+                <input type=\"checkbox\" checked=\"checked\" name=\"showLines\" id=\"showLines\">
+            </div>
+        </form>
+        
+        <form class=\"form-inline\">
+            <div class = \"form-group\">
+
+                <label for=\"minLines\" >Minimum correlation (0 to 1):</label>
+                <input type=\"text\" class=\"form-control form-control-sm\" id=\"minLines\" value=\"0.80\">
+                <button class=\"btn btn-primary btn-sm\" type=\"button\" id=\"submitLines\" >Submit</button>
+                <div id=\"errormessageLines\" class=\"invalid-feedback\">Error Message!</div>
+            </div>
+        </form>
+
+
+        <div class=\"row\">
+            <div class=\"col-lg-12\" id=\"highMap\"></div>
+        </div>
+
+        
+        <div class=\"row\">
+            <div></div>
+            <div class=\"col-lg-12 float-right\" id=\"highMapEurope\"></div>
+        </div>
+    </section>
+
+    
     ";
     }
 
-    // line 14
+    // line 22
     public function block_description($context, array $blocks = array())
     {
     }
@@ -149,7 +180,7 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
 
     public function getDebugInfo()
     {
-        return array (  136 => 14,  55 => 15,  53 => 14,  49 => 12,  46 => 11,  37 => 4,  34 => 3,  15 => 1,);
+        return array (  167 => 22,  63 => 23,  61 => 22,  55 => 18,  52 => 17,  37 => 4,  34 => 3,  15 => 1,);
     }
 
     public function getSourceContext()
@@ -159,31 +190,29 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
 {% block staticlinks %}
 <script src=\"//code.highcharts.com/stock/highstock.js\"></script>
 <script src=\"//code.highcharts.com/modules/heatmap.js\"></script>
-<script src=\"//code.highcharts.com/modules/treemap.js\"></script>
+
+<script src=\"//cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.6/proj4.js\"></script>
+<script src=\"//code.highcharts.com/maps/modules/map.js\"></script>
+<script src=\"//code.highcharts.com/mapdata/custom/world-robinson.js\"></script>
+<script src=\"//code.highcharts.com/mapdata/custom/europe.js\"></script>
 
 <script src=\"static/script-fincontagion.js\"></script>
+<script src=\"static/mapGenerator.js\"></script>
+
 {% endblock %}
 
 {% block content %}
-
+    <div class=\"overlay\">
+    </div>
+    
     <section class=\"container\">
         {% block description %}{% endblock %}
     </section>
     
-    <section class=\"container\" style=\"margin-bottom:20px\">
-        <form class=\"form-inline\">
-            <div class = \"form-group\">
-                <label for=\"stock\" >Stock Ticker:</label>
-                <input type=\"text\" class=\"form-control form-control-sm\" id=\"stock\" value=\"\" placeholder=\"e.g., AAPL\" title=\"Test\">
-                <button class=\"btn btn-primary btn-sm\" type=\"button\" id=\"submit\">Submit</button>
-                <div id=\"errormessage\" class=\"invalid-feedback\">Error Message!</div>
-            </div>
-        </form>
-    </section>
     
-    <section class=\"container\" id=\"spinnercontainer\" style=\"display:none\">
+    <section class=\"container\" id=\"spinnercontainer\" style=\"\">
         <div class=\"row\">
-            <div class=\"text-center col-12\"><h4 style=\"text-align:center\" id=\"loadmessage\"><h4></div>
+            <div class=\"text-center col-12\"><h4 style=\"text-align:center\" id=\"loadmessage\">Loading data and making graphs...</h4></div>
         </div>
         <div class=\"row\">
             <div class=\"sk-circle\">
@@ -235,7 +264,7 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
 
             
           <div class=\"tab-pane fade\" id=\"tab1\" role=\"tabpanel\" aria-labelledby=\"tab-1\">
-            <div id=\"chart_1\" class=\"chart\"\"></div>
+            <div id=\"chart_1\" class=\"chart\"></div>
           </div>
           <div class=\"tab-pane fade\" id=\"tab2\" role=\"tabpanel\" aria-labelledby=\"tab-2\">
             <div id=\"chart_2\" class=\"chart\"></div>
@@ -245,6 +274,39 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
           </div>
         </div>
     </section>
+    
+    <section class=\"container\">
+        <form class=\"form-inline\">
+            <div class = \"form-group\">
+
+                <label for=\"showLines\" >Draw connections between closely correlated countries?</label>
+                <input type=\"checkbox\" checked=\"checked\" name=\"showLines\" id=\"showLines\">
+            </div>
+        </form>
+        
+        <form class=\"form-inline\">
+            <div class = \"form-group\">
+
+                <label for=\"minLines\" >Minimum correlation (0 to 1):</label>
+                <input type=\"text\" class=\"form-control form-control-sm\" id=\"minLines\" value=\"0.80\">
+                <button class=\"btn btn-primary btn-sm\" type=\"button\" id=\"submitLines\" >Submit</button>
+                <div id=\"errormessageLines\" class=\"invalid-feedback\">Error Message!</div>
+            </div>
+        </form>
+
+
+        <div class=\"row\">
+            <div class=\"col-lg-12\" id=\"highMap\"></div>
+        </div>
+
+        
+        <div class=\"row\">
+            <div></div>
+            <div class=\"col-lg-12 float-right\" id=\"highMapEurope\"></div>
+        </div>
+    </section>
+
+    
     {% endblock %}", "layout-fincontagion.html", "/var/www/correlation/public_html/templates/layout-fincontagion.html");
     }
 }

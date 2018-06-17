@@ -11,7 +11,7 @@ WHERE (
 )
 GROUP BY pretty_date
 
-HAVING num_rows >= 300 AND DAYOFWEEK(pretty_date) = $dayOfWeek
+HAVING num_rows >= 500 AND DAYOFWEEK(pretty_date) = $dayOfWeek
 ORDER BY pretty_date ASC
 
 ",'','');

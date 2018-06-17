@@ -4,15 +4,63 @@ $(document).ready(function() {
           return heatMapData.data[e];
     });
 
+    
+    function startSpinner() {
+        $('#spinnercontainer').show();
+        $('.sk-circle').show();
+        $(".overlay").show();
+        //$('#resultscontainer').hide();
+    }
+    
+    function endSpinner() {
+        $('#spinnercontainer').hide();
+        $('.sk-circle').hide();
+        $(".overlay").hide();
+       // $('#resultscontainer').show();
+    }
+
+    function editSpinner(str) {
+        $('#loadmessage').text(str);
+    }
+
     makeHeatMap(heatMapData,tagsSeries);
     drawHeatMapUnderlines(heatMapData,tagsSeries);
+    endSpinner();
 
-    $("#submit").click(function(){
-        var lastDate = new Date(getLastDate());
-        lastDate.setDate(lastDate.getDate() - 1);
-        lastDate = lastDate.toISOString().split('T')[0];
-        getDates(lastDate); 
+    window.playState = 0; // 0 -> never played, 1 -> paused, 2-> playing
+    window.playIndex = 0;
+    window.dateCount = [];
+    
+
+    $("#playHistorical").click(function(){
+        if (window.playState === 0) {
+            startSpinner();
+            editSpinner('Loading historical data...');
+            
+            window.playState = 2;
+            
+            var lastDate = new Date(getLastDate());
+            lastDate.setDate(lastDate.getDate() - 1);
+            lastDate = lastDate.toISOString().split('T')[0];
+            getDates(lastDate);
+            
+            endSpinner();
+            $("#playHistorical").html('&#10074;&#10074; Click to pause');
+        }
+        else if (window.playState === 1) {
+            window.playState = 2;
+            getHistCorrel(window.dateCount,window.playIndex);
+            
+            $("#playHistorical").html('&#10074;&#10074; Click to pause');
+        }
+        else if (window.playState === 2) {
+            window.playState = 1;
+            
+            $("#playHistorical").html('&#9654; Click to resume');
+        } 
     });
+    
+        
 
     function getLastDate() {
         dates = [];
@@ -23,7 +71,7 @@ $(document).ready(function() {
         return date.slice(0,4) + '-' + date.slice(4,6) + '-' + date.slice(6,8);
     }
     
-    function getDates (lastDate) {
+    function getDates (lastDate) {        
         var model = []; var logic=[];
         model[0] = 'get_date_count_by_hist_correl';
         toScript = ['dateCount'];
@@ -43,8 +91,8 @@ $(document).ready(function() {
                 if (isJson(res)) {
                     res = JSON.parse(res);
                     console.log(res);
-                    var dateCount = res.dateCount;
-                    getHistCorrel(dateCount,0);
+                    window.dateCount = res.dateCount;
+                    getHistCorrel(window.dateCount,0);
                 } else {
                     console.log('Not Json');
                     console.log(res);
@@ -58,14 +106,18 @@ $(document).ready(function() {
     }
     
     function getHistCorrel(dateCount,i) {
+        window.playIndex = i;
+        if (window.dateCount == undefined || window.playIndex == undefined) return;
+        if (window.playState !== 2) {
+            return;
+        }
+                
         var model = []; var logic=[];
         model[0] = 'get_tags_series';
         model[1] = 'get_hist_correl_by_date';
         logic[0] = 'heatmap';
-        toScript = ['tagsSeries','tagsCorrel','heatMapData'];
        
         var date = dateCount[i].pretty_date;
-        console.log(i);
         console.log(date);
         
         $.ajax({
@@ -74,8 +126,8 @@ $(document).ready(function() {
             data: {
                 model: model,
                 logic: logic,
-                toScript: toScript,
-                fromAjax: {date: date}
+                toScript:  ['tagsSeries','tagsCorrel','heatMapData'],
+                fromAjax: {date: date, category: 'reg'}
                 },
             dataType: 'html',
             cache: false,
@@ -85,7 +137,7 @@ $(document).ready(function() {
                 res = JSON.parse(res);
                 chart = $("#heatmap").highcharts();
                 //console.log(chart.series[0].data);
-                //console.log(res.heatMapData.data);
+                console.log(res.heatMapData.data);
                 
                 for (j=0;j<res.heatMapData.data.length;j++) {
                     chart.series[0].data[j].update({
@@ -97,10 +149,32 @@ $(document).ready(function() {
                 }
                 chart.redraw();
                 
+                $("#date").remove();
+                chart.renderer.text(date,chart.plotLeft+(chart.plotWidth-chart.plotLeft)/2,chart.plotTop + (chart.plotHeight-chart.plotTop)/2) //(text,x,y)
+                .attr({
+                    zIndex: 4,
+                    'text-anchor': 'middle',
+                    id: 'date'
+                })
+                .css({
+                    textAlign: 'center',
+                    color: 'white',
+                    fontSize: '36px',
+                    opacity: 0.7,
+                    'text-shadow': '-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black'
+                })
+                .add();
                 
-                if (i<dateCount.length) {
-                    i++;
-                    setTimeout(function() { getHistCorrel(dateCount,i); }, 500);
+                /*
+                chart.destroy();
+                makeHeatMap(res.heatMapData,res.tagsSeries);
+                drawHeatMapUnderlines(res.heatMapData,res.tagsSeries);
+                */
+                if (window.playIndex < dateCount.length-1) {
+                    window.playIndex++;
+                    setTimeout(function() { getHistCorrel(dateCount,window.playIndex); }, 500);
+                } else {
+                    window.playIndex = 0;
                 }
                 /*chart.series[0].update({
                     //pointStart: res.heatMapData.data.pointStart,
@@ -118,21 +192,27 @@ $(document).ready(function() {
 
     
     function makeHeatMap(heatMapData,tagsSeries) {        
-        //Convert obj to array
-    
+        
        Highcharts.chart('heatmap', {
             chart: {
+                //plotHeight = 960-marginTop-marginBottom; plotWidth = 1060-marginLeft-marginRight
                 type: 'heatmap',
                 height: 1060,
-                marginTop: 40,
-                marginRight: 40,
+                marginTop: 80,
+                marginRight: 120,
                 marginBottom: 200,
-                marginLeft: 200,
+                marginLeft: 120,
                 plotBorderWidth: 1,
                 backgroundColor: null
             },
             title: {
-                text: 'Correlation Matrix'
+                useHTML: true,
+                text: 'Correlation Matrix Between Stock Markets of Major Economies'
+            },
+            subtitle: {
+                enabled: true,
+                useHTML: true,
+                text: '<button class="btn btn-primary btn-sm" type="button" id="playHistorical">&#9654; Click here to show changes over time!</button>'
             },
             credits: {
                 enabled:false
@@ -174,10 +254,12 @@ $(document).ready(function() {
             },
             legend: {
                 enabled:true,
-                layout:'horizontal',
-                align:'center',
+                layout:'vertical',
+                align:'right',
                 verticalAlign: 'top',
-                reversed:true
+                reversed:true,
+                symbolHeight: 800,
+                y:40
             },
         
             tooltip: {
@@ -245,6 +327,8 @@ $(document).ready(function() {
     function drawHeatMapUnderlines (heatMapData,tagsSeries) {
         var chart=$("#heatmap").highcharts();
         var boxW =  chart.xAxis[0].width/chart.xAxis[0].categories.length;
+        var boxH =  chart.yAxis[0].height/chart.yAxis[0].categories.length;
+
         //var origin = chart.series[0].points[0];
        /* var squareH = origin.shapeArgs.height;
         var squareW = origin.shapeArgs.width; */
@@ -305,8 +389,8 @@ $(document).ready(function() {
                 
                 
                 //top-left, bottom-right,etc
-                groups[i].yTop = offsetH-(groups[i].start)*boxW;
-                groups[i].yBottom = offsetH-(groups[i].end+1)*boxW;
+                groups[i].yTop = offsetH-(groups[i].start)*boxH;
+                groups[i].yBottom = offsetH-(groups[i].end+1)*boxH;
                 groups[i].xLeft = offsetW+groups[i].start*boxW;
                 groups[i].xRight = offsetW+(groups[i].end+1)*boxW;
 
@@ -318,23 +402,25 @@ $(document).ready(function() {
         console.log('groups');console.log(groups);
         
         //Draw x
-        groups.forEach((group,index) => {
+        groups.forEach(function(group,index) {
+            // horizontal line on x-axis
             chart.renderer.path(['M',group.start*boxW+offsetW+2,group.XAXISy-5,'L',(group.end+1)*boxW+offsetW-2,group.XAXISy-5])
             .attr({
                 'stroke-width': 2,
                 stroke: group.color
             })
             .add();
-
-            /*
-            chart.renderer.path(['M',group.XAXISxstart,group.XAXISy+10,'L',group.XAXISxend,group.XAXISy+10])
+            
+            // vertical line on y-axis
+            chart.renderer.path(['M',group.YAXISx+5,offsetH-group.start*boxH-5,'L',group.YAXISx+5,offsetH-(group.end+1)*boxH+5])
             .attr({
                 'stroke-width': 2,
                 stroke: group.color
             })
             .add();
-            */
-            var text = chart.renderer.text(group.grouping,offsetW+group.start*boxW+(group.end+1-group.start)*boxW/2,group.XAXISy+80) //(text,x,y)
+            
+            //text and rectangles
+            var text = chart.renderer.text(group.grouping,offsetW+group.start*boxW+(group.end+1-group.start)*boxW/2,group.XAXISy+100) //(text,x,y)
             .attr({
                 zIndex: 5,
                 'text-anchor': 'middle'
@@ -344,7 +430,6 @@ $(document).ready(function() {
                 color: 'white'
             })
             .add();
-            //console.log(text);    
             box = text.getBBox();
         
             chart.renderer.rect(box.x - 5, box.y - 5, box.width + 10, box.height + 10, 5)
@@ -357,13 +442,6 @@ $(document).ready(function() {
             .add();
 
             
-            //draw Y
-            chart.renderer.path(['M',group.YAXISx+5,offsetH-group.start*boxW-5,'L',group.YAXISx+5,offsetH-(group.end+1)*boxW+5])
-            .attr({
-                'stroke-width': 2,
-                stroke: group.color
-            })
-            .add();
             
             
             //Draw a box around the square - TOP -> BOT -> LEFT -> RIGHT

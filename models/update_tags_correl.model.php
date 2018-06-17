@@ -67,10 +67,4 @@ foreach ($seriesByFreq as $freq => $rows) {
 if ( count($sqldata) > 0) {
   $colnames = array('s_corr_nid','category','fk_id_1','fk_id_2','freq','trail','last_updated');
   $sql -> multipleInsert('tags_correl',$colnames,$sqldata);
-  
-  $modeldata['script'] = 'data='.json_encode($sqldata).';';
 }
-else {
-  $modeldata['script'] = 'data="No data";';
-}
-

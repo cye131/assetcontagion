@@ -76,12 +76,28 @@ ul.nav-tabs > li.nav-item > a.nav-link:not(.active) {
 
 
 /** Loading Spinner **/
+.overlay {
+    background: black;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    opacity: 0.3;
+    z-index: 98;
+}
+
+#loadmessage {
+  z-index: 99;
+  color: black;
+}
+
 .sk-circle {
-  display: none;
   margin: 100px auto;
   width: 100px;
   height: 100px;
   position: relative;
+  z-index:99;
 }
 .sk-circle .sk-child {
   width: 100%;
@@ -268,6 +284,16 @@ ul.nav-tabs > li.nav-item > a.nav-link:not(.active) {
     color: black;
 }
 
+
+/** Highmaps **/
+.selectedLines {
+  stroke : green;
+  stroke-width: 3;
+}
+
+.highcharts-null-point {
+  fill: rgba(255,255,255,0.2);
+}
 
 /** Datatables **/
 table.dataTable td.upperrow {

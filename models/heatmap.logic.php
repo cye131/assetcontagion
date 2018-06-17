@@ -55,9 +55,10 @@ function colorFormat($v) {
   else $maxColor = [255,0,0,1];
   $minColor = [251,250,182,0];
 
-  for($i=0;$i<=3;$i++) {
-    $rgba[$i] = round(($maxColor[$i] - $minColor[$i]) * abs($v),2) + $minColor[$i];
+  for($i=0;$i<=2;$i++) {
+    $rgba[$i] = round(($maxColor[$i] - $minColor[$i]) * abs($v),0) + $minColor[$i];
   }
+  $rgba[3] = round(($maxColor[3] - $minColor[3]) * abs($v),2) + $minColor[3];
 
   
   return 'rgba('.implode(',',$rgba).')';

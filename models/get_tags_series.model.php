@@ -1,7 +1,16 @@
 <?php
 
-//$category = $_GET['category'] ?? '';
-//echo $category;
+$varsToBind = [];
+
+$category = $fromAjax['category'] ?? $fromRouter['category'] ?? NULL;
+
+if (!is_null($category)) {
+    $category_str = 'AND category LIKE CONCAT(:category,"%")';
+    $varsToBind['category'] = $category;
+} else {
+    $category_str = '';
+}
+
 
 $tagsSeries = $sql -> selectToAssoc("
 SELECT *
@@ -9,15 +18,15 @@ FROM `tags_series` AS series
 LEFT JOIN `tags_series_base` AS base
 ON series.fk_id = base.b_id
 
-WHERE freq='d'  
-
+WHERE freq='d'
+$category_str
 
 ORDER BY base.category,base.b_id,series.freq
-",'','');
+",$varsToBind,'');
 
-
+/*
 $lookupArray = array(); $categories = array();
-/*foreach ($tagsSeries as $tag) {
+foreach ($tagsSeries as $tag) {
     $lookupArray[$tag['source']][] = array( 'lookup_code' => $tag['lookup_code'],
                                                                     'id' => $tag['id'],
                                                                    'last_updated' => $tag['last_updated'] ?? NULL

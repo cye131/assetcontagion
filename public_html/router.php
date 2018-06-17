@@ -16,7 +16,7 @@ $twig = new Twig_Environment($loader,array(
 
 //Set default URL
 if (isset($_GET['path']) && strlen($_GET['path'])) $request = $_GET['path'];
-else $request = 'stocksectorcorrelation';
+else $request = 'regions';
 
 $requestvars = array(
                      'title' => '',
@@ -30,6 +30,11 @@ $requestvars = array(
  *
  *
  */
+
+ $fromRouter = [];
+ $model = [];
+ $logic = [];
+ $toScript = [];
   
 //Routes - Main Sites
 if ($request == 'stocksectorcorrelation') {
@@ -41,12 +46,14 @@ elseif ($request == 'stock') {
   $title = 'Stock-to-Stock Correlation Lookup';
 }
 
-elseif ($request == 'financialcontagion') {
-  $title = 'Financial Contagion Index';
+elseif ($request == 'regions') {
+  $title = 'Global Stock Market Correlations';
+  $fromRouter = ['category' => 'reg'];
   $model[] = 'get_tags_series';
   $model[] = 'get_tags_correl';
+  $model[] = 'get_tags_gfi';
   $logic[] ='heatmap';
-  $toScript = ['tagsSeries','tagsCorrel','heatMapData'];
+  $toScript = ['tagsSeries','tagsCorrel','heatMapData','tagsGFI'];
 }
 
 
@@ -59,40 +66,39 @@ elseif ($request == 'updatehistseries') {
   $model[] = 'get_tags_series';
   $toScript = ['tagsSeries'];
 }
-//->fix
+
+//Currently does not use categories correctly!
 elseif ($request == 'updatetagscorrel') {
   $title = 'Correlation Tags Updater';
   $model[] = 'get_tags_series';
   $model[] = 'get_tags_correl';
   $model[] = 'update_tags_correl';
-  $toScript = ['tagsSeries','tagsCorrel'];
+  $toScript = ['tagsSeries','tagsCorrel','sqldata'];
 }
 
 elseif ($request == 'updatehistcorrel') {
   $title = 'Correlation History Updater';
-  $model[0] = 'get_tags_correl';
+  $model[] = 'get_tags_correl';
   $toScript = ['tagsCorrel'];
 }
 
 
 
-
 //Send request
-if (isset($model)) {
+if (count($model) > 0) {
   $sql = new MyPDO();
   foreach ($model as $m) {
     require_once("/var/www/correlation/models/$m.model.php");
     }
 }
 
-
-if (isset($logic)) {
+if (count($logic) > 0) {
   foreach ($logic as $l) {
     require_once("/var/www/correlation/models/$l.logic.php");
   }
 }
 
-if (isset($toScript)) {
+if (count($toScript) > 0) {
   $scriptStr = '';
   foreach ($toScript as $varName) {
     $scriptStr .= "$varName = ".json_encode(${$varName}).';'; 

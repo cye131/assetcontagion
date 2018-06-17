@@ -57,34 +57,6 @@ class __TwigTemplate_177deded1185abd80afdd552083fc22b83a3ed5001a6e75b91c3b561dd8
         <div class=\"container\" id=\"info\">
         </div>
     </section>
-
-    <script>
-        console.log(window.data);
-        /*
-        \$(\"#update\").click(function(){
-            console.log(tagsSeries);
-            curlData();
-        });
-
-        function curlData() {    
-            \$.ajax({
-                url: '/test/update_tags_correl.ajax.php',
-                type: 'POST',
-                data: {ajax: tagsSeries},
-                dataType: 'html',
-                cache: false,
-                timeout: 20000,
-                success: function(results){
-                    console.log(results);
-                    results = JSON.parse(results);
-                    console.log(results);                    
-                },
-                error:function(){
-                }
-            });
-        }*/
-
-    </script>
     
 ";
     }
@@ -131,34 +103,6 @@ class __TwigTemplate_177deded1185abd80afdd552083fc22b83a3ed5001a6e75b91c3b561dd8
         <div class=\"container\" id=\"info\">
         </div>
     </section>
-
-    <script>
-        console.log(window.data);
-        /*
-        \$(\"#update\").click(function(){
-            console.log(tagsSeries);
-            curlData();
-        });
-
-        function curlData() {    
-            \$.ajax({
-                url: '/test/update_tags_correl.ajax.php',
-                type: 'POST',
-                data: {ajax: tagsSeries},
-                dataType: 'html',
-                cache: false,
-                timeout: 20000,
-                success: function(results){
-                    console.log(results);
-                    results = JSON.parse(results);
-                    console.log(results);                    
-                },
-                error:function(){
-                }
-            });
-        }*/
-
-    </script>
     
 {% endblock %}", "updatetagscorrel.html", "/var/www/correlation/public_html/templates/updatetagscorrel.html");
     }
