@@ -76,10 +76,10 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
                 <div class=\"navbar-collapse collapse\" id=\"collapsingNavbarLg\">
                     <ul class=\"navbar-nav\">
                         <li class=\"nav-item\">
-                            <a class=\"nav-link\" href=\"/\">Correlation Calculator</a>
+                            <a class=\"nav-link\" href=\"/regions\">Cross-Regional Correlations</a>
                         </li>
                         <li class=\"nav-item\">
-                            <a class=\"nav-link\" href=\"/financialcontagion\">Financial Contagion Index</a>
+                            <a class=\"nav-link\" href=\"/\">Correlation Calculator (Under Development)</a>
                         </li>
                     </ul>
                 </div>
@@ -229,10 +229,10 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
                 <div class=\"navbar-collapse collapse\" id=\"collapsingNavbarLg\">
                     <ul class=\"navbar-nav\">
                         <li class=\"nav-item\">
-                            <a class=\"nav-link\" href=\"/\">Correlation Calculator</a>
+                            <a class=\"nav-link\" href=\"/regions\">Cross-Regional Correlations</a>
                         </li>
                         <li class=\"nav-item\">
-                            <a class=\"nav-link\" href=\"/financialcontagion\">Financial Contagion Index</a>
+                            <a class=\"nav-link\" href=\"/\">Correlation Calculator (Under Development)</a>
                         </li>
                     </ul>
                 </div>

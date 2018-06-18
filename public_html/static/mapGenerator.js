@@ -31,8 +31,8 @@ $(document).ready(function() {
     });
     
     prepData(tagsGFI);
-    drawStrongCorrelations(0.8);
-    drawStrongCorrelationsEurope(0.8);
+    drawStrongCorrelations(0.75);
+    drawStrongCorrelationsEurope(0.75);
     $("#highMapEurope > div").addClass('float-right');
     $("#highMapEurope > div").css('margin-top','-60px');
 
@@ -77,11 +77,12 @@ $(document).ready(function() {
                 marginRight: 0,
                 marginBottom: 0,
                 marginLeft: 0,
-                //backgroundColor: '#FCFFC5',
-                plotBackgroundImage: 'static/bg-parchment.png'
+                backgroundColor: 'rgba(255,255,255,0)',
             },
             title: {
                 text: 'Correlation to Global Stock Markets By Country'
+            },
+            subtitle: {
             },
             credits: {
                 enabled:false
@@ -101,7 +102,7 @@ $(document).ready(function() {
                 ]
             },
             legend: {
-                enabled:true,
+                enabled:false,
                 layout:'horizontal',
                 align:'center',
                 verticalAlign: 'top',
@@ -156,7 +157,12 @@ $(document).ready(function() {
                         }
                     }
                 }
-            },
+            },/*
+            tooltip: {
+                useHTML: true,
+                formatter: function () {
+                }
+            }*/
             series: [{
                 data: mapData,
                 name: 'Correlation to Global Stock Market Index',
@@ -228,17 +234,20 @@ $(document).ready(function() {
     }
     
     
-    function drawMapEurope (mapDataEurope) {        
+    function drawMapEurope (mapDataEurope) { 
         // Initiate the chart
         Highcharts.mapChart('highMapEurope', {
             chart: {
                 map: 'custom/europe',
                 height: 360,
                 width: 460,
-                marginTop: 0,
-                marginRight: 100,
-                marginBottom: 0,
-                marginLeft: 0
+                marginTop: 10,
+                marginRight: 120,
+                marginBottom: 10,
+                marginLeft: 10,
+                backgroundColor: 'rgba(255,255,255,0)',
+                plotBorderWidth: 1,
+                plotBorderColor: 'black'
             },
             title: {
                 text: ''
@@ -311,7 +320,7 @@ $(document).ready(function() {
     function drawStrongCorrelationsEurope(minLines) {
         var chart = $('#highMapEurope').highcharts();
         var points = chart.series[0].points;
-        
+
         console.log(chart);
         console.log(points);
         // Puts point coordinates into tagsSeriesXY
@@ -320,8 +329,8 @@ $(document).ready(function() {
             for (k=0;k<tagsSeries.length;k++) {
                 if (tagsSeries[k].code.toLowerCase() === points[i]["hc-key"]) {
                     tagsSeriesXY[points[i]["hc-key"]] = {};
-                    tagsSeriesXY[points[i]["hc-key"]].x = points[i].plotX;
-                    tagsSeriesXY[points[i]["hc-key"]].y = points[i].plotY;
+                    tagsSeriesXY[points[i]["hc-key"]].x = parseFloat(points[i].plotX) + chart.plotLeft;
+                    tagsSeriesXY[points[i]["hc-key"]].y = parseFloat(points[i].plotY) + chart.plotTop;
                 } //else console.log(tagsSeries[k].name + ' ' + points[i].name);
             }
         }

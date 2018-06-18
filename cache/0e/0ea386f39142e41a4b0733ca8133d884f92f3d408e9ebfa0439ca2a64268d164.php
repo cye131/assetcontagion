@@ -42,24 +42,29 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
 <script src=\"//code.highcharts.com/mapdata/custom/world-robinson.js\"></script>
 <script src=\"//code.highcharts.com/mapdata/custom/europe.js\"></script>
 
+<script src=\"//code.highcharts.com/stock/indicators/indicators.js\"></script>
+<script src=\"//code.highcharts.com/stock/indicators/ema.js\"></script>
+<script src=\"//code.highcharts.com/stock/indicators/bollinger-bands.js\"></script>
+
 <script src=\"static/script-fincontagion.js\"></script>
 <script src=\"static/mapGenerator.js\"></script>
+<script src=\"static/tsGenerator.js\"></script>
 
 ";
     }
 
-    // line 17
+    // line 22
     public function block_content($context, array $blocks = array())
     {
-        // line 18
+        // line 23
         echo "    <div class=\"overlay\">
     </div>
     
     <section class=\"container\">
         ";
-        // line 22
+        // line 27
         $this->displayBlock('description', $context, $blocks);
-        // line 23
+        // line 28
         echo "    </section>
     
     
@@ -89,23 +94,24 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
         <ul class=\"nav nav-tabs\" id=\"myTab\" role=\"tablist\">
             
           <li class=\"nav-item\">
-            <a class=\"nav-link active\" data-toggle=\"tab\" href=\"#heatmaptab\" role=\"tab\" aria-selected=\"true\">Matrix</a>
+            <a class=\"nav-link active\" data-toggle=\"tab\" href=\"#heatmaptab\" role=\"tab\" aria-selected=\"true\">Correlation Matrix</a>
           </li>
 
             
           <li class=\"nav-item\">
-            <a class=\"nav-link\" data-toggle=\"tab\" href=\"#tab1\" role=\"tab\" aria-controls=\"tab1\" aria-selected=\"true\">Stock-to-Industry Correlation</a>
+            <a class=\"nav-link\" data-toggle=\"tab\" href=\"#maptab\" role=\"tab\">Correlation Map</a>
           </li>
+          
           <li class=\"nav-item\">
-            <a class=\"nav-link\" data-toggle=\"tab\" href=\"#tab2\" role=\"tab\" aria-controls=\"tab2\" aria-selected=\"false\">Stock-to-Sector Correlation</a>
+            <a class=\"nav-link\" data-toggle=\"tab\" href=\"#tstab\" role=\"tab\">Historical Correlation Data</a>
           </li>
-          <li class=\"nav-item\">
-            <a class=\"nav-link\" data-toggle=\"tab\" href=\"#tab3\" role=\"tab\" aria-controls=\"tab3\" aria-selected=\"false\">Stock-to-Market Correlation</a>
-          </li>
+
         </ul>
         
+        
         <div class=\"tab-content\" id=\"myTabContent\">
-          <div class=\"tab-pane fade show active\" id=\"heatmaptab\" role=\"tabpanel\">
+            
+          <div class=\"tab-pane fade show active\" id=\"heatmaptab\" role=\"tabpanel\" >
             <div class=\"container\">    
                 <div class=\"row\">
                     <div class=\"col-lg-12\">
@@ -116,54 +122,64 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
           </div>
 
             
-          <div class=\"tab-pane fade\" id=\"tab1\" role=\"tabpanel\" aria-labelledby=\"tab-1\">
-            <div id=\"chart_1\" class=\"chart\"></div>
+          <div class=\"tab-pane fade\" id=\"maptab\" role=\"tabpanel\" style=\"background:url('static/bg-parchment.png') no-repeat center center fixed;background-size: cover;\">
+                <form class=\"form-inline\">
+                    <div class = \"form-group\">
+                        <label for=\"showLines\" style=\"font-weight:600\" >Draw connections between closely correlated countries?</label>
+                        <input type=\"checkbox\" checked=\"checked\" name=\"showLines\" id=\"showLines\">
+                    </div>
+                </form>
+                <form class=\"form-inline\">
+                    <div class = \"form-group\">
+                        <label for=\"minLines\"  style=\"font-weight:600\"  >Minimum correlation (0 to 1):</label>
+                        <input type=\"text\" class=\"form-control form-control-sm\" id=\"minLines\" value=\"0.75\" style=\"max-width:80px\">
+                        <button class=\"btn btn-primary btn-sm\" type=\"button\" id=\"submitLines\" >Submit</button>
+                        <div id=\"errormessageLines\" class=\"invalid-feedback\">Error Message!</div>
+                    </div>
+                </form>
+                <div class=\"row\">
+                    <div class=\"col-lg-12\" id=\"highMap\"></div>
+                </div>
+                
+                <div class=\"row\">
+                    <div></div>
+                    <div class=\"col-lg-12 float-right\" id=\"highMapEurope\"></div>
+                </div>
           </div>
-          <div class=\"tab-pane fade\" id=\"tab2\" role=\"tabpanel\" aria-labelledby=\"tab-2\">
-            <div id=\"chart_2\" class=\"chart\"></div>
+          
+          <div class=\"tab-pane fade\" id=\"tstab\" role=\"tabpanel\" style=\"\">
+                <form class=\"form-inline\">
+                    <div class = \"form-group\">
+                        <label for=\"corr_1\" style=\"font-weight:600\" >Get historical correlation for: </label>
+                        <select class=\"selectcorr form-control form-control-sm\" id=\"corr_1\">
+                        </select>
+                        <label for=\"corr_2\" style=\"font-weight:600\" > and </label>
+                        <select class=\"selectcorr form-control form-control-sm\" id=\"corr_2\">
+                        </select>
+                        <button class=\"btn btn-primary btn-sm\" type=\"button\" id=\"submitTS\" >Go</button>
+                        <div id=\"errormessageTS\" class=\"invalid-feedback\">Error Message!</div>
+                    </div>
+                </form>
+                
+                
+                <div class=\"row\">
+                    <div class=\"col-lg-12\" id=\"tsChart\"></div>
+                </div>
           </div>
-          <div class=\"tab-pane fade\" id=\"tab3\" role=\"tabpanel\" aria-labelledby=\"tab-3\">
-            <div id=\"chart_3\" class=\"chart\"></div>
-          </div>
+          
+
+          
         </div>
     </section>
     
     <section class=\"container\">
-        <form class=\"form-inline\">
-            <div class = \"form-group\">
-
-                <label for=\"showLines\" >Draw connections between closely correlated countries?</label>
-                <input type=\"checkbox\" checked=\"checked\" name=\"showLines\" id=\"showLines\">
-            </div>
-        </form>
-        
-        <form class=\"form-inline\">
-            <div class = \"form-group\">
-
-                <label for=\"minLines\" >Minimum correlation (0 to 1):</label>
-                <input type=\"text\" class=\"form-control form-control-sm\" id=\"minLines\" value=\"0.80\">
-                <button class=\"btn btn-primary btn-sm\" type=\"button\" id=\"submitLines\" >Submit</button>
-                <div id=\"errormessageLines\" class=\"invalid-feedback\">Error Message!</div>
-            </div>
-        </form>
-
-
-        <div class=\"row\">
-            <div class=\"col-lg-12\" id=\"highMap\"></div>
-        </div>
-
-        
-        <div class=\"row\">
-            <div></div>
-            <div class=\"col-lg-12 float-right\" id=\"highMapEurope\"></div>
-        </div>
     </section>
 
     
     ";
     }
 
-    // line 22
+    // line 27
     public function block_description($context, array $blocks = array())
     {
     }
@@ -180,7 +196,7 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
 
     public function getDebugInfo()
     {
-        return array (  167 => 22,  63 => 23,  61 => 22,  55 => 18,  52 => 17,  37 => 4,  34 => 3,  15 => 1,);
+        return array (  183 => 27,  68 => 28,  66 => 27,  60 => 23,  57 => 22,  37 => 4,  34 => 3,  15 => 1,);
     }
 
     public function getSourceContext()
@@ -196,8 +212,13 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
 <script src=\"//code.highcharts.com/mapdata/custom/world-robinson.js\"></script>
 <script src=\"//code.highcharts.com/mapdata/custom/europe.js\"></script>
 
+<script src=\"//code.highcharts.com/stock/indicators/indicators.js\"></script>
+<script src=\"//code.highcharts.com/stock/indicators/ema.js\"></script>
+<script src=\"//code.highcharts.com/stock/indicators/bollinger-bands.js\"></script>
+
 <script src=\"static/script-fincontagion.js\"></script>
 <script src=\"static/mapGenerator.js\"></script>
+<script src=\"static/tsGenerator.js\"></script>
 
 {% endblock %}
 
@@ -236,23 +257,24 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
         <ul class=\"nav nav-tabs\" id=\"myTab\" role=\"tablist\">
             
           <li class=\"nav-item\">
-            <a class=\"nav-link active\" data-toggle=\"tab\" href=\"#heatmaptab\" role=\"tab\" aria-selected=\"true\">Matrix</a>
+            <a class=\"nav-link active\" data-toggle=\"tab\" href=\"#heatmaptab\" role=\"tab\" aria-selected=\"true\">Correlation Matrix</a>
           </li>
 
             
           <li class=\"nav-item\">
-            <a class=\"nav-link\" data-toggle=\"tab\" href=\"#tab1\" role=\"tab\" aria-controls=\"tab1\" aria-selected=\"true\">Stock-to-Industry Correlation</a>
+            <a class=\"nav-link\" data-toggle=\"tab\" href=\"#maptab\" role=\"tab\">Correlation Map</a>
           </li>
+          
           <li class=\"nav-item\">
-            <a class=\"nav-link\" data-toggle=\"tab\" href=\"#tab2\" role=\"tab\" aria-controls=\"tab2\" aria-selected=\"false\">Stock-to-Sector Correlation</a>
+            <a class=\"nav-link\" data-toggle=\"tab\" href=\"#tstab\" role=\"tab\">Historical Correlation Data</a>
           </li>
-          <li class=\"nav-item\">
-            <a class=\"nav-link\" data-toggle=\"tab\" href=\"#tab3\" role=\"tab\" aria-controls=\"tab3\" aria-selected=\"false\">Stock-to-Market Correlation</a>
-          </li>
+
         </ul>
         
+        
         <div class=\"tab-content\" id=\"myTabContent\">
-          <div class=\"tab-pane fade show active\" id=\"heatmaptab\" role=\"tabpanel\">
+            
+          <div class=\"tab-pane fade show active\" id=\"heatmaptab\" role=\"tabpanel\" >
             <div class=\"container\">    
                 <div class=\"row\">
                     <div class=\"col-lg-12\">
@@ -263,47 +285,57 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
           </div>
 
             
-          <div class=\"tab-pane fade\" id=\"tab1\" role=\"tabpanel\" aria-labelledby=\"tab-1\">
-            <div id=\"chart_1\" class=\"chart\"></div>
+          <div class=\"tab-pane fade\" id=\"maptab\" role=\"tabpanel\" style=\"background:url('static/bg-parchment.png') no-repeat center center fixed;background-size: cover;\">
+                <form class=\"form-inline\">
+                    <div class = \"form-group\">
+                        <label for=\"showLines\" style=\"font-weight:600\" >Draw connections between closely correlated countries?</label>
+                        <input type=\"checkbox\" checked=\"checked\" name=\"showLines\" id=\"showLines\">
+                    </div>
+                </form>
+                <form class=\"form-inline\">
+                    <div class = \"form-group\">
+                        <label for=\"minLines\"  style=\"font-weight:600\"  >Minimum correlation (0 to 1):</label>
+                        <input type=\"text\" class=\"form-control form-control-sm\" id=\"minLines\" value=\"0.75\" style=\"max-width:80px\">
+                        <button class=\"btn btn-primary btn-sm\" type=\"button\" id=\"submitLines\" >Submit</button>
+                        <div id=\"errormessageLines\" class=\"invalid-feedback\">Error Message!</div>
+                    </div>
+                </form>
+                <div class=\"row\">
+                    <div class=\"col-lg-12\" id=\"highMap\"></div>
+                </div>
+                
+                <div class=\"row\">
+                    <div></div>
+                    <div class=\"col-lg-12 float-right\" id=\"highMapEurope\"></div>
+                </div>
           </div>
-          <div class=\"tab-pane fade\" id=\"tab2\" role=\"tabpanel\" aria-labelledby=\"tab-2\">
-            <div id=\"chart_2\" class=\"chart\"></div>
+          
+          <div class=\"tab-pane fade\" id=\"tstab\" role=\"tabpanel\" style=\"\">
+                <form class=\"form-inline\">
+                    <div class = \"form-group\">
+                        <label for=\"corr_1\" style=\"font-weight:600\" >Get historical correlation for: </label>
+                        <select class=\"selectcorr form-control form-control-sm\" id=\"corr_1\">
+                        </select>
+                        <label for=\"corr_2\" style=\"font-weight:600\" > and </label>
+                        <select class=\"selectcorr form-control form-control-sm\" id=\"corr_2\">
+                        </select>
+                        <button class=\"btn btn-primary btn-sm\" type=\"button\" id=\"submitTS\" >Go</button>
+                        <div id=\"errormessageTS\" class=\"invalid-feedback\">Error Message!</div>
+                    </div>
+                </form>
+                
+                
+                <div class=\"row\">
+                    <div class=\"col-lg-12\" id=\"tsChart\"></div>
+                </div>
           </div>
-          <div class=\"tab-pane fade\" id=\"tab3\" role=\"tabpanel\" aria-labelledby=\"tab-3\">
-            <div id=\"chart_3\" class=\"chart\"></div>
-          </div>
+          
+
+          
         </div>
     </section>
     
     <section class=\"container\">
-        <form class=\"form-inline\">
-            <div class = \"form-group\">
-
-                <label for=\"showLines\" >Draw connections between closely correlated countries?</label>
-                <input type=\"checkbox\" checked=\"checked\" name=\"showLines\" id=\"showLines\">
-            </div>
-        </form>
-        
-        <form class=\"form-inline\">
-            <div class = \"form-group\">
-
-                <label for=\"minLines\" >Minimum correlation (0 to 1):</label>
-                <input type=\"text\" class=\"form-control form-control-sm\" id=\"minLines\" value=\"0.80\">
-                <button class=\"btn btn-primary btn-sm\" type=\"button\" id=\"submitLines\" >Submit</button>
-                <div id=\"errormessageLines\" class=\"invalid-feedback\">Error Message!</div>
-            </div>
-        </form>
-
-
-        <div class=\"row\">
-            <div class=\"col-lg-12\" id=\"highMap\"></div>
-        </div>
-
-        
-        <div class=\"row\">
-            <div></div>
-            <div class=\"col-lg-12 float-right\" id=\"highMapEurope\"></div>
-        </div>
     </section>
 
     

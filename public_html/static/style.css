@@ -11,6 +11,14 @@ html {
     font-size: 14px;
 }
 
+body {
+  background-color: rgba(255, 235, 205,.1) !important;
+}
+
+.container {
+  max-width:1200px !important;
+}
+
 header {
     margin-bottom:25px;
     background-color: rgba(245,245,248,1) !important;
@@ -29,8 +37,11 @@ li.nav-item{
     padding-top:2px;
 }
 
+
+
 li.nav-item.active {
-    border-bottom:2px solid rgba(10, 24, 66,1);
+    border-bottom:3px solid rgba(10, 24, 66,1);
+    font-weight:600;
 }
 
 a.nav-link {
@@ -48,21 +59,33 @@ a.nav-link {
 div.tab-content {
     background-color: rgba(245,245,248,.8);
     min-height: 200px;
-    padding: 10px;
+}
+
+div.tab-pane {
+    background-color: rgba(245,245,248,.8);
+    padding: 10px 15px 15px 40px;
 }
 
 
 ul.nav-tabs > li.nav-item > a.nav-link.active {
-    background-color: rgba(245,245,248,.8) !important;
+    background-color: rgba(245,245,255,.8) !important;
     border-top-left-radius: .5rem;
     border-top-right-radius: .5rem;
     font-weight:bold;
     max-width: 15rem;
-    text-align: center
+    text-align: center;
 }
 
 ul.nav-tabs > li.nav-item > a.nav-link:not(.active) {
     font-weight:500;
+    background-color: #0056b3 !important;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    color:white !important;
+    text-align: center;
+    border-top: 1px solid #004a99;
+    border-left: 1px solid #004a99;
+    border-right: 1px solid #004a99;
 }
 
 
@@ -287,8 +310,8 @@ ul.nav-tabs > li.nav-item > a.nav-link:not(.active) {
 
 /** Highmaps **/
 .selectedLines {
-  stroke : green;
-  stroke-width: 3;
+  stroke : darkgreen;
+  stroke-width: 4;
 }
 
 .highcharts-null-point {
