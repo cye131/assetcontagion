@@ -1,9 +1,42 @@
 <?php
 $varsToBind = [];
 
+$category = $fromAjax['category'] ?? $fromRouter['category'] ?? NULL;
+$corr_type = $fromAjax['corr_type'] ?? $fromRouter['corr_type'] ?? NULL;
+$freq = $fromAjax['freq'] ?? $fromRouter['freq'] ?? NULL;
+$trail = $fromAjax['trail'] ?? $fromRouter['trail'] ?? NULL;
+
+
+
+
+if (!is_null($category)) {
+    $category_str = 'AND t1b.category LIKE CONCAT(:category,"%") AND t2b.category LIKE CONCAT(:category,"%") ';
+    $varsToBind['category'] = $category;
+} else $category_str = '';
+
+if (!is_null($corr_type)) {
+    $corr_type_str = 'AND t0.corr_type = :corr_type';
+    $varsToBind['corr_type'] = $corr_type;
+} else $corr_type_str = '';
+
+if (!is_null($freq)) {
+    $freq_str = 'AND t0.freq = :freq';
+    $varsToBind['freq'] = $freq;
+} else $freq_str = '';
+
+if (!is_null($trail)) {
+    $trail_str = 'AND t0.trail = :trail';
+    $varsToBind['trail'] = $trail;
+} else $trail_str = '';
+
+
+
+
+
+
 $tagsGFI = $sql->selectToAssoc("
 SELECT
-t0.*,
+t0.*,s0.*,
 
 t1.s_id AS s_id_1,t1.freq AS freq_1,
 t2.s_id AS s_id_2,t2.freq AS freq_2,
@@ -23,8 +56,19 @@ ON t0.fk_id_2 = t2.s_id
 LEFT JOIN tags_series_base AS t2b
 ON t2.fk_id = t2b.b_id
 
-WHERE t0.freq='d' AND t0.trail=30
-AND (t1b.category LIKE CONCAT('gfi','%') OR t2b.category LIKE CONCAT('gfi','%'))
+RIGHT JOIN specs_categories AS s0
+ON (
+    s0.cat_base_index = t1b.b_id
+    OR s0.cat_base_index = t2b.b_id
+    )
+
+WHERE (1 = 1
+$category_str
+$corr_type_str
+$freq_str
+$trail_str
+)
+
 
 ",$varsToBind,'');
 

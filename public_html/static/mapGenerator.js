@@ -216,9 +216,9 @@ $(document).ready(function() {
             code1 = tagsCorrel[i].code_1.toLowerCase() ;
             code2 = tagsCorrel[i].code_2.toLowerCase() ;
             
-            if (code1 === 'hk' || code2 === 'hk') continue;
+            if (code1 === 'hk' || code2 === 'hk' || code1 === 'world' || code2 === 'world') continue;
             
-            //console.log(code1);console.log(code2);
+            console.log(code1);console.log(code2);
             chart.renderer.path(['M'+tagsSeriesXY[code1].x,tagsSeriesXY[code1].y,'Q',(tagsSeriesXY[code1].x+tagsSeriesXY[code2].x)/2,(tagsSeriesXY[code1].y + tagsSeriesXY[code2].y)/2-20,tagsSeriesXY[code2].x,tagsSeriesXY[code2].y,])
             .attr({
                 'stroke-width': 1,
@@ -340,7 +340,7 @@ $(document).ready(function() {
         for (i=0;i<tagsCorrel.length;i++) {
             if (tagsCorrel[i].obs_end_val < minLines) continue;
             //console.log(tagsCorrel[i].obs_end_val);
-            if (tagsCorrel[i].grouping_1.indexOf('Europe') == -1 ||  tagsCorrel[i].grouping_2.indexOf('Europe') == -1) continue;
+            if (tagsCorrel[i].grouping_1 == undefined || tagsCorrel[i].grouping_2 == undefined || tagsCorrel[i].grouping_1.indexOf('Europe') == -1 ||  tagsCorrel[i].grouping_2.indexOf('Europe') == -1) continue;
 
             code1 = tagsCorrel[i].code_1.toLowerCase() ;
             code2 = tagsCorrel[i].code_2.toLowerCase() ;

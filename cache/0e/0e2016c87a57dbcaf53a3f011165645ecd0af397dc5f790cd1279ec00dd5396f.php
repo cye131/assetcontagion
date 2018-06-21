@@ -94,8 +94,20 @@ class __TwigTemplate_bf26b55b0cf4d5a89835611b47e2e439983c7691db325f713eba15439bd
         \$(\"#update\").click(function(){
             var category = \$(\"#category\").val();
             console.log(category);
-                    
-            console.log(tagsCorrel);
+            
+            if (category == undefined || category.length < 1) {
+                alert ('Enter a valid category!');
+                return;
+            }
+            
+            j = 0;tagsCorrelFiltered = [];
+            for (i=0;i<tagsCorrel.length;i++) {
+                if (tagsCorrel[i].category !== category) continue;
+                tagsCorrelFiltered[j] = tagsCorrel[i];
+                j++;
+            }
+
+            console.log(tagsCorrelFiltered);
             calcCorrel(0);
 
         });
@@ -111,7 +123,7 @@ class __TwigTemplate_bf26b55b0cf4d5a89835611b47e2e439983c7691db325f713eba15439bd
                 data: {
                     model: model,
                     toScript: toScript,
-                    fromAjax: {corrTag: tagsCorrel[i]}
+                    fromAjax: {corrTag: tagsCorrelFiltered[i]}
                 },
                 dataType: 'html',
                 cache: false,
@@ -121,28 +133,28 @@ class __TwigTemplate_bf26b55b0cf4d5a89835611b47e2e439983c7691db325f713eba15439bd
                     console.log(results);
                     results = JSON.parse(results).uHistCorrel;
                     console.log(results);
-                    console.log(tagsCorrel[i].s_corr_nid);
+                    console.log(tagsCorrelFiltered[i].s_corr_nid);
                     
                     
                     if (results.info.insertedHistData === true) {
-                        \$('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(11)').html('<span>Successfully updated #' + i  + ': ' + results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')</span>');
-                        \$('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(7)').html(results.info.firstDate);
-                        \$('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(8)').html(results.info.lastDate);
-                        \$('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(9)').html(results.info.lastFirstInput);
+                        \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(11)').html('<span>Successfully updated #' + i  + ': ' + results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')</span>');
+                        \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(7)').html(results.info.firstDate);
+                        \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(8)').html(results.info.lastDate);
+                        \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(9)').html(results.info.lastFirstInput);
 
                     }
                     else {
-                        console.log('#' + tagsCorrel[i].s_corr_nid + ' td:nth-child(11)');
-                        \$('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(11)').html('<span><b>Failed</b> to update #' + i  + ': '  + results.info.errorMsg + '</span>');
+                        console.log('#' + tagsCorrelFiltered[i].s_corr_nid + ' td:nth-child(11)');
+                        \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(11)').html('<span><b>Failed</b> to update #' + i  + ': '  + results.info.errorMsg + '</span>');
                     }
                     
                     i ++;
-                    if (i<tagsCorrel.length) calcCorrel(i);
+                    if (i<tagsCorrelFiltered.length) calcCorrel(i);
                 },
                 error:function(e, ts, et){
-                        \$('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(11)').html('<br><span style=\"font-weight:bold\">AJAX ERROR ON #' + i  + ': ' + tagsCorrel[i].s_corr_nid +  ' | ' + ts +  '</span>');
+                        \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(11)').html('<br><span style=\"font-weight:bold\">AJAX ERROR ON #' + i  + ': ' + tagsCorrelFiltered[i].s_corr_nid +  ' | ' + ts +  '</span>');
                         i ++;
-                        if (i<tagsCorrel.length) calcCorrel(i);
+                        if (i<tagsCorrelFiltered.length) calcCorrel(i);
                 }
             });
         }
@@ -231,8 +243,20 @@ class __TwigTemplate_bf26b55b0cf4d5a89835611b47e2e439983c7691db325f713eba15439bd
         \$(\"#update\").click(function(){
             var category = \$(\"#category\").val();
             console.log(category);
-                    
-            console.log(tagsCorrel);
+            
+            if (category == undefined || category.length < 1) {
+                alert ('Enter a valid category!');
+                return;
+            }
+            
+            j = 0;tagsCorrelFiltered = [];
+            for (i=0;i<tagsCorrel.length;i++) {
+                if (tagsCorrel[i].category !== category) continue;
+                tagsCorrelFiltered[j] = tagsCorrel[i];
+                j++;
+            }
+
+            console.log(tagsCorrelFiltered);
             calcCorrel(0);
 
         });
@@ -248,7 +272,7 @@ class __TwigTemplate_bf26b55b0cf4d5a89835611b47e2e439983c7691db325f713eba15439bd
                 data: {
                     model: model,
                     toScript: toScript,
-                    fromAjax: {corrTag: tagsCorrel[i]}
+                    fromAjax: {corrTag: tagsCorrelFiltered[i]}
                 },
                 dataType: 'html',
                 cache: false,
@@ -258,28 +282,28 @@ class __TwigTemplate_bf26b55b0cf4d5a89835611b47e2e439983c7691db325f713eba15439bd
                     console.log(results);
                     results = JSON.parse(results).uHistCorrel;
                     console.log(results);
-                    console.log(tagsCorrel[i].s_corr_nid);
+                    console.log(tagsCorrelFiltered[i].s_corr_nid);
                     
                     
                     if (results.info.insertedHistData === true) {
-                        \$('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(11)').html('<span>Successfully updated #' + i  + ': ' + results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')</span>');
-                        \$('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(7)').html(results.info.firstDate);
-                        \$('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(8)').html(results.info.lastDate);
-                        \$('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(9)').html(results.info.lastFirstInput);
+                        \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(11)').html('<span>Successfully updated #' + i  + ': ' + results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')</span>');
+                        \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(7)').html(results.info.firstDate);
+                        \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(8)').html(results.info.lastDate);
+                        \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(9)').html(results.info.lastFirstInput);
 
                     }
                     else {
-                        console.log('#' + tagsCorrel[i].s_corr_nid + ' td:nth-child(11)');
-                        \$('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(11)').html('<span><b>Failed</b> to update #' + i  + ': '  + results.info.errorMsg + '</span>');
+                        console.log('#' + tagsCorrelFiltered[i].s_corr_nid + ' td:nth-child(11)');
+                        \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(11)').html('<span><b>Failed</b> to update #' + i  + ': '  + results.info.errorMsg + '</span>');
                     }
                     
                     i ++;
-                    if (i<tagsCorrel.length) calcCorrel(i);
+                    if (i<tagsCorrelFiltered.length) calcCorrel(i);
                 },
                 error:function(e, ts, et){
-                        \$('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(11)').html('<br><span style=\"font-weight:bold\">AJAX ERROR ON #' + i  + ': ' + tagsCorrel[i].s_corr_nid +  ' | ' + ts +  '</span>');
+                        \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(11)').html('<br><span style=\"font-weight:bold\">AJAX ERROR ON #' + i  + ': ' + tagsCorrelFiltered[i].s_corr_nid +  ' | ' + ts +  '</span>');
                         i ++;
-                        if (i<tagsCorrel.length) calcCorrel(i);
+                        if (i<tagsCorrelFiltered.length) calcCorrel(i);
                 }
             });
         }

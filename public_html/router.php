@@ -48,7 +48,7 @@ elseif ($request == 'stock') {
 
 elseif ($request == 'regions') {
   $title = 'Global Stock Market Correlations';
-  $fromRouter = ['category' => 'reg'];
+  $fromRouter = ['category' => 'reg','corr_type' => 'rho','freq' => 'd', 'trail' => 30];
   $model[] = 'get_tags_series';
   $model[] = 'get_tags_correl';
   $model[] = 'get_tags_gfi';
