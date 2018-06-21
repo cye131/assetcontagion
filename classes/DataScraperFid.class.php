@@ -24,7 +24,7 @@ class DataScraperFid {
         
         $results['data'] = $data;
         $results['url'] = $this->url;
-        
+        $results['errorMsg'] = $this->errorMsg ?? NULL;
         return $results;
     }
     
@@ -70,7 +70,7 @@ class DataScraperFid {
     public function cleanAndDecodeData($html) {
         
         if (strlen($html) == 0) {
-            echo 'No HTML entered.';
+            $this->errorMsg = 'No HTML entered.';
             exit();
         } else {
             $clean = substr($html,0,-2); //remove opening and closing ( in data
@@ -94,7 +94,7 @@ class DataScraperFid {
         $tsarray = array();
         foreach ($json as $row) {
             if (!isset($row['IDENTIFIER']) || !isset($row['BARS']['CB'])) {
-                echo 'Error: Missing Identifier or Historical Data';
+                $this->errorMsg = 'Error: Missing Identifier or Historical Data';
                 continue;
             }
             
@@ -103,8 +103,8 @@ class DataScraperFid {
             foreach ($row['BARS']['CB'] as $k => $point) {
                 $date = (string) $this->fid_date($point['lt']);
                 
-                $id = str_replace('-','',$date).'.'.$this->fk_id;
-                $tsarray[] = array('h_id' => $id,
+                //$id = str_replace('-','',$date).'.'.$this->fk_id;
+                $tsarray[] = array(//'h_id' => $id,
                                         'date' => $date,
                                         'pretty_date' => $this->date_cleaner( $date ),
                                         'value' => (float) $point['cl'],

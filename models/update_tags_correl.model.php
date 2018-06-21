@@ -1,25 +1,40 @@
 <?php
 
-$seriesByFreq = array();
+$tagsSeries = $fromAjax['tagsSeries'] ?? $fromRouter['tagsSeries'] ?? NULL;
+$specsCategories = $fromAjax['specsCategories'] ?? $fromRouter['specsCategories'] ?? NULL;
+$existingUniqIdentifiers = $fromAjax['existingUniqIdentifiers'] ?? $fromRouter['existingUniqIdentifiers'] ?? [];
+unset($fromAjax);
+//$specsCategories should be an array corresponding to only ONE category --> Note, there are a LOT of variables here so make sure max_input_vars is high enough in php.ini (currently working with 5000)
+//$tagsCorrel and $tagsSeries are assumed to be already filtered correctly
+
+
+//Don't trust any natural keys within the table, calculate instead
+/*$existingUniqIdentifiers = [];
+foreach ($tagsCorrel as $row) {
+  $existingUniqIdentifiers[] = $row['category']. '.' .$row['fk_id_1']. '.' .$row['fk_id_2']. '.' .$row['freq']. '.' .$row['trail'];
+}*/
+
+
+//Trail-freq info
+$trailTmp = explode(',',$specsCategories['cat_freqtrails']);
+$trail = [];
+foreach ($trailTmp as $t) {
+  $trail[substr($t,0,1)][] = substr($t,2);
+}
+$corrTypes = explode(',',$specsCategories['cat_corrtypes']);
+
+
+$seriesByFreq = [];
 foreach ($tagsSeries as $row) {
-    $seriesByFreq[$row['freq']][$row['fk_id']] = $row;
+    $seriesByFreq[$row['freq']][$row['fk_id']] = $row;    
 }
 
-$trail = ['d' => [30,60],
-            'w' => [52],
-            'm' => [24],
-            'q' => [12],
-            'a' => [10]
-            ];
 
-$existingSCorrNid = array_column($tagsCorrel,'s_corr_nid');
-//print_r($existingSCorrNid);
 //ALWAYS ORDER BY B_ID
-$sqldata = array();
+$sqldata = array(); $uTagsCorr = array();
 //print_r($seriesByFreq);
 foreach ($seriesByFreq as $freq => $rows) {
-        //if ($freq !== 'd') continue;
-        
+          
         $codes = array_column($rows,'code');
         $keys = array_column($rows,'b_id');
         $codesArray = array_combine($keys,$codes);
@@ -42,19 +57,50 @@ foreach ($seriesByFreq as $freq => $rows) {
             //$row2 = $rows[array_search($code2,$codesArray)];
           
             foreach ($trail[$freq] as $tr) {
-            //Skip if already in existing $tagsCorrel data
-            if (in_array("{$row1['category']}.{$row1['s_id']}.{$row2['s_id']}.$freq.$tr",$existingSCorrNid) ) continue;
+            foreach ($corrTypes as $corrtype) {
+              
+              //Skip if already in existing $tagsCorrel data
+              $s_corr_nid = "{$row1['category']}.{$row1['s_id']}.{$row2['s_id']}.$freq.$tr.$corrtype";
+              
+              if (in_array($s_corr_nid,$existingUniqIdentifiers) ) {
+                $uTagsCorr[] = array('updated' => (bool) FALSE,
+                                                  'errorMsg' => 'Already exists',
+                                                  's_corr_nid' => $s_corr_nid,
+                                                  'fk_id_1' => $row1['s_id'],
+                                                  'fk_id_2' => $row2['s_id'],
+                                                  'freq' => $freq,
+                                                  'trail' => $tr,
+                                                  'corr_type' => $corrtype
+                                                  );
+                continue;
+              }
+              
+              else {
+                $uTagsCorr[] = array('updated' => (bool) TRUE,
+                                                  's_corr_nid' => $s_corr_nid,
+                                                  'fk_id_1' => $row1['s_id'],
+                                                  'fk_id_2' => $row2['s_id'],
+                                                  'freq' => $freq,
+                                                  'trail' => $tr,
+                                                  'corr_type' => $corrtype
+                                    );
+
 
                 $sqldata[] = array(
-                                    's_corr_nid' => "{$row1['category']}.{$row1['s_id']}.{$row2['s_id']}.$freq.$tr",
-                                    'category' => $row1['category'],
-                                    'fk_id_1' => $row1['s_id'],
-                                    'fk_id_2' => $row2['s_id'],
-                                    'freq' => $freq,
-                                    'trail' => $tr,
-                                    'last_updated' => date('Y-m-d H:i:s')
-                                  );
+                                  's_corr_nid' => $s_corr_nid,
+                                  'category' => $row1['category'],
+                                  'fk_id_1' => $row1['s_id'],
+                                  'fk_id_2' => $row2['s_id'],
+                                  'freq' => $freq,
+                                  'trail' => $tr,
+                                  'corr_type' => $corrtype,
+                                  'last_updated' => date('Y-m-d H:i:s')
+                                );
                 //print_r($row1);print_r($row2);
+              }
+              
+              
+            }
             }
         }
         
@@ -65,6 +111,6 @@ foreach ($seriesByFreq as $freq => $rows) {
 
 //exit();
 if ( count($sqldata) > 0) {
-  $colnames = array('s_corr_nid','category','fk_id_1','fk_id_2','freq','trail','last_updated');
+  $colnames = array('s_corr_nid','category','fk_id_1','fk_id_2','freq','trail','corr_type','last_updated');
   $sql -> multipleInsert('tags_correl',$colnames,$sqldata);
 }

@@ -20,20 +20,49 @@
     </section>
     
     <section class="container">
+        <div class="container" style="max-height:400px;overflow:auto">
+            <span id="expectedrows"></span>
+            <table id="table1" style="width:100%;text-align:center;">
+                <thead>
+                    <tr>
+                        <th>s_corr_id</th>
+                        <th>category</th>
+                        <th>freq</th>
+                        <th>trail</th>
+                        <th>b_id_1 (name_1)</th>
+                        <th>b_id_2 (name_2)</th>
+                        <th>obs_start</th>
+                        <th>obs_end</th>
+                        <th>obs_end_val</th>
+                        <th>last_updated</th>
+
+                        <th>error message/rows updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="container">
         <div class="container" id="info">
         </div>
     </section>
 
     <script>
-        
-        
+        $(document).ready(function() {
+            for (i=0;i<tagsCorrel.length;i++) {
+                $('#table1').append('<tr id="' + tagsCorrel[i].s_corr_id + '"><td>' + tagsCorrel[i].s_corr_id + '</td><td>' + tagsCorrel[i].category + '</td><td>' + tagsCorrel[i].freq + '</td><td>' + tagsCorrel[i].trail + '</td><td>' + tagsCorrel[i].b_id_1 + ' ' + tagsCorrel[i].name_1 + '</td><td>' + tagsCorrel[i].b_id_2 + ' ' + tagsCorrel[i].name_2 + '</td><td> ' + tagsCorrel[i].obs_start +  '</td><td>' + tagsCorrel[i].obs_end + '</td><td>' + tagsCorrel[i].obs_end_val + '</td><td>' + tagsCorrel[i].last_updated + '</td><td></td></tr>');
+            }
+        });
+
         $("#update").click(function(){
             var category = $("#category").val();
             console.log(category);
                     
             console.log(tagsCorrel);
             calcCorrel(0);
-            //calcCorrel(28);
 
         });
 
@@ -58,19 +87,26 @@
                     console.log(results);
                     results = JSON.parse(results).uHistCorrel;
                     console.log(results);
+                    console.log(tagsCorrel[i].s_corr_nid);
+                    
+                    
                     if (results.info.insertedHistData === true) {
-                        $("#info").append('<br><span>Successfully updated #' + i  + ': ' + tagsCorrel[i].s_corr_nid + '(' + tagsCorrel[i].freq + ') with ' + results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')</span>');
+                        $('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(11)').html('<span>Successfully updated #' + i  + ': ' + results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')</span>');
+                        $('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(7)').html(results.info.firstDate);
+                        $('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(8)').html(results.info.lastDate);
+                        $('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(9)').html(results.info.lastFirstInput);
+
                     }
                     else {
-                        $("#info").append('<br><span><b>Failed</b> to update #' + i  + ': ' + tagsCorrel[i].s_corr_nid +  ' | ' + results.info.errorMsg + '</span>');
+                        console.log('#' + tagsCorrel[i].s_corr_nid + ' td:nth-child(11)');
+                        $('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(11)').html('<span><b>Failed</b> to update #' + i  + ': '  + results.info.errorMsg + '</span>');
                     }
                     
-                    $("#info").append(' <a href="' + results.info.url + '">URL</a>');
                     i ++;
                     if (i<tagsCorrel.length) calcCorrel(i);
                 },
                 error:function(e, ts, et){
-                        $("#info").append('<br><span style="font-weight:bold">AJAX ERROR ON #' + i  + ': ' + tagsCorrel[i].s_corr_nid +  ' | ' + ts +  ' (s_corr_id: ' + tagsCorrel[i].s_corr_id +  ')</span>');
+                        $('#' + tagsCorrel[i].s_corr_id + ' td:nth-child(11)').html('<br><span style="font-weight:bold">AJAX ERROR ON #' + i  + ': ' + tagsCorrel[i].s_corr_nid +  ' | ' + ts +  '</span>');
                         i ++;
                         if (i<tagsCorrel.length) calcCorrel(i);
                 }

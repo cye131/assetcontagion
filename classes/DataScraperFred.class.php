@@ -44,9 +44,9 @@ class DataScraperFred {
             if (!isset($row['value']) || $row['value'] == 0 || $row['value'] == '.') continue;
     
             $date = (string) $row['date'];
-            $id = str_replace('-','',$date).'.'.$this->fk_id;
+            //$id = str_replace('-','',$date).'.'.$this->fk_id;
 
-            $tsarray[] = array('h_id' => $id,
+            $tsarray[] = array(//'h_id' => $id,
                                     'date' => $date,
                                     'pretty_date' => $this->date_cleaner( $date ),
                                     'value' => (float) $row['value'],

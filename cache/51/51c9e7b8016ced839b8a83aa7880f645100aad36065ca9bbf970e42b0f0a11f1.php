@@ -32,12 +32,16 @@ class __TwigTemplate_73a7adbdf821daf19a96776913c138b786b23fd8e98c9a282c2f1c02f42
     // line 3
     public function block_staticlinks($context, array $blocks = array())
     {
+        // line 4
+        echo "<script src=\"https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js\"></script>
+
+";
     }
 
-    // line 6
+    // line 8
     public function block_content($context, array $blocks = array())
     {
-        // line 7
+        // line 9
         echo "
     <section class=\"container\">
     </section>
@@ -46,19 +50,64 @@ class __TwigTemplate_73a7adbdf821daf19a96776913c138b786b23fd8e98c9a282c2f1c02f42
         <form class=\"form-inline\">
             <div class = \"form-group\">
                 <label for=\"category\" >Category:</label>
-                <input type=\"text\" class=\"form-control form-control-sm\" id=\"category\" value=\"\" placeholder=\"e.g., reg\">
+                <select class=\"form-control form-control-sm\" id=\"category\">
+                    <option value=\"\">All</option>
+                </select>
                 <button class=\"btn btn-primary btn-sm\" type=\"button\" id=\"update\">Update</button>
                 <div id=\"errormessage\" class=\"invalid-feedback\">Error Message!</div>
             </div>
-        </form>        
+        </form> 
     </section>
     
+    <section class=\"container\">
+        <div class=\"container\" style=\"max-height:400px;overflow:auto\">
+            <table id=\"table1\" style=\"width:100%;text-align:center;\">
+                <thead>
+                    <tr>
+                        <th>s_id</th>
+                        <th>fk_id</th>
+                        <th>name</th>
+                        <th>freq</th>
+                        <th>obs_start</th>
+                        <th>obs_end</th>
+                        <th>last_updated</th>
+                        <th>updated now</th>
+                        <th>error message/rows updated</th>
+                        <th>attempted url</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
     <section class=\"container\">
         <div class=\"container\" id=\"info\">
         </div>
     </section>
 
     <script>
+        \$(document).ready(function() {
+            
+            //Populate options text
+            for (i=0;i<specsCategories.length;i++) {
+                \$('#category').append('<option value=\"' + specsCategories[i].cat_nid + '\">' + specsCategories[i].cat_name + '</option>');
+            }
+            
+            for (i=0;i<tagsSeries.length;i++) {
+                \$('#table1').append('<tr id=\"' + tagsSeries[i].s_id + '\"><td>' + tagsSeries[i].s_id + '</td><td>' + tagsSeries[i].b_id + '</td><td>' + tagsSeries[i].name + '</td><td>' + tagsSeries[i].freq + '</td><td>' + tagsSeries[i].obs_start + '</td><td> ' + tagsSeries[i].obs_end +  '</td><td>' + tagsSeries[i].last_updated + '</td><td></td><td></td><td></td></tr>');
+            }
+            
+            \$('#table1').DataTable({
+                    paging: false,
+                    \"autoWidth\": false
+
+            });
+
+        });
+
+        
         \$(\"#update\").click(function(){
             var category = \$(\"#category\").val();
             var tagsSeriesFiltered = [];
@@ -74,15 +123,12 @@ class __TwigTemplate_73a7adbdf821daf19a96776913c138b786b23fd8e98c9a282c2f1c02f42
         });
 
         function curlData(category,tagsSeries,i) {
-            model = [];
-            model[0] = 'update_hist_series';
-            toScript = ['histSeries'];
             \$.ajax({
                 url: 'routerAjax.php',
                 type: 'POST',
                 data: {
-                    model: model,
-                    toScript: toScript,
+                    model: ['update_hist_series'],
+                    toScript: ['uHistSeries'],
                     fromAjax: {series: tagsSeries[i], category: category}
                     },
                 dataType: 'html',
@@ -91,24 +137,46 @@ class __TwigTemplate_73a7adbdf821daf19a96776913c138b786b23fd8e98c9a282c2f1c02f42
                 success: function(results){
                     console.log(\"Success\");
                     console.log(results);
-                    results = JSON.parse(results).histSeries;
+                    results = JSON.parse(results).uHistSeries;
                     console.log(results);
                     if (results.info.insertedHistData === true) {
-                        \$(\"#info\").append('<br><span>Successfully updated #' + i  + ': ' + tagsSeries[i].name + '(' + tagsSeries[i].freq + ') with ' + results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')</span>');
+                        console.log(tagsSeries[i].s_id);
+                        \$('#' + tagsSeries[i].s_id + ' td:nth-child(8)').text('Successfully updated #' + i  + ': ' + tagsSeries[i].name);
+                        \$('#' + tagsSeries[i].s_id + ' td:nth-child(9)').text(results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')');
+
                     }
                     else {
-                        \$(\"#info\").append('<br><span><b>Failed</b> to update #' + i  + ': ' + tagsSeries[i].name +  ' | ' + results.info.errorMsg + '</span>');
+                        \$('#' + tagsSeries[i].s_id + ' td:nth-child(8)').html('<b>Failed</b> to update #' + i  + ': ' + tagsSeries[i].name);
+                        \$('#' + tagsSeries[i].s_id + ' td:nth-child(9)').text(results.info.errorMsg);
                     }
                     
-                    \$(\"#info\").append(' <a href=\"' + results.info.url + '\">URL</a>');
+                    \$('#' + tagsSeries[i].s_id + ' td:nth-child(10)').append(' <a href=\"' + results.info.url + '\">URL</a>');
+                    
                     i ++;
                     if (i<tagsSeries.length) curlData(category,tagsSeries,i);
+                    else {
+                        \$('#table1').DataTable().destroy();
+                        \$('#table1').DataTable({
+                                    paging: false,
+                                    \"autoWidth\": false
+    
+                        });
+                    }
                     
                 },
                 error: function(e, ts, et){
-                        \$(\"#info\").append('<br><span style=\"font-weight:bold\">AJAX ERROR ON #' + i  + ': ' + tagsSeries[i].name +  ' | ' + ts +  ' (s_id: ' + tagsSeries[i].s_id +  ')</span>');
+                        \$('#' + tagsSeries[i].s_id + ' td:nth-child(8)').html('<b>Failed</b> to update #' + i  + ': ' + tagsSeries[i].name);
+                        \$('#' + tagsSeries[i].s_id + ' td:nth-child(9)').html('<br><span style=\"font-weight:bold\">AJAX ERROR | ' + ts +  ' (s_id: ' + tagsSeries[i].s_id +  ')</span>');
                         i ++;
                         if (i<tagsSeries.length) curlData(category,tagsSeries,i);
+                        else {
+                            \$('#table1').DataTable().destroy();
+                            \$('#table1').DataTable({
+                                        paging: false,
+                                        \"autoWidth\": false
+        
+                            });
+                        }
                 }
             });
         }
@@ -130,7 +198,7 @@ class __TwigTemplate_73a7adbdf821daf19a96776913c138b786b23fd8e98c9a282c2f1c02f42
 
     public function getDebugInfo()
     {
-        return array (  41 => 7,  38 => 6,  33 => 3,  15 => 1,);
+        return array (  45 => 9,  42 => 8,  36 => 4,  33 => 3,  15 => 1,);
     }
 
     public function getSourceContext()
@@ -138,6 +206,8 @@ class __TwigTemplate_73a7adbdf821daf19a96776913c138b786b23fd8e98c9a282c2f1c02f42
         return new Twig_Source("{% extends \"layout.html\" %}
 
 {% block staticlinks %}
+<script src=\"https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js\"></script>
+
 {% endblock %}
 
 {% block content %}
@@ -149,19 +219,64 @@ class __TwigTemplate_73a7adbdf821daf19a96776913c138b786b23fd8e98c9a282c2f1c02f42
         <form class=\"form-inline\">
             <div class = \"form-group\">
                 <label for=\"category\" >Category:</label>
-                <input type=\"text\" class=\"form-control form-control-sm\" id=\"category\" value=\"\" placeholder=\"e.g., reg\">
+                <select class=\"form-control form-control-sm\" id=\"category\">
+                    <option value=\"\">All</option>
+                </select>
                 <button class=\"btn btn-primary btn-sm\" type=\"button\" id=\"update\">Update</button>
                 <div id=\"errormessage\" class=\"invalid-feedback\">Error Message!</div>
             </div>
-        </form>        
+        </form> 
     </section>
     
+    <section class=\"container\">
+        <div class=\"container\" style=\"max-height:400px;overflow:auto\">
+            <table id=\"table1\" style=\"width:100%;text-align:center;\">
+                <thead>
+                    <tr>
+                        <th>s_id</th>
+                        <th>fk_id</th>
+                        <th>name</th>
+                        <th>freq</th>
+                        <th>obs_start</th>
+                        <th>obs_end</th>
+                        <th>last_updated</th>
+                        <th>updated now</th>
+                        <th>error message/rows updated</th>
+                        <th>attempted url</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
     <section class=\"container\">
         <div class=\"container\" id=\"info\">
         </div>
     </section>
 
     <script>
+        \$(document).ready(function() {
+            
+            //Populate options text
+            for (i=0;i<specsCategories.length;i++) {
+                \$('#category').append('<option value=\"' + specsCategories[i].cat_nid + '\">' + specsCategories[i].cat_name + '</option>');
+            }
+            
+            for (i=0;i<tagsSeries.length;i++) {
+                \$('#table1').append('<tr id=\"' + tagsSeries[i].s_id + '\"><td>' + tagsSeries[i].s_id + '</td><td>' + tagsSeries[i].b_id + '</td><td>' + tagsSeries[i].name + '</td><td>' + tagsSeries[i].freq + '</td><td>' + tagsSeries[i].obs_start + '</td><td> ' + tagsSeries[i].obs_end +  '</td><td>' + tagsSeries[i].last_updated + '</td><td></td><td></td><td></td></tr>');
+            }
+            
+            \$('#table1').DataTable({
+                    paging: false,
+                    \"autoWidth\": false
+
+            });
+
+        });
+
+        
         \$(\"#update\").click(function(){
             var category = \$(\"#category\").val();
             var tagsSeriesFiltered = [];
@@ -177,15 +292,12 @@ class __TwigTemplate_73a7adbdf821daf19a96776913c138b786b23fd8e98c9a282c2f1c02f42
         });
 
         function curlData(category,tagsSeries,i) {
-            model = [];
-            model[0] = 'update_hist_series';
-            toScript = ['histSeries'];
             \$.ajax({
                 url: 'routerAjax.php',
                 type: 'POST',
                 data: {
-                    model: model,
-                    toScript: toScript,
+                    model: ['update_hist_series'],
+                    toScript: ['uHistSeries'],
                     fromAjax: {series: tagsSeries[i], category: category}
                     },
                 dataType: 'html',
@@ -194,24 +306,46 @@ class __TwigTemplate_73a7adbdf821daf19a96776913c138b786b23fd8e98c9a282c2f1c02f42
                 success: function(results){
                     console.log(\"Success\");
                     console.log(results);
-                    results = JSON.parse(results).histSeries;
+                    results = JSON.parse(results).uHistSeries;
                     console.log(results);
                     if (results.info.insertedHistData === true) {
-                        \$(\"#info\").append('<br><span>Successfully updated #' + i  + ': ' + tagsSeries[i].name + '(' + tagsSeries[i].freq + ') with ' + results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')</span>');
+                        console.log(tagsSeries[i].s_id);
+                        \$('#' + tagsSeries[i].s_id + ' td:nth-child(8)').text('Successfully updated #' + i  + ': ' + tagsSeries[i].name);
+                        \$('#' + tagsSeries[i].s_id + ' td:nth-child(9)').text(results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')');
+
                     }
                     else {
-                        \$(\"#info\").append('<br><span><b>Failed</b> to update #' + i  + ': ' + tagsSeries[i].name +  ' | ' + results.info.errorMsg + '</span>');
+                        \$('#' + tagsSeries[i].s_id + ' td:nth-child(8)').html('<b>Failed</b> to update #' + i  + ': ' + tagsSeries[i].name);
+                        \$('#' + tagsSeries[i].s_id + ' td:nth-child(9)').text(results.info.errorMsg);
                     }
                     
-                    \$(\"#info\").append(' <a href=\"' + results.info.url + '\">URL</a>');
+                    \$('#' + tagsSeries[i].s_id + ' td:nth-child(10)').append(' <a href=\"' + results.info.url + '\">URL</a>');
+                    
                     i ++;
                     if (i<tagsSeries.length) curlData(category,tagsSeries,i);
+                    else {
+                        \$('#table1').DataTable().destroy();
+                        \$('#table1').DataTable({
+                                    paging: false,
+                                    \"autoWidth\": false
+    
+                        });
+                    }
                     
                 },
                 error: function(e, ts, et){
-                        \$(\"#info\").append('<br><span style=\"font-weight:bold\">AJAX ERROR ON #' + i  + ': ' + tagsSeries[i].name +  ' | ' + ts +  ' (s_id: ' + tagsSeries[i].s_id +  ')</span>');
+                        \$('#' + tagsSeries[i].s_id + ' td:nth-child(8)').html('<b>Failed</b> to update #' + i  + ': ' + tagsSeries[i].name);
+                        \$('#' + tagsSeries[i].s_id + ' td:nth-child(9)').html('<br><span style=\"font-weight:bold\">AJAX ERROR | ' + ts +  ' (s_id: ' + tagsSeries[i].s_id +  ')</span>');
                         i ++;
                         if (i<tagsSeries.length) curlData(category,tagsSeries,i);
+                        else {
+                            \$('#table1').DataTable().destroy();
+                            \$('#table1').DataTable({
+                                        paging: false,
+                                        \"autoWidth\": false
+        
+                            });
+                        }
                 }
             });
         }

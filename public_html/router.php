@@ -64,7 +64,8 @@ elseif ($request == 'regions') {
 elseif ($request == 'updatehistseries') {
   $title = 'Historical Series Updater';
   $model[] = 'get_tags_series';
-  $toScript = ['tagsSeries'];
+  $model[] = 'get_specs_categories';
+  $toScript = ['tagsSeries','specsCategories'];
 }
 
 //Currently does not use categories correctly!
@@ -72,15 +73,22 @@ elseif ($request == 'updatetagscorrel') {
   $title = 'Correlation Tags Updater';
   $model[] = 'get_tags_series';
   $model[] = 'get_tags_correl';
-  $model[] = 'update_tags_correl';
-  $toScript = ['tagsSeries','tagsCorrel','sqldata'];
+  $model[] = 'get_specs_categories';
+  $toScript = ['tagsSeries','tagsCorrel','specsCategories'];
 }
 
 elseif ($request == 'updatehistcorrel') {
   $title = 'Correlation History Updater';
+  $fromRouter = ['corr_type' => 'rho'];
   $model[] = 'get_tags_correl';
   $toScript = ['tagsCorrel'];
 }
+
+
+
+
+
+
 
 
 

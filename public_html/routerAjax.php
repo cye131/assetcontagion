@@ -37,6 +37,6 @@ if (isset($toScript)) {
   
   echo json_encode($res);
 }
-else echo 'No requested variables from AJAX!';
+else echo 'No requested variables from AJAX, or too many variables sent through AJAX!';
 
 

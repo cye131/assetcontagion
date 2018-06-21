@@ -1,7 +1,7 @@
 <?php
 
-$series = $fromAjax['series'] ?? NULL;
-$histSeries = array('data' => array(),'info' => array());
+$series = $fromAjax['series'] ?? $fromRouter['series'] ?? NULL;
+$uHistSeries = array('data' => array(),'info' => array());
 
 
 
@@ -24,17 +24,22 @@ $data = $results['data'];
  */
 //print_r($data);
 //exit();
-$histSeries['info']['url'] = $results['url'];
-if (!isset($data) || count($data) === 0) {
-    $histSeries['info']['errorMsg'] = 'No data was able to be retrieved via cURL';
-    $histSeries['info']['insertedHistData'] = (bool) FALSE;
+$uHistSeries['info']['url'] = $results['url'];
+
+if (isset($results['errorMsg']) && strlen($results['errorMsg']) > 0) {
+    $uHistSeries['info']['errorMsg'] = $results['errorMsg'];
+    $uHistSeries['info']['insertedHistData'] = (bool) FALSE;
+}
+else if (!isset($data) || count($data) === 0) {
+    $uHistSeries['info']['errorMsg'] = 'No data was able to be retrieved via cURL';
+    $uHistSeries['info']['insertedHistData'] = (bool) FALSE;
 }
 elseif (count($data) === 1 && $data[0]['date'] === $scraper->min_date) { // If the only entry is the min-date, don't update
-    $histSeries['info']['errorMsg'] = 'No new data to add';
-    $histSeries['info']['insertedHistData'] = (bool) FALSE;
+    $uHistSeries['info']['errorMsg'] = 'No new data to add';
+    $uHistSeries['info']['insertedHistData'] = (bool) FALSE;
 }
 else {
-    $colNames = array('h_id','date','pretty_date','value','chg','fk_id');
+    $colNames = array('date','pretty_date','value','chg','fk_id');
     $sql -> multipleInsert ('hist_series',$colNames,$data);
 }
 
@@ -46,16 +51,16 @@ else {
  *
  *
  */
-if ( isset($histSeries['info']['insertedHistData']) && $histSeries['info']['insertedHistData'] === FALSE) {
+if ( isset($uHistSeries['info']['insertedHistData']) && $uHistSeries['info']['insertedHistData'] === FALSE) {
 }
 elseif ( !isset($sql -> successRowsChanged) || $sql -> successRowsChanged === 0 ) {
-    $histSeries['info'] = array('rowsChg' => 0,
+    $uHistSeries['info'] = array('rowsChg' => 0,
                                     'errorMsg' => 'Could not update historical data',
                                     'insertedHistData' => (bool) FALSE
                                     );
 }
 else {
-    $histSeries['info'] = array('rowsChg' => $sql -> successRowsChanged,
+    $uHistSeries['info'] = array('rowsChg' => $sql -> successRowsChanged,
                                     'errorMsg' => '',
                                     'insertedHistData' => (bool) TRUE,
                                     'firstDate' => array_slice($data, 0,1)[0]['date'],
@@ -71,29 +76,29 @@ else {
  *
  *
  */
-if ($histSeries['info']['insertedHistData'] === TRUE) {
+if ($uHistSeries['info']['insertedHistData'] === TRUE) {
     
-    $queryVals = array('obs_end' => $histSeries['info']['lastDate'],'s_id' => $series['s_id']);
+    $queryVals = array('obs_end' => $uHistSeries['info']['lastDate'],'s_id' => $series['s_id']);
     
     if (is_null($series['obs_start']) || strlen($series['obs_start']) <= 0 ) {
         $includeObsStart = 'obs_start=:obs_start,';
-        $queryVals['obs_start'] = $histSeries['info']['firstDate'];
+        $queryVals['obs_start'] = $uHistSeries['info']['firstDate'];
     } else {
         $includeObsStart = '';
     }
     
     //print_r($series);
-    //print_r($histSeries['info']);
+    //print_r($uHistSeries['info']);
     //print_r($queryVals);
     $query = "UPDATE tags_series SET $includeObsStart obs_end=:obs_end,last_updated=now() WHERE s_id=:s_id";
     $stmt = $sql->prepare($query);
     $stmt->execute($queryVals);
     
-    $histSeries['info']['updatedTags'] = (bool) TRUE;
+    $uHistSeries['info']['updatedTags'] = (bool) TRUE;
     
     
-    $histSeries['data'] = $data;
+    $uHistSeries['data'] = $data;
 }
 
 
-//echo json_encode($histSeries);
+//echo json_encode($uHistSeries);

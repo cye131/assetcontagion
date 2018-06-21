@@ -31,7 +31,7 @@ foreach ($data['timeseries'] as $prettyDate=>$row) {
   if ( !isset($row['correlation']) || is_null($row['correlation']) ) continue;
   
   $dataVals[] = array(
-    'h_id' => str_replace('-','',$prettyDate).'.'.$corrTag['s_corr_id'],
+    //'h_id' => str_replace('-','',$prettyDate).'.'.$corrTag['s_corr_id'],
     'pretty_date' => $prettyDate,
     'value' => $row['correlation'],
     'fk_id' => $corrTag['s_corr_id']
@@ -51,7 +51,7 @@ elseif (count($dataVals) === 0) {
     $uHistCorrel['info']['insertedHistData'] = (bool) FALSE;
 }
 else {
-    $colNames = array('h_id','pretty_date','value','fk_id');
+    $colNames = array(/*'h_id',*/'pretty_date','value','fk_id');
     $sql -> multipleInsert ('hist_correl',$colNames,$dataVals);
 }
 
