@@ -2,12 +2,14 @@
 
 
 ##Changelog
+## [1.7]
+- Added OLS univariate beta
 
 
 ### [1.6]
-- Added Kendall's Tau and Spearman's Rho
-- Added OLS univariate beta
-
+- Added alternate correlation calculations (kendall's tau and spearman's rho)
+- Added front-end selection for correlation type and frequency
+- Changed router so that POST variables override $fromRouter variables on identical keys ($fromRouter now functions as a sort of "default")
 
 ### [1.5] - 2018-06-20
 - Upgraded MySQL to 8.0
