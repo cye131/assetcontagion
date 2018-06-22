@@ -1,5 +1,13 @@
 $(document).ready(function() {
-    
+    //Resizes width after clicking each tab, otherwise highcharts is too skinny!
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function () {
+        if ($('.successmsg').text().length > 0) {
+        $( '.chart' ).each(function() { 
+            $(this).highcharts().reflow();
+        });
+        }
+    });
+
     /* Highlights navigation bar menu item if it's active */
     $(".nav-item").each(function(){
         var a = $(this).find('a:first');
@@ -16,7 +24,7 @@ $(document).ready(function() {
         if (specsCategories.length !== 1) console.log('ERR: No category selected');
         else {
             var freqtrails = specsCategories[0].cat_freqtrails.split(',');
-            var selectedfreqtrail =  (typeof window.freq != undefined && typeof window.trail !=undefined) ? window.freq + '.' + window.trail : null;
+            var selectedfreqtrail =  (typeof window.freq !== undefined && typeof window.trail !== undefined) ? window.freq + '.' + window.trail : null;
             for (i=0;i<freqtrails.length;i++) {
                 var freqtrails_split = freqtrails[i].split('.');
                 var freqtrails_str = freqtrails_split[1] + (freqtrails_split[0] === 'd' ? '-day' : freqtrails_split[0]) + ' ' + (freqtrails_split[0] === 'd' ? 'Rolling Correlation' : 'Correlation') ;
@@ -24,7 +32,7 @@ $(document).ready(function() {
             }
             
             var corr_types = specsCategories[0].cat_corrtypes.split(',');
-            var selectedcorr_type =  (typeof window.corr_type != undefined && typeof window.corr_type !=undefined) ? window.corr_type : null; console.log(selectedcorr_type);
+            var selectedcorr_type =  (typeof window.corr_type !== undefined && typeof window.corr_type !== undefined) ? window.corr_type : null; console.log(selectedcorr_type);
             for (i=0;i<corr_types.length;i++) {
                 var corr_type_str = (corr_types[i] === 'rho' ? 'Pearson Correlation' : (corr_types[i] === 'ktau' ? "Kendall's Tau" : '')) ;
                 $('#corr_type').append('<option value="' + corr_types[i] + '" ' +  (corr_types[i] === selectedcorr_type ? 'selected' : '') + ' >' + corr_type_str + '</option>');
@@ -91,10 +99,19 @@ $(document).ready(function() {
             
             window.playState = 2;
             
-            var lastDate = new Date(getLastDate());
+           /* var lastDate = new Date(getLastDate());
             lastDate.setDate(lastDate.getDate() - 1);
             lastDate = lastDate.toISOString().split('T')[0];
-            getDates(lastDate);
+            getDates(lastDate);*/
+           
+            // Get all Mondays and display result
+            // SO console doensn't show all results
+            var mondays = getMondays(new Date(2010,0,1));
+            console.log(mondays);    
+            // Count of Mondays, not all shown in SO console
+            console.log('There are ' + mondays.length + ' Mondays, the first is ' + mondays[0].toString())
+            window.dateCount = mondays;
+            getHistCorrel(window.dateCount,0);
             
             endSpinner();
             $("#playHistorical").html('&#10074;&#10074; Click to pause');
@@ -112,33 +129,53 @@ $(document).ready(function() {
         } 
     });
     
-        
+    // Get all Mondays from start date to today
+    // Default today's date
+    function getMondays(d) {      
+      // Set to first Monday
+      d.setDate(d.getDate() + (8 - (d.getDay() || 7)) % 7);
+      var mondays = [dateToYmd(d)];
+    
+      // Create Dates for all Mondays up to end year and month
+      while (d < new Date() ) {
+        var m = new Date(d.setDate(d.getDate() + 7));
+        mondays.push(dateToYmd(m));
+      }
+      mondays.pop();
+      return mondays;
+    }
+    
+    function dateToYmd(date) {         
+        var yyyy = date.getFullYear().toString();                                    
+        var mm = (date.getMonth()+1).toString(); // getMonth() is zero-based         
+        var dd  = date.getDate().toString();             
+        return yyyy + '-' + (mm[1]?mm:"0"+mm[0]) + '-' + (dd[1]?dd:"0"+dd[0]);
+    }
 
+        
     function getLastDate() {
         dates = [];
         for (i=0;i<tagsCorrel.length;i++) {
-            dates[i] = parseFloat( tagsCorrel[i].obs_end.replace('-','').replace('-','') );
+            if (tagsCorrel[i].obs_end === null ) dates[i] = 99999999;
+            else dates[i] = parseFloat( tagsCorrel[i].obs_end.replace('-','').replace('-','') );
         }
         date = Math.min.apply(Math,dates).toString();
+        console.log(dates);
         return date.slice(0,4) + '-' + date.slice(4,6) + '-' + date.slice(6,8);
     }
     
     function getDates (lastDate) {        
-        var model = []; var logic=[];
-        model[0] = 'get_date_count_by_hist_correl';
-        toScript = ['dateCount'];
         $.ajax({
             url: 'routerAjax.php',
             type: 'POST',
             data: {
-                model: model,
-                logic: logic,
-                toScript: toScript,
+                model: ['get_date_count_by_hist_correl'],
+                toScript:  ['dateCount'],
                 date: lastDate
                 },
             dataType: 'html',
             cache: false,
-            timeout: 10000,
+            timeout: 15000,
             success: function(res){
                 if (isJson(res)) {
                     res = JSON.parse(res);
@@ -159,7 +196,7 @@ $(document).ready(function() {
     
     function getHistCorrel(dateCount,i) {
         window.playIndex = i;
-        if (window.dateCount == undefined || window.playIndex == undefined) return;
+        if (window.dateCount === undefined || window.playIndex === undefined) return;
         if (window.playState !== 2) {
             return;
         }
@@ -169,7 +206,7 @@ $(document).ready(function() {
         model[1] = 'get_hist_correl_by_date';
         logic[0] = 'heatmap';
        
-        var date = dateCount[i].pretty_date;
+        var date = dateCount[i];
         console.log(date);
         
         $.ajax({
@@ -183,39 +220,41 @@ $(document).ready(function() {
                 },
             dataType: 'html',
             cache: false,
-            timeout: 10000,
+            timeout: 20000,
             success: function(res){
-                //console.log(res);
-                res = JSON.parse(res);
-                chart = $("#heatmap").highcharts();
-                //console.log(chart.series[0].data);
-                console.log(res.heatMapData.data);
-                
-                for (j=0;j<res.heatMapData.data.length;j++) {
-                    chart.series[0].data[j].update({
-                        value: res.heatMapData.data[j].value,
-                        color: res.heatMapData.data[j].color,
-                        pretty_date: res.heatMapData.data[j].pretty_date,
-                        tooltip: res.heatMapData.data[j].tooltip
-                    },false);
+                console.log(res);
+                if (res !== undefined && res.length > 0) {
+                    res = JSON.parse(res);
+                    chart = $("#heatmap").highcharts();
+                    //console.log(chart.series[0].data);
+                    console.log(res.heatMapData.data);
+                    
+                    for (j=0;j<res.heatMapData.data.length;j++) {
+                        chart.series[0].data[j].update({
+                            value: res.heatMapData.data[j].value,
+                            color: res.heatMapData.data[j].color,
+                            pretty_date: res.heatMapData.data[j].pretty_date,
+                            tooltip: res.heatMapData.data[j].tooltip
+                        },false);
+                    }
+                    chart.redraw();
+                    
+                    $("#date").remove();
+                    chart.renderer.text(date,chart.plotLeft+(chart.plotWidth-chart.plotLeft)/2,chart.plotTop + (chart.plotHeight-chart.plotTop)/2) //(text,x,y)
+                    .attr({
+                        zIndex: 4,
+                        'text-anchor': 'middle',
+                        id: 'date'
+                    })
+                    .css({
+                        textAlign: 'center',
+                        color: 'white',
+                        fontSize: '36px',
+                        opacity: 0.7,
+                        'text-shadow': '-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black'
+                    })
+                    .add();
                 }
-                chart.redraw();
-                
-                $("#date").remove();
-                chart.renderer.text(date,chart.plotLeft+(chart.plotWidth-chart.plotLeft)/2,chart.plotTop + (chart.plotHeight-chart.plotTop)/2) //(text,x,y)
-                .attr({
-                    zIndex: 4,
-                    'text-anchor': 'middle',
-                    id: 'date'
-                })
-                .css({
-                    textAlign: 'center',
-                    color: 'white',
-                    fontSize: '36px',
-                    opacity: 0.7,
-                    'text-shadow': '-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black'
-                })
-                .add();
                 
                 /*
                 chart.destroy();

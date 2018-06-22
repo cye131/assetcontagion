@@ -127,7 +127,7 @@ class __TwigTemplate_bf26b55b0cf4d5a89835611b47e2e439983c7691db325f713eba15439bd
                 },
                 dataType: 'html',
                 cache: false,
-                timeout: 10000,
+                timeout: 20000,
                 success: function(results){
                     console.log(\"Success\");
                     console.log(results);
@@ -140,7 +140,7 @@ class __TwigTemplate_bf26b55b0cf4d5a89835611b47e2e439983c7691db325f713eba15439bd
                         \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(11)').html('<span>Successfully updated #' + i  + ': ' + results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')</span>');
                         \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(7)').html(results.info.firstDate);
                         \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(8)').html(results.info.lastDate);
-                        \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(9)').html(results.info.lastFirstInput);
+                        \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(9)').html(results.info.lastVal);
 
                     }
                     else {
@@ -276,7 +276,7 @@ class __TwigTemplate_bf26b55b0cf4d5a89835611b47e2e439983c7691db325f713eba15439bd
                 },
                 dataType: 'html',
                 cache: false,
-                timeout: 10000,
+                timeout: 20000,
                 success: function(results){
                     console.log(\"Success\");
                     console.log(results);
@@ -289,7 +289,7 @@ class __TwigTemplate_bf26b55b0cf4d5a89835611b47e2e439983c7691db325f713eba15439bd
                         \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(11)').html('<span>Successfully updated #' + i  + ': ' + results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')</span>');
                         \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(7)').html(results.info.firstDate);
                         \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(8)').html(results.info.lastDate);
-                        \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(9)').html(results.info.lastFirstInput);
+                        \$('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(9)').html(results.info.lastVal);
 
                     }
                     else {

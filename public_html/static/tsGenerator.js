@@ -9,7 +9,7 @@ $(document).ready(function() {
         var opt1 = $('#corr_1').val();
         var opt2 = $('#corr_2').val();
         
-        if (opt1 == undefined || opt2 == undefined) {
+        if (opt1 === undefined || opt2 === undefined) {
             $('.selectcorr').addClass('is-invalid');
             $( "#errormessageTS" ).show();
             $( "#errormessageTS" ).text('Inputs cannot be empty!');

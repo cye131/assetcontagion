@@ -1,15 +1,20 @@
 
 
 
-##Changelog
-## [1.7]
+## ChangeLog
+### []
 - Added OLS univariate beta
 
 
-### [1.6]
+### [1.8] - 2018-06-23
+- Forced chart reflow on new tab select
+- Bug fix for historical heatmap with null obs_end
+- Changed historical heatmap to increase by Monday-indexed dates (Previously did a count over the historical data table but was too slow)
+
+### [1.6] - 2018-06-22
 - Added alternate correlation calculations (kendall's tau and spearman's rho)
 - Added front-end selection for correlation type and frequency
-- Changed router so that POST variables override $fromRouter variables on identical keys ($fromRouter now functions as a sort of "default")
+- Changed router so that POST variables override $fromRouter variables on identical keys ($fromRouter now functions as a default)
 
 ### [1.5] - 2018-06-20
 - Upgraded MySQL to 8.0

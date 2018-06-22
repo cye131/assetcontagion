@@ -6,6 +6,9 @@
  *
  */
 
+if (count($tagsCorrel) === 0) exit();
+ 
+ 
 //Creates array for heatmap
 $hmData = array();
 $hmInfo = array();
