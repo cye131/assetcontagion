@@ -4,69 +4,31 @@ class CorrelationData {
     
     public function __construct($combinedSeries,$corrTag) {
         //$combinedSeries takes 2 series together in a multidimensional array
-        //$corrTag is a one-dimensional keyed array with 'freq','trail','val_type_1','val_type_2' mandatory
+        //$corrTag is a one-dimensional keyed array with 'freq','trail','val_type_1','val_type_2' , corr_type mandatory
         $this->combinedSeries = $combinedSeries;
         $this->seriesNames = array_keys($combinedSeries);
-        $this->freq = '';
-        $this->trail = (int) 30;
+        $this->freq = $corrTag['freq'] ?? NULL;
+        $this->trail = $corrTag['trail'] ?? NULL;
         $this->val_type_1 = 'chg';
         $this->val_type_2 = 'chg';
-        
+        $this->corr_type = $corrTag['corr_type'] ?? NULL;
+
         foreach ($corrTag as $k=>$v) {
             $this->$k = $v;
         }
+        
         $this->correlData = array();
         $this->correlIndex = array();
     }
     
     
-    public static function getDupletCombinations($array) {
-        //takes array [a,b,c] returns [[ab],[ac],[bc]]
-        $combinations = array();
-        
-        $k = (int) 0;
-        
-        for ($i=0;$i<count($array);$i++) {
-            for ($j=$i+1;$j<count($array);$j++) {
-                $combinations[$k][0] = $array[$i];
-                $combinations[$k][1] = $array[$j];
-            
-            $k++;
-            }
-            
-        }
-
-        return $combinations;        
-    }
     
-    public static function pearsonCorrelation($x, $y){
-        $length= count($x);
-        $mean1=array_sum($x) / $length;
-        $mean2=array_sum($y) / $length;
-        $a=0;
-        $b=0;
-        $axb=0;
-        $a2=0;
-        $b2=0;
-        for ($i=0;$i<$length;$i++) {
-            $a=$x[$i]-$mean1;
-            $b=$y[$i]-$mean2;
-            $axb=$axb+($a*$b);
-            $a2=$a2+ pow($a,2);
-            $b2=$b2+ pow($b,2);
-        }
-        if ( sqrt($a2*$b2) == 0 ) $corr = NULL;
-        else $corr= $axb / sqrt($a2*$b2);
-        return $corr;
-    }
 
-    
     
     public function calculateCorrelation() {
     //Takes data of the form array->date->roi/value/etc        
         $this->calculateCorrelationData();
         $this->calculateCorrelationIndex();
-        //print_r($this->correlData);        print_r($this->combinedSeries);
 
         return ['data' => $this->correlData,'index' => $this->correlIndex];
     }
@@ -122,7 +84,7 @@ class CorrelationData {
             $data1_l[] = $tsRow[1];
             $data2_l[] = $tsRow[2];
             $dates_l[] = $date;
-            
+
             if  (count($data1_l) > $this->trail) {
                 array_shift($data1_l);
                 array_shift($data2_l);
@@ -133,9 +95,9 @@ class CorrelationData {
             
             if  (count($data1_l) === (int) $this->trail) {
 
-                $corr = $this::pearsonCorrelation($data1_l,$data2_l);
+                $corr = $this->getCorr($data1_l,$data2_l,$this->corr_type);
+                                                                                                      
                 $data['timeseries'][$date]['correlation'] = !is_null($corr) ? (float) round($corr,4) : NULL;
-                
                 $data['timeseries'][$date]['inputs_used'] = count($dates_l);
                 $data['timeseries'][$date]['earliest_input'] = $dates_l[0];
             }
@@ -195,6 +157,104 @@ class CorrelationData {
     
     
     
+    public static function getDupletCombinations($array) {
+        //takes array [a,b,c] returns [[ab],[ac],[bc]]
+        $combinations = array();
+        
+        $k = (int) 0;
+        
+        for ($i=0;$i<count($array);$i++) {
+            for ($j=$i+1;$j<count($array);$j++) {
+                $combinations[$k][0] = $array[$i];
+                $combinations[$k][1] = $array[$j];
+            
+            $k++;
+            }
+            
+        }
+
+        return $combinations;        
+    }
+    
+    public function getCorr ($x,$y,$type) {
+        if ($type === 'rho') return $this->pearsonCorrelation($x,$y,$type);
+        elseif ($type === 'ktau') return $this->kendallsTau($x,$y,$type);
+        elseif ($type === 'srho') return $this->spearmansRho($x,$y,$type);
+    }
+    
+    
+    private function pearsonCorrelation($x, $y){
+        $length = count($x);
+        $mean1 = array_sum($x) / $length;
+        $mean2 = array_sum($y) / $length;
+        $a = 0;
+        $b = 0;
+        $axb = 0;
+        $a2 = 0;
+        $b2 = 0;
+        for ($i=0;$i<$length;$i++) {
+            $a = $x[$i]-$mean1;
+            $b = $y[$i]-$mean2;
+            $axb = $axb+($a*$b);
+            $a2 = $a2+ pow($a,2);
+            $b2 = $b2+ pow($b,2);
+        }
+        if ( sqrt($a2*$b2) == 0 ) $corr = NULL;
+        else $corr= $axb / sqrt($a2*$b2);
+        return $corr;
+    }
+
+    private function kendallsTau ($x, $y){
+        $numC = (int) 0;
+        $numD = (int) 0;
+        $tiesX = (int) 0;
+        $tiesY = (int) 0;
+        $numerator = (int) 0;
+        $n = count($x);
+
+        if ($n !== count($y) || $n === 0) {
+            return $corr = NULL;
+        }
+        else {
+            
+            for ($i=0;$i<$n;$i++) {
+            for ($j=$i+1;$j<$n;$j++) {
+                
+                if (  $x[$i] === $x[$j]  || $y[$i] === $y[$j]) {
+                    if ( $x[$i] === $x[$j]  ) $tiesX++;
+                    if ( $y[$i] === $y[$j]  ) $tiesY++;
+                    continue;
+                }
+                
+                if ( ($x[$i] < $x[$j] && $y[$i] < $y[$j]) || ($x[$i] > $x[$j] && $y[$i] > $y[$j]) ) {
+                    $numC ++;   
+                } else {
+                    $numD ++;
+                }
+                
+            }
+            }
+            
+            $numerator = $n*($n-1)/2;
+            //echo "Num$numerator C$numC D$numD  N$n";
+            
+            return $corr = ($numerator == 0 ? NULL : ($numC - $numD)/$numerator);
+        }
+        
+        
+    }
+    
+    private function spearmansRho ($x,$y) {
+        usort($x);
+        usort($y);
+        return $this->pearsonCorrelation($x,$y);
+        
+    }
+
+    
+    
+    
+    
     
     
     
@@ -205,4 +265,3 @@ class CorrelationData {
 }
 
 
-?>

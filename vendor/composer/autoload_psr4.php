@@ -8,4 +8,5 @@ $baseDir = dirname($vendorDir);
 return array(
     'Twig\\' => array($vendorDir . '/twig/twig/src'),
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
+    'Phpml\\' => array($vendorDir . '/php-ai/php-ml/src'),
 );

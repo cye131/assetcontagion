@@ -7,7 +7,7 @@ $category = $fromAjax['category'] ?? $fromRouter['category'] ?? NULL;
 
 
 if (!is_null($category)) {
-    $category_str = 'WHERE specs_categories = :category';
+    $category_str = 'WHERE cat_nid = :category';
     $varsToBind['category'] = $category;
 } else {
     $category_str = '';

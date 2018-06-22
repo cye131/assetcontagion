@@ -90,6 +90,22 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
         </div>
     </section>
     
+    <section class=\"container\" style=\"margin-bottom:20px\">
+        <form class=\"form-inline\" method=\"post\" action=\"\" id=\"corrselector\">
+            <div class = \"form-group\">
+                <label for=\"freqtrail\" style=\"font-weight:600\" >Data frequency</label>
+                <select class=\"form-control form-control-sm\" id=\"freqtrail\"></select>
+                <input type=\"hidden\" id=\"freq\" name=\"freq\"></input>
+                <input type=\"hidden\" id=\"trail\" name=\"trail\"></input>
+            </div>
+            <div class = \"form-group\" style=\"margin-left:10px\">
+                <label for=\"corr_type\" style=\"font-weight:600\" >Correlation Type</label>
+                <select class=\"form-control form-control-sm\" name=\"corr_type\" id=\"corr_type\"></select>
+                <button class=\"btn btn-primary btn-sm\" type=\"submit\" id=\"submitcorrselector\" >Change</button>
+            </div>
+        </form>
+    </section>
+
     <section class=\"container\" id=\"resultscontainer\">
         <ul class=\"nav nav-tabs\" id=\"myTab\" role=\"tablist\">
             
@@ -118,7 +134,7 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
                         <div id=\"heatmap\"></div>
                     </div>
                 </div>
-            </div>  
+            </div>
           </div>
 
             
@@ -196,7 +212,7 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
 
     public function getDebugInfo()
     {
-        return array (  183 => 27,  68 => 28,  66 => 27,  60 => 23,  57 => 22,  37 => 4,  34 => 3,  15 => 1,);
+        return array (  199 => 27,  68 => 28,  66 => 27,  60 => 23,  57 => 22,  37 => 4,  34 => 3,  15 => 1,);
     }
 
     public function getSourceContext()
@@ -253,6 +269,22 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
         </div>
     </section>
     
+    <section class=\"container\" style=\"margin-bottom:20px\">
+        <form class=\"form-inline\" method=\"post\" action=\"\" id=\"corrselector\">
+            <div class = \"form-group\">
+                <label for=\"freqtrail\" style=\"font-weight:600\" >Data frequency</label>
+                <select class=\"form-control form-control-sm\" id=\"freqtrail\"></select>
+                <input type=\"hidden\" id=\"freq\" name=\"freq\"></input>
+                <input type=\"hidden\" id=\"trail\" name=\"trail\"></input>
+            </div>
+            <div class = \"form-group\" style=\"margin-left:10px\">
+                <label for=\"corr_type\" style=\"font-weight:600\" >Correlation Type</label>
+                <select class=\"form-control form-control-sm\" name=\"corr_type\" id=\"corr_type\"></select>
+                <button class=\"btn btn-primary btn-sm\" type=\"submit\" id=\"submitcorrselector\" >Change</button>
+            </div>
+        </form>
+    </section>
+
     <section class=\"container\" id=\"resultscontainer\">
         <ul class=\"nav nav-tabs\" id=\"myTab\" role=\"tablist\">
             
@@ -281,7 +313,7 @@ class __TwigTemplate_5c7f26fe2039aa74a91bee810ee0b60174226710d272904ce8c2f8a334e
                         <div id=\"heatmap\"></div>
                     </div>
                 </div>
-            </div>  
+            </div>
           </div>
 
             

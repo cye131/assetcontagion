@@ -26,6 +26,7 @@ $index = $results['index'];
  *
  *
  */
+ 
 $dataVals = array();
 foreach ($data['timeseries'] as $prettyDate=>$row) {
   if ( !isset($row['correlation']) || is_null($row['correlation']) ) continue;
@@ -54,7 +55,6 @@ else {
     $colNames = array(/*'h_id',*/'pretty_date','value','fk_id');
     $sql -> multipleInsert ('hist_correl',$colNames,$dataVals);
 }
-
 
 
 /* Check if historical data insert was successful

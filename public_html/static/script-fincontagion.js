@@ -9,6 +9,48 @@ $(document).ready(function() {
     });
 
     
+    /* Frequency & Correlation Type form */
+    setCategoryOptions();
+    
+    function setCategoryOptions() {
+        if (specsCategories.length !== 1) console.log('ERR: No category selected');
+        else {
+            var freqtrails = specsCategories[0].cat_freqtrails.split(',');
+            var selectedfreqtrail =  (typeof window.freq != undefined && typeof window.trail !=undefined) ? window.freq + '.' + window.trail : null;
+            for (i=0;i<freqtrails.length;i++) {
+                var freqtrails_split = freqtrails[i].split('.');
+                var freqtrails_str = freqtrails_split[1] + (freqtrails_split[0] === 'd' ? '-day' : freqtrails_split[0]) + ' ' + (freqtrails_split[0] === 'd' ? 'Rolling Correlation' : 'Correlation') ;
+                $('#freqtrail').append('<option value="' + freqtrails[i] + '" ' + (freqtrails[i] === selectedfreqtrail ? 'selected' : '')  + ' >' + freqtrails_str + '</option>');
+            }
+            
+            var corr_types = specsCategories[0].cat_corrtypes.split(',');
+            var selectedcorr_type =  (typeof window.corr_type != undefined && typeof window.corr_type !=undefined) ? window.corr_type : null; console.log(selectedcorr_type);
+            for (i=0;i<corr_types.length;i++) {
+                var corr_type_str = (corr_types[i] === 'rho' ? 'Pearson Correlation' : (corr_types[i] === 'ktau' ? "Kendall's Tau" : '')) ;
+                $('#corr_type').append('<option value="' + corr_types[i] + '" ' +  (corr_types[i] === selectedcorr_type ? 'selected' : '') + ' >' + corr_type_str + '</option>');
+            }
+
+        }
+    }
+    
+    
+    $("#corrselector").submit(function(e){
+        e.preventDefault();
+        var freqtrail = $('#freqtrail').val();
+        freqtrail = freqtrail.split('.');
+        
+        $('#freq').val(freqtrail[0]);
+        $('#trail').val(freqtrail[1]);
+        
+        $("#corrselector")[0].submit();
+    });
+
+    
+    
+    
+    
+    
+    
     //Obj to Array
     Object.keys(heatMapData.data).map(function(e) {
           return heatMapData.data[e];

@@ -50,6 +50,22 @@
         </div>
     </section>
     
+    <section class="container" style="margin-bottom:20px">
+        <form class="form-inline" method="post" action="" id="corrselector">
+            <div class = "form-group">
+                <label for="freqtrail" style="font-weight:600" >Data frequency</label>
+                <select class="form-control form-control-sm" id="freqtrail"></select>
+                <input type="hidden" id="freq" name="freq"></input>
+                <input type="hidden" id="trail" name="trail"></input>
+            </div>
+            <div class = "form-group" style="margin-left:10px">
+                <label for="corr_type" style="font-weight:600" >Correlation Type</label>
+                <select class="form-control form-control-sm" name="corr_type" id="corr_type"></select>
+                <button class="btn btn-primary btn-sm" type="submit" id="submitcorrselector" >Change</button>
+            </div>
+        </form>
+    </section>
+
     <section class="container" id="resultscontainer">
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             
@@ -78,7 +94,7 @@
                         <div id="heatmap"></div>
                     </div>
                 </div>
-            </div>  
+            </div>
           </div>
 
             

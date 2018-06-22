@@ -49,11 +49,12 @@ elseif ($request == 'stock') {
 elseif ($request == 'regions') {
   $title = 'Global Stock Market Correlations';
   $fromRouter = ['category' => 'reg','corr_type' => 'rho','freq' => 'd', 'trail' => 30];
+  $model[] = 'get_specs_categories';
   $model[] = 'get_tags_series';
   $model[] = 'get_tags_correl';
   $model[] = 'get_tags_gfi';
   $logic[] ='heatmap';
-  $toScript = ['tagsSeries','tagsCorrel','heatMapData','tagsGFI'];
+  $toScript = ['tagsSeries','tagsCorrel','heatMapData','tagsGFI','specsCategories','corr_type','freq','trail'];
 }
 
 
@@ -79,7 +80,6 @@ elseif ($request == 'updatetagscorrel') {
 
 elseif ($request == 'updatehistcorrel') {
   $title = 'Correlation History Updater';
-  $fromRouter = ['corr_type' => 'rho'];
   $model[] = 'get_tags_correl';
   $toScript = ['tagsCorrel'];
 }
@@ -90,6 +90,17 @@ elseif ($request == 'updatehistcorrel') {
 
 
 
+/* Override the $fromAjax variables with $_POST variables if they're set
+ *
+ *
+ *
+ *
+ */
+foreach ($fromRouter as $k => $fR) {
+ if ( isset($_POST[$k]) && !is_null($_POST[$k]) ) {
+  $fromRouter[$k] = $_POST[$k];
+ }
+}
 
 
 //Send request
@@ -115,6 +126,7 @@ if (count($toScript) > 0) {
   $requestvars['script'] = $script->minify();
 }
 else $requestvars['script'] = '';
+
 
 
 if (isset($title)) $requestvars['title'] = $title; else $title = 'No Title';
