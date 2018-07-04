@@ -3,7 +3,7 @@ class MyPDO extends PDO {
     
     public function __construct() {
         
-        require_once('/var/www/correlation/config/db.php');
+        require_once(__DIR__.'/../config/db.php');
         
         $dsn = 'mysql:dbname='.DB_DATABASE;
         $username = DB_USER;

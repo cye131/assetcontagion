@@ -2,11 +2,19 @@
 
 
 ## ChangeLog
-### []
-- Added OLS univariate beta
+### [1.8] = 2018-07-03
+- Added a correlation index, including database, CRUD model, Highcharts graph, script for cronjob, and REST API
+- Added better coloration system to heatmap
+- Added JS minification & concatenation system
+- Added /js/ folder
+- Added /cronscripts/ folder
+- Improved all links by changing all absolute links to relative links
+- Improved routing system to be inline with the arima project
+- Improved and refactored all JS code
+- Fixed get_hist_correl_by_date model with proper input reception
 
 
-### [1.8] - 2018-06-23
+### [1.7] - 2018-06-23
 - Forced chart reflow on new tab select
 - Bug fix for historical heatmap with null obs_end
 - Changed historical heatmap to increase by Monday-indexed dates (Previously did a count over the historical data table but was too slow)

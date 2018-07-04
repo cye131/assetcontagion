@@ -1,43 +1,70 @@
 <?php
 spl_autoload_register('myAutoloader');
 function myAutoloader($classname) {
-  require_once "/var/www/correlation/classes/" . $classname . '.class.php';
+  require_once __DIR__."/../classes/$classname.class.php";
 }
+require_once __DIR__.'/../vendor/autoload.php';
 
-
-require_once '/var/www/correlation/vendor/autoload.php';
-$loader = new Twig_Loader_Filesystem(__DIR__.'/templates');
-$twig = new Twig_Environment($loader,array(
-                                           'debug' => true,
-                                           'cache' => '/var/www/correlation/cache'
-                                           ));
-
-
-
-//Set default URL
-if (isset($_GET['path']) && strlen($_GET['path'])) $request = $_GET['path'];
-else $request = 'regions';
-
-$requestvars = array(
-                     'title' => '',
-                     'modeldata' => array()
-                     );
+$twig = new Twig_Environment(
+                             new Twig_Loader_Filesystem(__DIR__.'/templates'),
+                             ['debug' => true,'cache' => __DIR__.'/twig-cache']
+                             );
 
 
 
-/* Model returns $modeldata -> $modeldata['script'] goes into <script></script> tag on bottom of body
+/* DEV MODE
  *
  *
  *
  */
+ $DEV_MODE = ( $_SERVER['REMOTE_ADDR'] === '24.99.149.88') ? true : false;
 
+ 
+ 
+/* $fromRouter sends information to model and logic files
+ * $model specifies /molders folder for SQL data
+ * $logic specifies any model-type files for anything other than SQL data
+ * $toScript specifies any variables to be returned from the model/logic files to be inserted in <script></script> tags at the bottom of the HTML body
+ *  $incFiles specifies a list of JS/CSS files to be returned
+ */
  $fromRouter = [];
  $model = [];
  $logic = [];
- $toScript = [];
+ $toScript =[];
+ $incJS = [];
+
+ 
+ 
+ 
+ /* Set defaults here
+  *
+  *
+  *
+  */
+ $request = (isset($_GET['path']) && strlen($_GET['path'])) ? $_GET['path'] : 'regions';
+
+
+ /* Define routes
+  *
+  *
+  *
+  */
+
   
 //Routes - Main Sites
-if ($request == 'stocksectorcorrelation') {
+if ($request === 'regions') {
+  $title = 'Global Stock Market Correlations';
+  /*$fromRouter = ['category' => 'reg','corr_type' => 'rho','freq' => 'd', 'trail' => 30];
+  $model[] = 'get_specs_categories';
+  $model[] = 'get_tags_series';
+  $model[] = 'get_tags_correl';
+  $model[] = 'get_tags_gfi';*/
+  //$logic[] ='heatmap';
+  //$toScript = ['tagsSeries','tagsCorrel','heatMapData','tagsGFI','specsCategories','corr_type','freq','trail'];
+  array_push($incJS,'regions','heatmap','mapGenerator'/*,'tsGenerator'*/);
+}
+
+elseif ($request == 'stocksectorcorrelation') {
   $title = 'Stock Sector Industry Correlation Lookup';
   $model = 'correlations/getstocks.script.php';
 }
@@ -45,18 +72,6 @@ if ($request == 'stocksectorcorrelation') {
 elseif ($request == 'stock') {
   $title = 'Stock-to-Stock Correlation Lookup';
 }
-
-elseif ($request == 'regions') {
-  $title = 'Global Stock Market Correlations';
-  $fromRouter = ['category' => 'reg','corr_type' => 'rho','freq' => 'd', 'trail' => 30];
-  $model[] = 'get_specs_categories';
-  $model[] = 'get_tags_series';
-  $model[] = 'get_tags_correl';
-  $model[] = 'get_tags_gfi';
-  $logic[] ='heatmap';
-  $toScript = ['tagsSeries','tagsCorrel','heatMapData','tagsGFI','specsCategories','corr_type','freq','trail'];
-}
-
 
 
 
@@ -96,39 +111,71 @@ elseif ($request == 'updatehistcorrel') {
  *
  *
  */
-foreach ($fromRouter as $k => $fR) {
- if ( isset($_POST[$k]) && !is_null($_POST[$k]) ) {
-  $fromRouter[$k] = $_POST[$k];
+ foreach ($fromRouter as $k => $fR) {
+  if ( isset($_POST[$k]) && !is_null($_POST[$k]) ) {
+   $fromRouter[$k] = $_POST[$k];
+  }
  }
-}
+ 
+ 
+ 
+ /* Execute models and logics scripts
+  *
+  *
+  *
+  */
+ if (count($model) > 0) {
+   $sql = new MyPDO();
+   foreach ($model as $m) {
+     require_once(__DIR__."/../models/$m.model.php");
+     }
+ }
+ 
+ if (count($logic) > 0) {
+   foreach ($logic as $l) {
+     require_once(__DIR__."/../models/$l.logic.php");
+   }
+ }
 
+ /* Prepares variables to send to HTML template
+  *
+  *
+  *
+  */
 
-//Send request
-if (count($model) > 0) {
-  $sql = new MyPDO();
-  foreach ($model as $m) {
-    require_once("/var/www/correlation/models/$m.model.php");
-    }
-}
-
-if (count($logic) > 0) {
-  foreach ($logic as $l) {
-    require_once("/var/www/correlation/models/$l.logic.php");
+ if (count($toScript) > 0) {
+   $scriptStr = '';
+   foreach ($toScript as $varName) {
+     $scriptStr .= "$varName = ".json_encode(${$varName}).';'; 
+   }
+   $script = new StaticFile('js',$scriptStr);
+   $toHTML['bodyScript'] = $script->minify();
+ }
+ else $toHTML['bodyScript'] = '';
+ 
+ $toHTML['title'] = ( isset($title) ) ? $title : 'No Title';
+ 
+ 
+ if ($DEV_MODE === true) {
+  $minifier = new MatthiasMullie\Minify\JS(__DIR__."/../js/main.js");
+  foreach ($incJS as $js) {
+   $minifier->add(__DIR__."/../js/$js.js");
   }
-}
-
-if (count($toScript) > 0) {
-  $scriptStr = '';
-  foreach ($toScript as $varName) {
-    $scriptStr .= "$varName = ".json_encode(${$varName}).';'; 
-  }
-  $script = new StaticFile('js',$scriptStr);
-  $requestvars['script'] = $script->minify();
-}
-else $requestvars['script'] = '';
+  $minifier->minify(__DIR__."/static/$request.js");
+ }
+ 
+ if (count($incJS) > 0) $toHTML['pageJS'] = '<script src="static/'.$request.'.js"></script>';
+ else $toHTML['pageJS'] = '';
 
 
 
-if (isset($title)) $requestvars['title'] = $title; else $title = 'No Title';
-
-echo $twig->render($request.'.html', $requestvars);  
+ /* Renders page
+  *
+  *
+  *
+  */
+ 
+ echo $twig->render($request.'.html', $toHTML);
+                    exit();
+ try { echo $twig->render($request.'.html', $toHTML); }
+ catch (Exception $e) { echo 'Page not found'; }

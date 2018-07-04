@@ -1,42 +1,69 @@
 <?php
 spl_autoload_register('myAutoloader');
 function myAutoloader($classname) {
-  require_once "/var/www/correlation/classes/" . $classname . '.class.php';
+  require_once __DIR__."/../classes/$classname.class.php";
+}
+require_once __DIR__.'/../vendor/autoload.php';
+
+
+/* Exit if not AJAX
+ *
+ *
+ *
+ */
+
+if(empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest') {
+  echo 'Not AJAX';
+  return;
 }
 
 
-//Routes - AJAX
-if(empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest') exit();
-
-$model = $_POST['model'] ?? NULL;
-$logic = $_POST['logic'] ?? NULL;
-$fromAjax = $_POST['fromAjax'] ?? NULL;
-$toScript = $_POST['toScript'] ?? NULL;
 
 
 
-//Send request
-if (isset($model)) {
+/* Execute PHP code
+ *
+ *
+ *
+ */
+$model = $_POST['model'] ?? [];
+$logic = $_POST['logic'] ?? [];
+$fromAjax = $_POST['fromAjax'] ?? [];
+$toScript = $_POST['toScript'] ?? [];
+
+
+if (count($model) > 0) {
   $sql = new MyPDO();
   foreach ($model as $m) {
-    require_once("/var/www/correlation/models/$m.model.php");
+    if (isset($errMsg)) break;
+    require_once(__DIR__."/../models/$m.model.php");
     }
 }
 
-if (isset($logic)) {
+if (count($logic) > 0) {
   foreach ($logic as $l) {
-    require_once("/var/www/correlation/models/$l.logic.php");
+    if (isset($errMsg)) break;
+    require_once(__DIR__."/../models/$l.logic.php");
   }
 }
 
+
+
+
+
+/* Send to script
+ *
+ *
+ *
+ */
+$res = [];
 if (isset($toScript)) {
-  $res = [];
   foreach ($toScript as $varName) {
     $res[$varName] = (${$varName}); 
-  }
-  
-  echo json_encode($res);
+  }  
 }
-else echo 'No requested variables from AJAX, or too many variables sent through AJAX!';
+if (isset($errMsg)) $res['errMsg'] = $errMsg;
+
+echo json_encode($res);
 
 

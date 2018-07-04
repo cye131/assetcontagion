@@ -23,6 +23,11 @@ class ComposerStaticInitcddd95f2d3b7699a93b530a4234d4a1b
         array (
             'Phpml\\' => 6,
         ),
+        'M' => 
+        array (
+            'MatthiasMullie\\PathConverter\\' => 29,
+            'MatthiasMullie\\Minify\\' => 22,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -37,6 +42,14 @@ class ComposerStaticInitcddd95f2d3b7699a93b530a4234d4a1b
         'Phpml\\' => 
         array (
             0 => __DIR__ . '/..' . '/php-ai/php-ml/src',
+        ),
+        'MatthiasMullie\\PathConverter\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/matthiasmullie/path-converter/src',
+        ),
+        'MatthiasMullie\\Minify\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/matthiasmullie/minify/src',
         ),
     );
 
