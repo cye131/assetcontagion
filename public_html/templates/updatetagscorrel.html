@@ -39,6 +39,7 @@
                         <th>category</th>
                         <th>freq</th>
                         <th>trail</th>
+                        <th>corr_type</th>
                         <th>b_id_1 (name_1)</th>
                         <th>b_id_2 (name_2)</th>
                         <th>obs_start</th>
@@ -109,7 +110,7 @@
                 }
             
                 for (i=0;i<tagsCorrelFiltered.length;i++) {
-                    $('#table1').append('<tr id="' + tagsCorrelFiltered[i].uniq_nid + '"><td>' + tagsCorrelFiltered[i].s_corr_id + '</td><td>' + tagsCorrelFiltered[i].category + '</td><td>' + tagsCorrelFiltered[i].freq + '</td><td>' + tagsCorrelFiltered[i].trail + '</td><td>' + tagsCorrelFiltered[i].b_id_1 + ' ' + tagsCorrelFiltered[i].name_1 + '</td><td>' + tagsCorrelFiltered[i].b_id_2 + ' ' + tagsCorrelFiltered[i].name_2 + '</td><td> ' + tagsCorrelFiltered[i].obs_start +  '</td><td>' + tagsCorrelFiltered[i].obs_end + '</td><td>' + tagsCorrelFiltered[i].obs_end_val + '</td><td>' + tagsCorrelFiltered[i].last_updated + '</td><td></td><td></td></tr>');
+                    $('#table1').append('<tr id="' + tagsCorrelFiltered[i].uniq_nid + '"><td>' + tagsCorrelFiltered[i].s_corr_id + '</td><td>' + tagsCorrelFiltered[i].category + '</td><td>' + tagsCorrelFiltered[i].freq + '</td><td>' + tagsCorrelFiltered[i].trail + '</td><td>'+ tagsCorrelFiltered[i].corr_type +'</td><td>' + tagsCorrelFiltered[i].b_id_1 + ' ' + tagsCorrelFiltered[i].name_1 + '</td><td>' + tagsCorrelFiltered[i].b_id_2 + ' ' + tagsCorrelFiltered[i].name_2 + '</td><td> ' + tagsCorrelFiltered[i].obs_start +  '</td><td>' + tagsCorrelFiltered[i].obs_end + '</td><td>' + tagsCorrelFiltered[i].obs_end_val + '</td><td>' + tagsCorrelFiltered[i].last_updated + '</td><td></td><td></td></tr>');
                 }
                 
                 $('#table1').DataTable({

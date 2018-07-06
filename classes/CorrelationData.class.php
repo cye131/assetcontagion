@@ -42,7 +42,6 @@ class CorrelationData {
             
             if ($code === $this->seriesNames[0]) $level = (int) 1;
             elseif ($code === $this->seriesNames[1]) $level = (int) 2;
-            else {echo $code;print_r( $this->seriesNames );exit();}
             
             //echo $level;
             //echo $this->freq;echo $this->trail;
@@ -94,9 +93,9 @@ class CorrelationData {
             }
             
             if  (count($data1_l) === (int) $this->trail) {
-
+                $start = microtime(true);
                 $corr = $this->getCorr($data1_l,$data2_l,$this->corr_type);
-                                                                                                      
+                echo "$date: $corr | Total Time: ".round(microtime(true) - $start,2)." secs\n";
                 $data['timeseries'][$date]['correlation'] = !is_null($corr) ? (float) round($corr,4) : NULL;
                 $data['timeseries'][$date]['inputs_used'] = count($dates_l);
                 $data['timeseries'][$date]['earliest_input'] = $dates_l[0];
@@ -111,7 +110,7 @@ class CorrelationData {
         $index = array();
         $index['codes'] = $this->seriesNames;
         $index['valuestocorrelate'] = [$this->val_type_1,$this->val_type_2];
-        
+
         //calculates first shared date
         foreach ($this->combinedSeries[$this->seriesNames[0]] as $date=>$row) $dates1[] = $date;
         foreach ($this->combinedSeries[$this->seriesNames[1]] as $date=>$row) {
@@ -177,9 +176,10 @@ class CorrelationData {
     }
     
     public function getCorr ($x,$y,$type) {
-        if ($type === 'rho') return $this->pearsonCorrelation($x,$y,$type);
-        elseif ($type === 'ktau') return $this->kendallsTau($x,$y,$type);
-        elseif ($type === 'srho') return $this->spearmansRho($x,$y,$type);
+        if ($type === 'rho') return $this->pearsonCorrelation($x,$y);
+        elseif ($type === 'ktau') return $this->kendallsTau($x,$y);
+        elseif ($type === 'srho') return $this->spearmansRho($x,$y);
+        elseif ($type === 'mic') return $this->MIC($x,$y);
     }
     
     
@@ -250,17 +250,12 @@ class CorrelationData {
         return $this->pearsonCorrelation($x,$y);
         
     }
+    
+    
+    private function MIC($x,$y) {
+        return Timeseries::MIC($x,$y);
+    }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
 }
 

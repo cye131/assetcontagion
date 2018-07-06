@@ -1,95 +1,104 @@
 $(document).ready(function() {
 
     
-
     (function() {
+      
         var category = 'reg';
         var corr_type = sessionStorage.getItem('corr_type') || 'rho';
         var freq = sessionStorage.getItem('freq') || 'd';
         var trail = sessionStorage.getItem('trail') || 30;
+        var data = {};
+        $('#overlay').show();
 
-        var ajaxGetSpecsCategories = getAJAX(['get_specs_categories'],[],['specsCategories'],{'category': category, 'corr_type': corr_type, 'freq': freq, 'trail': trail},10000);
-        var ajaxGetTagsSeries = getAJAX(['get_tags_series'],[],['tagsSeries'],{'category': category, 'corr_type': corr_type, 'freq': freq, 'trail': trail},10000);
-        var ajaxGetTagsCorrel = getAJAX(['get_tags_correl'],[],['tagsCorrel'],{'category': category, 'corr_type': corr_type, 'freq': freq, 'trail': trail},10000);
-
-        $.when(ajaxGetSpecsCategories,ajaxGetTagsSeries, ajaxGetTagsCorrel).done(function(r1, r2, r3) {
-            var data= {
-                dataInfo: {"category": category, "corr_type": corr_type, "freq": freq, "trail": trail},
-                specsCategories: JSON.parse(r1[0]).specsCategories,
-                tagsSeries: JSON.parse(r2[0]).tagsSeries,
-                tagsCorrel: JSON.parse(r3[0]).tagsCorrel,
-                tagsGFI: []
-            };
-            $.each(data.tagsCorrel, function(i,row) {
-                if (row.grouping_1 === 'World.' || row.grouping_2 === 'World.') data.tagsGFI.push(row);
-            });
-            $('#data').data(data);
-            setCategoryOptions(data);
-            drawHeatMap(data.tagsSeries,data.tagsCorrel);
-
-            drawMaps(data.tagsGFI);
-            drawStrongCorrelations(data.tagsSeries,data.tagsCorrel,0.75);
-            drawStrongCorrelationsEurope(data.tagsSeries,data.tagsCorrel,0.75);
-            $("#highMapEurope > div").addClass('float-right');
-            $("#highMapEurope > div").css('margin-top','-60px');
+        var d1 = $.Deferred(function(dfd) {
+          var ajaxGetSpecsCategories = getAJAX(['get_specs_categories'],[],['specsCategories'],{'category': category, 'corr_type': corr_type, 'freq': freq, 'trail': trail},10000,1);
+          var ajaxGetTagsSeries = getAJAX(['get_tags_series'],[],['tagsSeries'],{'category': category, 'corr_type': corr_type, 'freq': freq, 'trail': trail},10000,1);
+          var ajaxGetTagsCorrel = getAJAX(['get_tags_correl'],[],['tagsCorrel'],{'category': category, 'corr_type': corr_type, 'freq': freq, 'trail': trail},10000,1);
+  
+          $.when(ajaxGetSpecsCategories,ajaxGetTagsSeries, ajaxGetTagsCorrel).done(function(r1, r2, r3) {
+              $.extend(true,data,{
+                  dataInfo: {"category": category, "corr_type": corr_type, "freq": freq, "trail": trail},
+                  specsCategories: JSON.parse(r1[0]).specsCategories,
+                  tagsSeries: JSON.parse(r2[0]).tagsSeries,
+                  tagsCorrel: JSON.parse(r3[0]).tagsCorrel,
+                  tagsGFI: []
+              });
+              $.each(data.tagsCorrel, function(i,row) {
+                  if (row.grouping_1 === 'World.' || row.grouping_2 === 'World.') data.tagsGFI.push(row);
+              });
+              setCategoryOptions(data);
+              drawHeatMap(data.tagsSeries,data.tagsCorrel);
+  
+              drawMaps(data.tagsGFI);
+              drawStrongCorrelations(data.tagsSeries,data.tagsCorrel,0.75);
+              drawStrongCorrelationsEurope(data.tagsSeries,data.tagsCorrel,0.75);
+              $("#highMapEurope > div").addClass('float-right').css('margin-top','-60px');
+              
+              dfd.resolve(data);
+              return dfd.promise();
+          });
         });
         
-        
-        var ajaxGetHistCorrIndex = getAJAX(['get_hist_corr_index'],[],['histCorrIndex'],{'category': category, 'corr_type': corr_type, 'freq': freq, 'trail': trail},10000);
-        ajaxGetHistCorrIndex.done(function(res) {
-            var histCorrIndex = JSON.parse(res).histCorrIndex;
-            drawHeatMapDates(histCorrIndex);
-
-            var dates = [];
-            $.each(histCorrIndex, function(i,row) {
-                dates.push(row.pretty_date);
-            });
-            $('#data').data('dates',dates.reverse());
+        var d2 = $.Deferred(function(dfd) {
+          var ajaxGetHistCorrIndex = getAJAX(['get_hist_corr_index'],[],['histCorrIndex'],{'category': category, 'corr_type': corr_type, 'freq': freq, 'trail': trail},10000,1);
+          ajaxGetHistCorrIndex.done(function(res) {
+            
+              var histCorrIndex = JSON.parse(res).histCorrIndex;
+              drawHeatMapDates(histCorrIndex);
+  
+              var dates = [];
+              $.each(histCorrIndex, function(i,row) {
+                  dates.push(row.pretty_date);
+              });
+              $.extend(true,data,{
+                'hmDates': dates,
+                "playState": 'pause', // 1 -> not playing, 2-> playing
+                "playIndex": dates.length - 1,
+              });
+                
+          });
+          
+            dfd.resolve(data);
+            return dfd.promise();
         });
         
-        
-        window.playState = 0; // 0 -> never played, 1 -> paused, 2-> playing
-        window.playIndex = 0;
-        window.dateCount = [];
-        
-        
+        $.when(d1,d2).done(function(data1,data2) {
+          $.extend(true,data,data1,data2);
+          setData(data);
+          $('#overlay').hide();
+        });
 
     })();
+    
+    
+    $('#heatmap').on('click', '#heatmap-subtitle-group > button.heatmap-subtitle', function() {
+      var data = getData();
+      if (data.playState == null) return;
+            
+      if ($(this).data('dir') === 'pause') {              
+        data.playState = 'pause';
+      }
+      
+      if ($(this).data('dir') === 'start' || $(this).data('dir') === 'end') {
+        if ($(this).data('dir') === 'start' ) data.playIndex = 0;
+        else data.playIndex = data.hmDates.length - 1;
+        data.playState = 'pause';
+      }
+      
+      else if ($(this).data('dir') === 'back' || $(this).data('dir') === 'forward') {
+        if ($(this).data('dir') === 'back') data.playIndex = (data.playIndex >= 5 ? data.playIndex - 5 : 0);
+        else data.playIndex = (data.playIndex + 5 <= data.hmDates.length - 1 ? data.playIndex + 5: data.hmDates.length);
+        data.playState = $(this).data('dir');
+      }
+      
+      
+      setData(data);
+      if ($(this).data('dir') !== 'pause') updateCharts($('#heatmap').highcharts(),$('#heatmap-dates').highcharts());
+      return;
 
-         
-                 
-    $('#heatmap').on('click', '#playHistorical', function() {
-        if (window.playState === 0) {
-            $('#overlay').show();
-            $('#loadmessage').text('Loading data...');
-            
-            window.playState = 2;
-            
-            // Get all Mondays and display result
-            // SO console doensn't show all results
-            //var mondays = getMondays(new Date(2010,0,1));
-            // Count of Mondays, not all shown in SO console
-            //console.log('There are ' + mondays.length + ' Mondays, the first is ' + mondays[0].toString());
-           // window.dateCount = mondays;
-           window.dateCount = $('#data').data().dates;
-            getHistCorrel(window.dateCount,0);
-            
-            $('#overlay').hide();
-            $("#playHistorical").html('&#10074;&#10074; Click to pause');
-        }
-        else if (window.playState === 1) {
-            window.playState = 2;
-            getHistCorrel(window.dateCount,window.playIndex);
-            
-            $("#playHistorical").html('&#10074;&#10074; Click to pause');
-        }
-        else if (window.playState === 2) {
-            window.playState = 1;
-            
-            $("#playHistorical").html('&#9654; Click to resume');
-        } 
     });
-
+    
+    
 
 
     //Resizes width after clicking each tab, otherwise highcharts is too skinny!
@@ -134,7 +143,7 @@ function setCategoryOptions(data) {
         var corr_types = data.specsCategories[0].cat_corrtypes.split(',');
         var selectedcorr_type =  (typeof sessionStorage.getItem('corr_type') !== undefined) ? sessionStorage.getItem('corr_type') : null;
         for (i=0;i<corr_types.length;i++) {
-            var corr_type_str = (corr_types[i] === 'rho' ? 'Pearson Correlation' : (corr_types[i] === 'ktau' ? "Kendall's Tau" : '')) ;
+            var corr_type_str = (corr_types[i] === 'rho' ? 'Pearson Correlation' : (corr_types[i] === 'ktau' ? "Kendall's Tau" : (corr_types[i] === 'mic' ? 'Maximal Information Coefficient (MIC)' : ''))) ;
             $('#corr_type').append('<option value="' + corr_types[i] + '" ' +  (corr_types[i] === selectedcorr_type ? 'selected' : '') + ' >' + corr_type_str + '</option>');
         }
 
@@ -142,134 +151,96 @@ function setCategoryOptions(data) {
 }
 
 
-// Get all Mondays from start date to today
-// Default today's date
-function getMondays(d) {
-  // Set to first Monday
-  d.setDate(d.getDate() + (8 - (d.getDay() || 7)) % 7);
-  var mondays = [dateToYmd(d)];
 
-  // Create Dates for all Mondays up to end year and month
-  while (d < new Date() ) {
-    var m = new Date(d.setDate(d.getDate() + 7));
-    mondays.push(dateToYmd(m));
+
+function updateCharts(chartHM,chartHMDates) {
+    var timeStart = new Date().getTime();
+
+    var data = getData();
+  
+    if (data.hmDates === undefined || data.playIndex === undefined) return;
+    var date = data.hmDates[data.playIndex];
+    updatePlotLine(chartHMDates,new Date(date).getTime());
+    
+
+    var ajaxGetHistCorrel = getAJAX(
+                                    ['get_hist_correl_by_date'],[],['tagsCorrel',],
+                                    {"date": date, "category": data.dataInfo.category, "corr_type": data.dataInfo.corr_type, "freq": data.dataInfo.freq, "trail": data.dataInfo.trail},
+                                    20000,'disabled');
+
+    ajaxGetHistCorrel.done(function(res) {
+            if (JSON.parse(res).tagsCorrel.length == null) return;
+            
+            var tagsCorrelDate = JSON.parse(res).tagsCorrel;
+            var hm = drawHeatMap(data.tagsSeries,tagsCorrelDate,1);
+            
+            for (j=0;j<hm.data.length;j++) {
+                chartHM.series[0].data[j].update(hm.data[j],false);
+            }
+            chartHM.redraw();
+            $('#heatmap-subtitle-date').text(Highcharts.dateFormat('%m/%d/%Y',new Date(date).getTime()));
+            
+                      
+            //If at end or beginning, auto-pause
+            
+            if (data.playIndex <= 0 ) {
+              data.playState = 'pause';
+              data.playIndex = 0;
+            }
+            
+            else if (data.playIndex >= data.hmDates.length - 1) {
+              data.playState = 'pause';
+              data.playIndex = data.hmDates.length - 1;
+            }
+            
+            else {
+              if (data.playState === 'forward')  data.playIndex = data.playIndex + 5; //skip by week
+              else data.playIndex = data.playIndex - 5; //skip by week
+            }
+            
+            setData(data);
+            
+            updateHMButtons();
+            var timeEnd = new Date().getTime();
+            var timeWait = timeEnd-timeStart < 2000 ? 2000 - (timeEnd-timeStart) : 2000;
+          
+            if (data.playState !== 'pause') setTimeout(function() { updateCharts(chartHM,chartHMDates); }, timeWait);
+            
+    });
+}
+
+
+
+
+
+
+
+function updateHMButtons () {
+  var data = getData();
+  var buttons = $('#heatmap-subtitle-group').find('button.heatmap-subtitle').removeClass('active').prop('disabled',false).end();
+
+  if (data.playIndex === 0) {
+    buttons.find('[data-dir="start"],[data-dir="back"]').prop('disabled',true);
+    return;
   }
-  mondays.pop();
-  return mondays;
+  
+  if (data.playIndex === data.hmDates.length-1) {
+    buttons.find('[data-dir="end"],[data-dir="forward"]').prop('disabled',true);
+    return;
+  }
+  
+  if (data.playState === 'pause') {
+    buttons.find('[data-dir="pause"]').addClass('active',true);
+    return;
+  }
+
+  if (data.playState === 'back') {
+    buttons.find('[data-dir="back"]').addClass('active',true);
+    return;
+  }
+
+  if (data.playState === 'forward') {
+    buttons.find('[data-dir="forward"]').addClass('active',true);
+    return;
+  }  
 }
-
-function dateToYmd(date) {         
-    var yyyy = date.getFullYear().toString();                                    
-    var mm = (date.getMonth()+1).toString(); // getMonth() is zero-based         
-    var dd  = date.getDate().toString();             
-    return yyyy + '-' + (mm[1]?mm:"0"+mm[0]) + '-' + (dd[1]?dd:"0"+dd[0]);
-}
-
-
-
-function getHistCorrel(dateCount,i) {
-    window.playIndex = i;
-    if (window.dateCount === undefined || window.playIndex === undefined) return;
-    if (window.playState !== 2) {
-        return;
-    }
-    
-    var date = dateCount[i];
-    //console.log(date);
-    var data = $('#data').data();
-    
-    var ajaxGetHistCorrel = getAJAX(
-                                    ['get_hist_correl_by_date'],[],['tagsCorrel',],
-                                    {"date": date, "category": data.dataInfo.category, "corr_type": data.dataInfo.corr_type, "freq": data.dataInfo.freq, "trail": data.dataInfo.trail},
-                                    20000,'disabled');
-    
-    ajaxGetHistCorrel.done(function(res) {
-        console.log(res);
-            if (JSON.parse(res).tagsCorrel.length > 0) {
-                var tagsCorrelDate = JSON.parse(res).tagsCorrel;
-                var hm = drawHeatMap(data.tagsSeries,tagsCorrelDate,1);
-                
-                
-                chart = $("#heatmap").highcharts();
-
-                for (j=0;j<hm.data.length;j++) {
-                    chart.series[0].data[j].update(hm.data[j],false);
-                }
-                chart.redraw();
-                
-                
-                
-                $("#date").remove();
-                chart.renderer.text(date,chart.plotLeft+(chart.plotWidth-chart.plotLeft)/2,chart.plotTop + (chart.plotHeight-chart.plotTop)/2) //(text,x,y)
-                .attr({
-                    zIndex: 4,
-                    'text-anchor': 'middle',
-                    id: 'date'
-                })
-                .css({
-                    textAlign: 'center',
-                    color: 'white',
-                    fontSize: '36px',
-                    opacity: 0.7,
-                    'text-shadow': '-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black'
-                })
-                .add();
-            }
-            
-            if (window.playIndex < dateCount.length-1) {
-                //window.playIndex++;
-                window.playIndex = window.playIndex + 5; //skip by week
-                setTimeout(function() { getHistCorrel(dateCount,window.playIndex); }, 200);
-            } else {
-                window.playIndex = 0;
-            }
-    });
-}
-
-
-
-
-
-function getHistCorrelSingle(date) {
-    console.log(date);
-    var data = $('#data').data();
-    
-    var ajaxGetHistCorrel = getAJAX(
-                                    ['get_hist_correl_by_date'],[],['tagsCorrel',],
-                                    {"date": date, "category": data.dataInfo.category, "corr_type": data.dataInfo.corr_type, "freq": data.dataInfo.freq, "trail": data.dataInfo.trail},
-                                    20000,'disabled');
-    
-    ajaxGetHistCorrel.done(function(res) {
-        console.log(res);
-            if (JSON.parse(res).tagsCorrel.length > 0) {
-                var tagsCorrelDate = JSON.parse(res).tagsCorrel;
-                var hm = drawHeatMap(data.tagsSeries,tagsCorrelDate,1);
-                
-                
-                chart = $("#heatmap").highcharts();
-
-                for (j=0;j<hm.data.length;j++) {
-                    chart.series[0].data[j].update(hm.data[j],false);
-                }
-                chart.redraw();
-                
-                $("#date").remove();
-                chart.renderer.text(date,chart.plotLeft+(chart.plotWidth-chart.plotLeft)/2,chart.plotTop + (chart.plotHeight-chart.plotTop)/2) //(text,x,y)
-                .attr({
-                    zIndex: 4,
-                    'text-anchor': 'middle',
-                    id: 'date'
-                })
-                .css({
-                    textAlign: 'center',
-                    color: 'white',
-                    fontSize: '36px',
-                    opacity: 0.7,
-                    'text-shadow': '-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black'
-                })
-                .add();
-            }
-            
-    });
-}
-

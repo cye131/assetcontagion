@@ -11,4 +11,5 @@ return array(
     'Phpml\\' => array($vendorDir . '/php-ai/php-ml/src'),
     'MatthiasMullie\\PathConverter\\' => array($vendorDir . '/matthiasmullie/path-converter/src'),
     'MatthiasMullie\\Minify\\' => array($vendorDir . '/matthiasmullie/minify/src'),
+    'MathPHP\\' => array($vendorDir . '/markrogoyski/math-php/src'),
 );

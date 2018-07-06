@@ -38,7 +38,7 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
     <meta name=keywords content=\"sectors, gics sectors, gics groups, gics lookup, stock sector correlation, correlation\" />
     
     <link rel=\"stylesheet\" href=\"static/style.css\">
-    <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css\" integrity=\"sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB\" crossorigin=\"anonymous\">
+    <link rel=\"stylesheet\" href=\"static/bootstrap.min.css\">
     
     <script src=\"//code.jquery.com/jquery-git.min.js\"></script>
 
@@ -204,7 +204,7 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
     <meta name=keywords content=\"sectors, gics sectors, gics groups, gics lookup, stock sector correlation, correlation\" />
     
     <link rel=\"stylesheet\" href=\"static/style.css\">
-    <link rel=\"stylesheet\" href=\"https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css\" integrity=\"sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB\" crossorigin=\"anonymous\">
+    <link rel=\"stylesheet\" href=\"static/bootstrap.min.css\">
     
     <script src=\"//code.jquery.com/jquery-git.min.js\"></script>
 

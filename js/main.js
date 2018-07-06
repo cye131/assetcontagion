@@ -14,6 +14,18 @@ $(document).ready(function() {
     
 });
 
+/* VDOM
+ *
+ *
+ *
+ */
+function getData() {
+  return $('#data').data();
+}
+
+function setData(d) {
+  $('#data').data(d);
+}
 
 
 /* Validation
@@ -125,10 +137,14 @@ function getDataTablesOptions() {
 function getHighChartsOptions() {
   var o = {
         chart: {
-            backgroundColor: 'rgba(225, 233, 240,.6)',
-            plotBackgroundColor: '#FFFFFF',
-            plotBorderColor: '#C0C0C0',
-            height: 500,
+            style: {
+              fontFamily: 'inherit'
+            },
+        },
+        title: {
+            style: {
+              fontFamily: 'inherit'
+            }
         }
   };
         
