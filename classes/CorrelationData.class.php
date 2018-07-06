@@ -1,5 +1,5 @@
 <?php
-$i = 2;
+$i = 0;
 class CorrelationData {
     
     public function __construct($combinedSeries,$corrTag) {
