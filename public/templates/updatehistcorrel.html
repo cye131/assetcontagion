@@ -1,0 +1,127 @@
+{% extends "layout.html" %}
+
+{% block staticlinks %}
+{% endblock %}
+
+{% block content %}
+
+    <section class="container">
+    </section>
+    
+    <section class="container" style="margin-bottom:20px">
+        <form class="form-inline">
+            <div class = "form-group">
+                <label for="category" >Category:</label>
+                <input type="text" class="form-control form-control-sm" id="category" value="" placeholder="e.g., reg">
+                <button class="btn btn-primary btn-sm" type="button" id="update">Update</button>
+                <div id="errormessage" class="invalid-feedback">Error Message!</div>
+            </div>
+        </form>        
+    </section>
+    
+    <section class="container-flex">
+        <div class="container-flex" style="max-height:400px;overflow:auto">
+            <span id="expectedrows"></span>
+            <table id="table1" style="width:100%;text-align:center;">
+                <thead>
+                    <tr>
+                        <th>s_corr_id</th>
+                        <th>category</th>
+                        <th>freq</th>
+                        <th>trail</th>
+                        <th>corr_type</th>
+                        <th>b_id_1 (name_1)</th>
+                        <th>b_id_2 (name_2)</th>
+                        <th>obs_start</th>
+                        <th>obs_end</th>
+                        <th>obs_end_val</th>
+                        <th>last_updated</th>
+
+                        <th>error message/rows updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="container">
+        <div class="container" id="info">
+        </div>
+    </section>
+
+    <script>
+        $(document).ready(function() {
+            for (i=0;i<tagsCorrel.length;i++) {
+                $('#table1').append('<tr id="' + tagsCorrel[i].s_corr_id + '"><td>' + tagsCorrel[i].s_corr_id + '</td><td>' + tagsCorrel[i].category + '</td><td>' + tagsCorrel[i].freq + '</td><td>' + tagsCorrel[i].trail + '</td><td>' + tagsCorrel[i].corr_type + '</td><td>' + tagsCorrel[i].b_id_1 + ' ' + tagsCorrel[i].name_1 + '</td><td>' + tagsCorrel[i].b_id_2 + ' ' + tagsCorrel[i].name_2 + '</td><td> ' + tagsCorrel[i].obs_start +  '</td><td>' + tagsCorrel[i].obs_end + '</td><td>' + tagsCorrel[i].obs_end_val + '</td><td>' + tagsCorrel[i].last_updated + '</td><td></td></tr>');
+            }
+        });
+
+        $("#update").click(function(){
+            var category = $("#category").val();
+            console.log(category);
+            
+            if (category == undefined || category.length < 1) {
+                alert ('Enter a valid category!');
+                return;
+            }
+            
+            j = 0;tagsCorrelFiltered = [];
+            for (i=0;i<tagsCorrel.length;i++) {
+                if (tagsCorrel[i].category !== category) continue;
+                tagsCorrelFiltered[j] = tagsCorrel[i];
+                j++;
+            }
+
+            console.log(tagsCorrelFiltered);
+            calcCorrel(0);
+
+        });
+
+        function calcCorrel(i) {
+            $.ajax({
+                url: 'routerAjax.php',
+                type: 'POST',
+                data: {
+                    model: ['update_hist_correl'],
+                    toScript: ['uHistCorrel'],
+                    fromAjax: {corrTag: tagsCorrelFiltered[i]}
+                },
+                dataType: 'html',
+                cache: false,
+                timeout: 20000,
+                success: function(results){
+                    console.log("Success");
+                    console.log(results);
+                    results = JSON.parse(results).uHistCorrel;
+                    console.log(results);
+                    console.log(tagsCorrelFiltered[i].s_corr_nid);
+                    
+                    
+                    if (results.info.insertedHistData === true) {
+                        $('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(12)').html('<span>Successfully updated #' + i  + ': ' + results.info.rowsChg + ' rows (' + results.info.firstDate + ' to ' + results.info.lastDate + ')</span>');
+                        $('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(8)').html(results.info.firstDate);
+                        $('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(9)').html(results.info.lastDate);
+                        $('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(10)').html(results.info.lastVal);
+
+                    }
+                    else {
+                        console.log('#' + tagsCorrelFiltered[i].s_corr_nid + ' td:nth-child(12)');
+                        $('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(12)').html('<span><b>Failed</b> to update #' + i  + ': '  + results.info.errorMsg + '</span>');
+                    }
+                    
+                    i ++;
+                    if (i<tagsCorrelFiltered.length) calcCorrel(i);
+                },
+                error:function(e, ts, et){
+                        $('#' + tagsCorrelFiltered[i].s_corr_id + ' td:nth-child(12)').html('<br><span style="font-weight:bold">AJAX ERROR ON #' + i  + ': ' + tagsCorrelFiltered[i].s_corr_nid +  ' | ' + ts +  '</span>');
+                        i ++;
+                        if (i<tagsCorrelFiltered.length) calcCorrel(i);
+                }
+            });
+        }
+
+    </script>
+    
+{% endblock %}

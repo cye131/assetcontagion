@@ -14,6 +14,18 @@ $(document).ready(function() {
     
 });
 
+/* VDOM
+ *
+ *
+ *
+ */
+function getData() {
+  return $('#data').data();
+}
+
+function setData(d) {
+  $('#data').data(d);
+}
 
 
 /* Validation
@@ -125,10 +137,14 @@ function getDataTablesOptions() {
 function getHighChartsOptions() {
   var o = {
         chart: {
-            backgroundColor: 'rgba(225, 233, 240,.6)',
-            plotBackgroundColor: '#FFFFFF',
-            plotBorderColor: '#C0C0C0',
-            height: 500,
+            style: {
+              fontFamily: 'inherit'
+            },
+        },
+        title: {
+            style: {
+              fontFamily: 'inherit'
+            }
         }
   };
         
@@ -152,6 +168,21 @@ function arrayColumn(array, columnName) {
 }
 
 
+function getCorrName(corr_type) {
+    if (corr_type === 'rho') return "Pearson's Correlation Coefficient";
+    else if (corr_type === 'ktau') return "Kendall's &#120591; Coefficient";
+    else if (corr_type === 'mic') return "Maximal Information Coefficient";
+    else if (corr_type === 'srho') return "Spearman's Rho";
+}
+
+function getCorrMath(corr_type) {
+    if (corr_type === 'rho') return "Pearson's Correlation Coefficient";
+    else if (corr_type === 'ktau') return " \\tau = \\frac{2}{n(n-1)} \\sum_{i=1}^{N} \\sum_{j=i}^{N} \\begin{cases} 1, & \\text{if } (x_i > x_j \\text{ and } y_j > y_j)  \\text{ or } (x_i < x_j \\text{ and } y_j < y_j)  \\\\0, &\\text{if } x_i = x_j \\text{ or } y_i = y_j  \\\\-1, &\\text{otherwise} \\end{cases}";
+    else if (corr_type === 'mic') return "Maximal Information Coefficient";
+    else if (corr_type === 'srho') return "Spearman's Rho";
+}
+
+//    else if (corr_type === 'ktau') return "\\tau = \\sum_{i=1}^{N} \\sum_{j=i}^{N} \\begin{cases} -1, & \\text{if} & x_i > x_j \\implies x_j > y_j & \\text{or} x_i < x_j \\implies x_j < y_j  \\\\0, & \\text{x_i = x_j) & \\text{or} & \\text{y_i = y_j}  \\\\ 1, & \\text{otherwise} \\end{cases}";
 
 
 

@@ -1,0 +1,1 @@
+ps -o pid,sess,cmd afx | egrep "( |/)cron( -f)?$"

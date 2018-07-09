@@ -2,6 +2,7 @@ function drawHeatMap(tagsSeries,tagsCorrel,noChart) {
     var hm = {"data":[], "info":{} };
     var vals = [];
     var val;
+    var lastDate = new Date('1970-01-01');
     
     if (tagsSeries.length === 0 || tagsCorrel.length === 0 ) return;
 
@@ -28,7 +29,7 @@ function drawHeatMap(tagsSeries,tagsCorrel,noChart) {
             val = tagRow.h_value || tagRow.obs_end_val || null;
             val = parseFloat(val).toFixed(4);
             vals.push(val);
-            
+                        
             $.extend(true,hm.data[i],{
                 "pretty_date": tagRow.h_pretty_date || tagRow.obs_end,
                 "value": val,
@@ -40,6 +41,8 @@ function drawHeatMap(tagsSeries,tagsCorrel,noChart) {
                 //"color": (val == null) ? '#cccccc' : colorFormat(val),
                 "tooltip": (val == null) ? false : true
             });
+            
+            if (new Date(hm.data[i].pretty_date) > lastDate) lastDate = new Date(hm.data[i].pretty_date);
         });
         i++;
         
@@ -74,26 +77,39 @@ function drawHeatMap(tagsSeries,tagsCorrel,noChart) {
     
     if (noChart) return hm;
     
-    
-    var o = {
+    var o = getHighChartsOptions();
+    $.extend(true,o, {
          chart: {
              //plotHeight = 960-marginTop-marginBottom; plotWidth = 1060-marginLeft-marginRight
              height: 1060,
-             marginTop: 80,
-             marginRight: 120,
+             marginTop: 100,
+             marginRight: 130,
              marginBottom: 200,
-             marginLeft: 120,
+             marginLeft: 130,
              plotBorderWidth: 1,
              backgroundColor: null
          },
          title: {
-             useHTML: true,
              text: 'Correlation Matrix Between Stock Markets of Major Economies'
          },
          subtitle: {
              enabled: true,
              useHTML: true,
-             text: '<button class="btn btn-primary btn-sm" type="button" id="playHistorical">&#9654; Click here to show changes over time!</button>'
+             style: {
+                width: '100%',
+                "z-index": 1
+             },
+             text: '<div class="row text-center"><div class="col-12 d-inline-block">'+
+                        '<h4 class="text-secondary"><span class="badge badge-secondary">*Data for&nbsp;<span id="heatmap-subtitle-date">'+ Highcharts.dateFormat('%m/%d/%Y',lastDate) +'</span></span></h4>'+
+                    '</div></div>'+
+                    '<div class="row text-center"><div class="col-12 btn-group d-inline-block" role="group" id="heatmap-subtitle-group">' +
+                        '<button class="btn btn-secondary btn-sm" type="button" disabled>Click to show changes over time&nbsp;</button>'+
+                        '<button class="btn btn-primary btn-sm heatmap-subtitle" type="button" data-dir="start" style="letter-spacing:-2px">&#10074;&#9664;&#9664;</button>' +
+                        '<button class="btn btn-primary btn-sm heatmap-subtitle" type="button" data-dir="back">&#9664;</button>' +
+                        '<button class="btn btn-primary btn-sm heatmap-subtitle" type="button" data-dir="pause" disabled>&#10074;&#10074;</button>' +
+                        '<button class="btn btn-primary btn-sm heatmap-subtitle" type="button" data-dir="forward" disabled>&#9654;</button>' +
+                        '<button class="btn btn-primary btn-sm heatmap-subtitle" type="button" data-dir="end" style="letter-spacing:-2px" disabled>&#9654;&#9654;&#10074;</button>' +
+                    '</div></div>'
          },
          credits: {
              enabled:false
@@ -150,6 +166,9 @@ function drawHeatMap(tagsSeries,tagsCorrel,noChart) {
      
          tooltip: {
              useHTML: true,
+             style: {
+                "z-index": 10 
+             },
              formatter: function () {
                  if(this.point.tooltip === true) {
                      var cat_x=''; var cat_y=''; var proxy_x=''; var proxy_y = '';
@@ -206,8 +225,7 @@ function drawHeatMap(tagsSeries,tagsCorrel,noChart) {
              },
              turboThreshold: 0
          }]
-     };
-    
+     });
     var chart = new Highcharts.chart('heatmap', o);
 
     
@@ -381,15 +399,11 @@ function drawHeatMap(tagsSeries,tagsCorrel,noChart) {
 
 
 
-
-
-
-
-
-
-
-
-
+/* Heat Map Date Chart
+ *
+ *
+ *
+ */
 
 function drawHeatMapDates(histCorrIndex) {
     var hmd = [];
@@ -401,29 +415,40 @@ function drawHeatMapDates(histCorrIndex) {
         });
         vals.push( parseFloat(histCorrIndex[i].value) );
     }
-    console.log(data);
-    var max = Math.max(...vals);
-    var min = Math.min(...vals);
+
+    //var max = Math.max(...vals);
+    //var min = Math.min(...vals);
 
     var hmcol = [];
     for(i=0;i<histCorrIndex.length;i++) {
         hmcol.push({
             "x": new Date(histCorrIndex[i].pretty_date).getTime(),
-            "low": min,
-            "high": max
+            "low": -1,
+            "high": 1
         });
     }
-
     
-    var o = {
+    // Add one false date for padding
+    hmcol.push({
+        "x": hmcol[hmcol.length-1].x +1000*60*60*24,
+        "low": null,
+        "high": null
+    });
+
+    var o = getHighChartsOptions();
+    
+    $.extend(true,o,{
         chart: {
-            backgroundColor: 'rgba(255,255,255,0)'
+            backgroundColor: 'rgba(255,255,255,0)',
+            marginRight: 50,
+            marginLeft: 50
         },
         credits: {
             enabled: false  
         },
         title: {
-            text: null
+            text: 'Average ' + (sessionStorage.getItem('trail') || '30') + (sessionStorage.getItem('freq') || 'd') + ' cross-regional equity correlation (' + (getCorrName(sessionStorage.getItem('corr_type')) || 'Pearson Correlation') + ')',
+            useHTML: true
         },
     
         subtitle: {
@@ -432,29 +457,24 @@ function drawHeatMapDates(histCorrIndex) {
         plotOptions: {
                 series: {
                     dataGrouping: {
-                        units: [['day',[1]]]
+                        enabled: true,
+                        units: [ ['day',[1]]]
                     },
                     cursor: 'pointer',
                     point: {
                         events: {
                             click: function () {
-                                console.log(this);
-                                                            console.log(this.x);
-    
+                                var data = getData();
                                 var d = new Date(this.x).toISOString().split('T')[0];
-                                getHistCorrelSingle(d);
+                                if (data.hmDates.indexOf(d) === -1) return;
                                 
-                                var chart = $('#heatmap-dates').highcharts();
-                                chart.xAxis[0].removePlotLine('plot-line');
-
-                                chart.xAxis[0].addPlotLine({
-                                    value: this.x,
-                                    color: 'rgba(255,0,0,.5)',
-                                    width: 5,
-                                    id: 'plot-line',
-                                    zIndex: 3
+                                $.extend(true,data,{
+                                    "playIndex": data.hmDates.indexOf(d),
+                                    "playState": "pause"
                                 });
+                                setData(data);
 
+                                updateCharts($('#heatmap').highcharts(),this.series.chart);
                             }
                         }
                     }
@@ -470,67 +490,68 @@ function drawHeatMapDates(histCorrIndex) {
             shared: true
         },
         yAxis: {
-            max: max,
-            min: min,
+            max: 1,//max,
+            min: -1,//min,
             startOnTick: false,
-            endOnTick: false
+            endOnTick: false,
+            opposite:false,
+            showLastLabel: true,
+            labels: {
+                formatter: function () {
+                    return this.value.toFixed(1);
+                }
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: 'black',
+                dashStyle: 'Dash',
+                zIndex: 2
+                },{
+                value: 1,
+                width: 1,
+                color: 'rgba(10, 24, 66,1)',
+                zIndex: 5
+                },{
+                value: -1,
+                width: 1,
+                color: 'rgba(10, 24, 66,1)',
+                zIndex: 5
+                }
+            ]
+        },
+        xAxis: {
+            dateTimeLabelFormats: {
+                day: "%m-%d-%Y",
+                week: "%m-%d-%Y"
+            },
+            
+            labels: {
+            }
         },
         navigator: {
             enabled: false
         },
-
-        /*
-        annotations: [{
-            labelOptions: {
-                shape: 'connector',
-                align: 'right',
-                justify: false,
-                crop: true,
-                style: {
-                    fontSize: '0.8em',
-                    textOutline: '1px white'
-                }
-            },
-            labels: [{
-                point: {
-                    x: new Date('2018-05-03').getTime(),
-                    y: 2
-                },
-                text: 'Arbois'
-            }],
-        }],
-        */
         series: [{
             data: hmd,
             turboThreshold: 0,
             id: 's01',
-            lineColor: Highcharts.getOptions().colors[1],
-            fillOpacity: 0.5,
-            name: 'Elevation',
+            type: 'line',
+            color: '#333',
             marker: {
                 enabled: false
             },
-            zIndex: 1
+            zIndex: 1,
 
-        }, {
-            type: 'flags',
-            name: 'Date',
-            onSeries: 's01',
-            shape: 'squarepin',
-            data: [{
-                x: 1529884800000,
-                title: 'Flag',
-                text: 'Test'
-            }],
-            zIndex: 1
-
-        },{
+        },
+        {
             type: 'arearange',
             data: hmcol,
             turboThreshold: 0,
             linkedTo: 's01',
             zIndex: 0,
-            color: 'rgba(255,255,255,0)'
+            fillColor: 'rgba(255,255,255,0)',
+            lineColor: 'rgba(255,255,255,0)'
         },{
             type: 'sma',
             linkedTo: 's01',
@@ -540,18 +561,47 @@ function drawHeatMapDates(histCorrIndex) {
             zIndex: 1,
             marker: {
                 enabled: false
-            }
+            },
+            visible: false
         }]
-    };
+    });
     
+
     var c = new Highcharts.stockChart('heatmap-dates', o);
 
-    
-    
-    
+    updatePlotLine(c,hmd[hmd.length-1].x);
+}
+
+function updatePlotLine(chart,date) {
+    chart.xAxis[0].removePlotLine('plot-line');
+    chart.xAxis[0].addPlotLine({
+        value: date,
+        color: 'rgba(255,0,0,.5)',
+        width: 5,
+        id: 'plot-line',
+        zIndex: 3,
+        label: {
+            text: '<h6 class="text-danger">Currently displayed date</h6>',
+            align: 'left',
+            verticalAlign: 'top',
+            rotation: 90,
+            useHTML: true
+        }
+    });
 }
 
 
+
+
+
+
+/* Color Formatter
+ *
+ *
+ *
+ */
+
+/*
 function colorFormat(v) {
     var maxColor;
     var minColor;
@@ -569,5 +619,4 @@ function colorFormat(v) {
     
     return 'rgba(' + rgba.join(',') + ')';
 }
-
-
+*/

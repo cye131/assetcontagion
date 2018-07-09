@@ -1,15 +1,23 @@
 <?php
-$corrTag = $fromAjax['corrTag'] ?? NULL;
-$uHistCorrel = array('data' => array(),'info' => array());
+$varsToBind = [];
 
+$corrTag = $fromAjax['corrTag'] ?? $fromRouter['corrTag'] ?? NULL;
+$varsToBind['fk_id_1'] = $corrTag['fk_id_1'];
+$varsToBind['fk_id_2'] = $corrTag['fk_id_2'];
+
+if ( $corrTag['obs_end_input_min'] !== null ) {
+  $dateStr = "AND hist_series.pretty_date >= :pretty_date";
+  $varsToBind['pretty_date'] = $corrTag['obs_end_input_min'];
+} else $dateStr = '';
 
 //print_r($series);
 
 $hist = $sql -> selectToAssoc("
 SELECT *
 FROM hist_series
-WHERE hist_series.fk_id = ? OR hist_series.fk_id = ?
-",[$corrTag['fk_id_1'],$corrTag['fk_id_2']],['fk_id','pretty_date']);
+WHERE (hist_series.fk_id = :fk_id_1 OR hist_series.fk_id = :fk_id_2)
+$dateStr
+",$varsToBind,['fk_id','pretty_date']);
 
 if (count($hist) !== 2) echo 'ERROR';
 
@@ -41,6 +49,7 @@ foreach ($data['timeseries'] as $prettyDate=>$row) {
 }
 
 
+$uHistCorrel = array('data' => array(),'info' => array());
 
 
 if (!isset($data) || count($data) === 0) {

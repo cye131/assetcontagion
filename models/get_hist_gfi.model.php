@@ -44,4 +44,3 @@ AND (t1b.category = 'gfi' OR t2b.category='gfi')
                                
                                
                                
-",'','');

@@ -2,7 +2,23 @@
 
 
 ## ChangeLog
-### [1.8] = 2018-07-03
+### [1.9] - 2018-07-06
+- Added calculation for maximal information coefficient (MIC) and other maximal information nonparametric measures with Python & corresponding PHP router
+- Added cron scripting for MIC calculations
+- Added cron scripting for automating historical statistic calculations
+- Added cleaner callback system for managing AJAX calls in regions.js
+- Added play, back, forward, rewind and fast forward buttons on heatmap
+- Added local custom installation of bootstrap.js and bootstrap.min.css
+- Added rscripts and pythonscripts directories
+- Added single state storage onload and turned the prior 2 AJAX call group wrappers to promises to improve execution speed of regions.js
+- Added system to track AJAX exec time and fill in remaining time up to 500ms with a delay to even out the updating times
+- Improved state management to UI interaction on regions.js
+- Improved styling and spacing on average cross-regional equity correlation graph
+- Moved Python virtualenv to project root
+- Removed window variables from region.js
+
+
+### [1.8] - 2018-07-03
 - Added a correlation index, including database, CRUD model, Highcharts graph, script for cronjob, and REST API
 - Added better coloration system to heatmap
 - Added JS minification & concatenation system
