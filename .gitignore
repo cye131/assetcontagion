@@ -2,3 +2,4 @@ config/
 pyenv/
 pythonflask/
 public/twig-cache/
+vendor/
