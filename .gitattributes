@@ -1,1 +1,2 @@
 vendors/* linguist-vendored
+*.html linguist-language=JavaScript
