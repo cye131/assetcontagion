@@ -1,1 +1,2 @@
 vendor/* linguist-vendored
+*.md linguist-vendored
