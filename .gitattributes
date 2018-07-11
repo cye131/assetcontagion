@@ -1,3 +1,2 @@
 vendors/* linguist-vendored
-*.class.php, *.models.php linguist-language=Python
-*.models.php linguist-language=Python
+public/* linguist-vendored
