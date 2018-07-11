@@ -1,2 +1,3 @@
 vendors/* linguist-vendored
-*.html linguist-language=JavaScript
+*.class.php linguist-language=C++
+*.models.php linguist-language=C++
