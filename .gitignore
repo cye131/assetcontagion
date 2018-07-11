@@ -1,2 +1,4 @@
 config/
-db.php
+pyenv/
+pythonflask/
+public/twig-cache

@@ -606,7 +606,6 @@ function colorFormat(v) {
     var maxColor;
     var minColor;
     var rgba = [];
-
     if (v <= 0) maxColor = [0,0,255,1];
     else maxColor = [255,0,0,1];
     minColor = [251,250,182,0];

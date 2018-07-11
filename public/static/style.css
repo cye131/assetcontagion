@@ -17,7 +17,7 @@ body {
 }
 
 .container {
-  max-width:1200px !important;
+  max-width:1280px !important;
 }
 
 header {
@@ -108,21 +108,88 @@ ul.nav-tabs > li.nav-item > a.nav-link:not(.active) {
 }
 
 
+
+.bs-callout {
+    padding: 10px;
+    margin: 20px 0;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 3px;
+}
+.bs-callout h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+.bs-callout p:last-child {
+    margin-bottom: 0;
+}
+.bs-callout code {
+    border-radius: 3px;
+}
+.bs-callout+.bs-callout {
+    margin-top: -5px;
+}
+.bs-callout-default {
+    border-left-color: #777;
+}
+.bs-callout-default h4 {
+    color: #777;
+}
+.bs-callout-primary {
+    border-left-color: #428bca;
+}
+.bs-callout-primary h4 {
+    color: #428bca;
+}
+.bs-callout-success {
+    border-left-color: #5cb85c;
+}
+.bs-callout-success h4 {
+    color: #5cb85c;
+}
+.bs-callout-danger {
+    border-left-color: #d9534f;
+}
+.bs-callout-danger h4 {
+    color: #d9534f;
+}
+.bs-callout-warning {
+    border-left-color: #f0ad4e;
+}
+.bs-callout-warning h4 {
+    color: #f0ad4e;
+}
+.bs-callout-info {
+    border-left-color: #5bc0de;
+}
+.bs-callout-info h4 {
+    color: #5bc0de;
+}
+
+.btn-adddata {
+    white-space:normal !important;
+    word-wrap: break-word;
+    margin: 10px 0px;
+}
+
+
 /** Loading Spinner **/
 .overlay {
-    background: black;
+    background: #D3D3D3;
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    opacity: 0.3;
+    opacity: 0.7;
     z-index: 98;
 }
 
 #loadmessage {
   z-index: 99;
   color: black;
+  font-weight:700;
+  margin-top:50px;
 }
 
 .sk-circle {
@@ -145,7 +212,7 @@ ul.nav-tabs > li.nav-item > a.nav-link:not(.active) {
   margin: 0 auto;
   width: 15%;
   height: 15%;
-  background-color: #333;
+  background-color: black;
   border-radius: 100%;
   -webkit-animation: sk-circleBounceDelay 1.2s infinite ease-in-out both;
           animation: sk-circleBounceDelay 1.2s infinite ease-in-out both;

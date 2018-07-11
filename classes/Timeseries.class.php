@@ -199,8 +199,8 @@ class Timeseries {
     */
         
         $pyFile = 'mic.py'; 
-        $pyDir = dirname(__FILE__,2).'/pythonscripts';
-        $vEnv = dirname(__FILE__,2).'/pythonenv/bin/activate';
+        $pyDir = dirname(__FILE__,2).'/pyscripts';
+        $vEnv = dirname(__FILE__,2).'/pyenv/bin/activate';
 
         $toR = [
             'y1' => $y1,
@@ -224,4 +224,5 @@ class Timeseries {
         return $res['mic'];
         
     }
+    
 }

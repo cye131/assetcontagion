@@ -1,5 +1,4 @@
 <?php
-
 class CorrelationData {
     
     public function __construct($combinedSeries,$corrTag) {

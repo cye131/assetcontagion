@@ -33,9 +33,7 @@ class __TwigTemplate_872a55b1076dfeb6b7b454662dfd4c2afd29e830724cfae80e0a77b5559
     public function block_staticlinks($context, array $blocks = array())
     {
         // line 4
-        echo "<script src=\"//code.highcharts.com/stock/highstock.js\"></script>
-<script src=\"//code.highcharts.com/modules/heatmap.js\"></script>
-<script src=\"//code.highcharts.com/stock/highcharts-more.js\"></script>
+        echo "<script src=\"//code.highcharts.com/modules/heatmap.js\"></script>
 
 <script src=\"//cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.6/proj4.js\"></script>
 <script src=\"//code.highcharts.com/maps/modules/map.js\"></script>
@@ -45,14 +43,13 @@ class __TwigTemplate_872a55b1076dfeb6b7b454662dfd4c2afd29e830724cfae80e0a77b5559
 <script src=\"//code.highcharts.com/stock/indicators/indicators.js\"></script>
 <script src=\"//code.highcharts.com/stock/indicators/ema.js\"></script>
 <script src=\"//code.highcharts.com/stock/indicators/bollinger-bands.js\"></script>
-
 ";
     }
 
-    // line 19
+    // line 16
     public function block_content($context, array $blocks = array())
     {
-        // line 20
+        // line 17
         echo "    
     <section class=\"container\">
     </section>
@@ -193,7 +190,7 @@ class __TwigTemplate_872a55b1076dfeb6b7b454662dfd4c2afd29e830724cfae80e0a77b5559
 
     public function getDebugInfo()
     {
-        return array (  56 => 20,  53 => 19,  36 => 4,  33 => 3,  15 => 1,);
+        return array (  53 => 17,  50 => 16,  36 => 4,  33 => 3,  15 => 1,);
     }
 
     public function getSourceContext()
@@ -201,9 +198,7 @@ class __TwigTemplate_872a55b1076dfeb6b7b454662dfd4c2afd29e830724cfae80e0a77b5559
         return new Twig_Source("{% extends \"layout.html\" %}
 
 {% block staticlinks %}
-<script src=\"//code.highcharts.com/stock/highstock.js\"></script>
 <script src=\"//code.highcharts.com/modules/heatmap.js\"></script>
-<script src=\"//code.highcharts.com/stock/highcharts-more.js\"></script>
 
 <script src=\"//cdnjs.cloudflare.com/ajax/libs/proj4js/2.3.6/proj4.js\"></script>
 <script src=\"//code.highcharts.com/maps/modules/map.js\"></script>
@@ -213,7 +208,6 @@ class __TwigTemplate_872a55b1076dfeb6b7b454662dfd4c2afd29e830724cfae80e0a77b5559
 <script src=\"//code.highcharts.com/stock/indicators/indicators.js\"></script>
 <script src=\"//code.highcharts.com/stock/indicators/ema.js\"></script>
 <script src=\"//code.highcharts.com/stock/indicators/bollinger-bands.js\"></script>
-
 {% endblock %}
 
 {% block content %}
@@ -342,6 +336,6 @@ class __TwigTemplate_872a55b1076dfeb6b7b454662dfd4c2afd29e830724cfae80e0a77b5559
     </section>
 
     
-    {% endblock %}", "regions.html", "/var/www/correlation/public_html/templates/regions.html");
+    {% endblock %}", "regions.html", "/var/www/contagion/public/templates/regions.html");
     }
 }

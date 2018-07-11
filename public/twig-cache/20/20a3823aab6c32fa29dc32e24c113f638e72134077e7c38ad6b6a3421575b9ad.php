@@ -44,6 +44,8 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
 
     <script src=\"//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js\" integrity=\"sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q\" crossorigin=\"anonymous\"></script>
     <script src=\"//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js\" integrity=\"sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl\" crossorigin=\"anonymous\"></script>
+    <script src=\"//code.highcharts.com/stock/highstock.js\"></script>
+    <script src=\"//code.highcharts.com/stock/highcharts-more.js\"></script>
 
     <script type=\"text/javascript\" async src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML\">
         MathJax.Hub.Config({
@@ -54,9 +56,9 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
 
 
     ";
-        // line 29
+        // line 31
         $this->displayBlock('staticlinks', $context, $blocks);
-        // line 30
+        // line 32
         echo "    ";
         echo ($context["pageJS"] ?? null);
         echo "
@@ -92,9 +94,9 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
         
     </header>    
     ";
-        // line 62
-        $this->displayBlock('content', $context, $blocks);
         // line 64
+        $this->displayBlock('content', $context, $blocks);
+        // line 66
         echo "
 
 <footer class=\"page-footer font-small pt-4 mt-5\" style=\"background: rgba(10, 24, 66,1);\">
@@ -161,7 +163,7 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
 
 <script>
   ";
-        // line 129
+        // line 131
         echo ($context["bodyScript"] ?? null);
         echo "
 </script>
@@ -171,15 +173,15 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
 </html>";
     }
 
-    // line 29
+    // line 31
     public function block_staticlinks($context, array $blocks = array())
     {
     }
 
-    // line 62
+    // line 64
     public function block_content($context, array $blocks = array())
     {
-        // line 63
+        // line 65
         echo "    ";
     }
 
@@ -195,7 +197,7 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
 
     public function getDebugInfo()
     {
-        return array (  183 => 63,  180 => 62,  175 => 29,  165 => 129,  98 => 64,  96 => 62,  60 => 30,  58 => 29,  34 => 8,  25 => 1,);
+        return array (  185 => 65,  182 => 64,  177 => 31,  167 => 131,  100 => 66,  98 => 64,  62 => 32,  60 => 31,  34 => 8,  25 => 1,);
     }
 
     public function getSourceContext()
@@ -219,6 +221,8 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
 
     <script src=\"//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js\" integrity=\"sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q\" crossorigin=\"anonymous\"></script>
     <script src=\"//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js\" integrity=\"sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl\" crossorigin=\"anonymous\"></script>
+    <script src=\"//code.highcharts.com/stock/highstock.js\"></script>
+    <script src=\"//code.highcharts.com/stock/highcharts-more.js\"></script>
 
     <script type=\"text/javascript\" async src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML\">
         MathJax.Hub.Config({

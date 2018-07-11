@@ -40,7 +40,7 @@ $twig = new Twig_Environment(
   *
   *
   */
- $request = (isset($_GET['path']) && strlen($_GET['path'])) ? $_GET['path'] : 'regions';
+ $request = (isset($_GET['path']) && strlen($_GET['path'])) ? $_GET['path'] : 'contagion';
 
 
  /* Define routes
@@ -49,17 +49,13 @@ $twig = new Twig_Environment(
   *
   */
 
-  
-//Routes - Main Sites
-if ($request === 'regions') {
+if ($request === 'contagion') {
+ $title = 'Financial Contagion Index';
+  array_push($incJS,'contagion');
+}
+
+elseif ($request === 'regions') {
   $title = 'Global Stock Market Correlations';
-  /*$fromRouter = ['category' => 'reg','corr_type' => 'rho','freq' => 'd', 'trail' => 30];
-  $model[] = 'get_specs_categories';
-  $model[] = 'get_tags_series';
-  $model[] = 'get_tags_correl';
-  $model[] = 'get_tags_gfi';*/
-  //$logic[] ='heatmap';
-  //$toScript = ['tagsSeries','tagsCorrel','heatMapData','tagsGFI','specsCategories','corr_type','freq','trail'];
   array_push($incJS,'regions','heatmap','mapGenerator'/*,'tsGenerator'*/);
 }
 
@@ -163,7 +159,7 @@ elseif ($request == 'updatehistcorrel') {
   $minifier->minify(__DIR__."/static/$request.js");
  }
  
- if (count($incJS) > 0) $toHTML['pageJS'] = '<script src="static/'.$request.'.js"></script>';
+ if ( isset($title) ) $toHTML['pageJS'] = '<script src="static/'.$request.'.js"></script>';
  else $toHTML['pageJS'] = '';
 
 
@@ -174,6 +170,5 @@ elseif ($request == 'updatehistcorrel') {
   *
   */
  
- echo $twig->render($request.'.html', $toHTML);
  try { echo $twig->render($request.'.html', $toHTML); }
  catch (Exception $e) { echo 'Page not found'; }

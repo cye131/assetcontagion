@@ -141,7 +141,7 @@ $(document).ready(function() {
       var tooltipID = $(this).attr('aria-describedby');
       var tooltip = $('#' + tooltipID);
       MathJax.Hub.Queue(["Typeset",MathJax.Hub,tooltip[0]]);
-    })
+    });
 
 
 });

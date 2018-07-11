@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block staticlinks %}
+<script src="//code.highcharts.com/stock/indicators/indicators.js"></script>
+<script src="//code.highcharts.com/stock/indicators/ema.js"></script>
+<script src="//code.highcharts.com/stock/indicators/bollinger-bands.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<section class="container">
+    
+    <div class="bs-callout bs-callout-primary bg-white">
+        <h5 class="text-primary">Financial Contagion Index</h5>
+        <h6 class="font-italic mt-3">What is financial contagion?</h6>
+        <p>Financial contagion is the situation where a shock to the price of an asset spreads out to other regions or asset classes. </p>
+        <p>For example, in 2008, the downturn in the U.S. subprime mortgage market triggered the bankruptcy of Lehman Brothers, in turn leading to the collapses of its insurers and other major financial institutions. Banks and investors were forced to sell their assets at firesale prices, further crashing the prices of risky securities and and leading to a global plunge in equity prices.</p>
+        <p>Due to the increasing interdependence of the global economy and the increased ability of investors to invest into foreign markets and non-traditional asset classes, financial contagion has continued to rise over time.</p>
+        <h6 class="font-italic mt-3">The mission of this website</h6>
+        <p>This website provides an index that tracks financial contagion and its changes over time, by aggregating the cross-asset correlations between different regions and between different asset classes. My goal is to create a better understanding of the following the general risk level in the world economy to idiosyncratic shocks.</p>
+        <h6 class="font-italic mt-3">Methodology</h6>
+        <p>Under Construction</p>
+    </div>
+    
+    <div class="bs-callout bs-callout-info bg-white">
+        <h5 class="text-primary">Stylized Facts</h5>
+        <h6 class="font-italic mt-3">What is financial contagion?</h6>
+        <p>Financial contagion is the situation where a shock to the price of an asset spreads out to other regions or asset classes. </p>
+        <p>For example, in 2008, the downturn in the U.S. subprime mortgage market triggered the bankruptcy of Lehman Brothers, in turn leading to the collapses of its insurers and other major financial institutions. Banks and investors were forced to sell their assets at firesale prices, further crashing the prices of risky securities and and leading to a global plunge in equity prices.
+    </div>
+    
+</section>
+
+
+<section class="container">
+    <div id="chart-fci"></div>
+    
+    
+    
+</section>
+
+
+
+
+
+{% endblock %}

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+if [ "$#" -ne 1 ]; then
+  echo "Invalid argument count"
+  exit
+fi
+
+. /var/www/contagion/pyenv/bin/activate && python3 /var/www/contagion/pyscripts/$1 && deactivate
