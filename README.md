@@ -2,6 +2,9 @@
 
 
 ## ChangeLog
+### [v1.10] - 2018-07-10
+
+
 ### [1.9] - 2018-07-06
 - Added calculation for maximal information coefficient (MIC) and other maximal information nonparametric measures with Python & corresponding PHP router
 - Added cron scripting for MIC calculations

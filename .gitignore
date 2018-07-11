@@ -1,4 +1,4 @@
 config/
 pyenv/
 pythonflask/
-public/twig-cache
+public/twig-cache/
