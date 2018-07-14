@@ -20,13 +20,14 @@
     <script src="//code.highcharts.com/stock/highstock.js"></script>
     <script src="//code.highcharts.com/stock/highcharts-more.js"></script>
 
+<!--
     <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML">
         MathJax.Hub.Config({
           extensions: ["tex2jax.js"],
           jax: ["input/TeX","output/HTML-CSS"]
         });
     </script>
-
+-->
 
     {% block staticlinks %}{% endblock %}
     {{ pageJS | raw }}
@@ -40,7 +41,7 @@
             </div>
         </div>
         
-        <nav class="navbar navbar-expand-xl navbar-light">
+        <nav class="navbar navbar-expand-xl navbar-dark bg-dark" id="navbar">
             <div class="container">
                 <!--<a class="navbar-brand" href="#"></a>-->
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsingNavbarLg">
@@ -51,15 +52,18 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/contagion">Financial Contagion Index</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/regions">Cross-Regional Correlation</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="/regions">Cross-Regional Correlation</a>
+                            <div class="dropdown-menu bg-dark">
+                              <a class="dropdown-item" href="/regions-hm">Correlation Matrix</a>
+                              <a class="dropdown-item" href="/regions-map">Map</a>
+                              <a class="dropdown-item" href="/regions-ts">Historical Data</a>
+                            </div>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
-
-        
     </header>    
     {% block content %}
     {% endblock %}

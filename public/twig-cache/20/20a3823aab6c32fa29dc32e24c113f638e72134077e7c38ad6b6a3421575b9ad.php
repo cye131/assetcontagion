@@ -47,18 +47,19 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
     <script src=\"//code.highcharts.com/stock/highstock.js\"></script>
     <script src=\"//code.highcharts.com/stock/highcharts-more.js\"></script>
 
+<!--
     <script type=\"text/javascript\" async src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML\">
         MathJax.Hub.Config({
           extensions: [\"tex2jax.js\"],
           jax: [\"input/TeX\",\"output/HTML-CSS\"]
         });
     </script>
-
+-->
 
     ";
-        // line 31
-        $this->displayBlock('staticlinks', $context, $blocks);
         // line 32
+        $this->displayBlock('staticlinks', $context, $blocks);
+        // line 33
         echo "    ";
         echo ($context["pageJS"] ?? null);
         echo "
@@ -72,7 +73,7 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
             </div>
         </div>
         
-        <nav class=\"navbar navbar-expand-xl navbar-light\">
+        <nav class=\"navbar navbar-expand-xl navbar-dark bg-dark\" id=\"navbar\">
             <div class=\"container\">
                 <!--<a class=\"navbar-brand\" href=\"#\"></a>-->
                 <button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\"#collapsingNavbarLg\">
@@ -83,20 +84,23 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
                         <li class=\"nav-item\">
                             <a class=\"nav-link\" href=\"/contagion\">Financial Contagion Index</a>
                         </li>
-                        <li class=\"nav-item\">
-                            <a class=\"nav-link\" href=\"/regions\">Cross-Regional Correlation</a>
+                        <li class=\"nav-item dropdown\">
+                            <a class=\"nav-link dropdown-toggle\" data-toggle=\"dropdown\" href=\"/regions\">Cross-Regional Correlation</a>
+                            <div class=\"dropdown-menu bg-dark\">
+                              <a class=\"dropdown-item\" href=\"/regions-hm\">Correlation Matrix</a>
+                              <a class=\"dropdown-item\" href=\"/regions-map\">Map</a>
+                              <a class=\"dropdown-item\" href=\"/regions-ts\">Historical Data</a>
+                            </div>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
-
-        
     </header>    
     ";
-        // line 64
+        // line 68
         $this->displayBlock('content', $context, $blocks);
-        // line 66
+        // line 70
         echo "
 
 <footer class=\"page-footer font-small pt-4 mt-5\" style=\"background: rgba(10, 24, 66,1);\">
@@ -163,7 +167,7 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
 
 <script>
   ";
-        // line 131
+        // line 135
         echo ($context["bodyScript"] ?? null);
         echo "
 </script>
@@ -173,15 +177,15 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
 </html>";
     }
 
-    // line 31
+    // line 32
     public function block_staticlinks($context, array $blocks = array())
     {
     }
 
-    // line 64
+    // line 68
     public function block_content($context, array $blocks = array())
     {
-        // line 65
+        // line 69
         echo "    ";
     }
 
@@ -197,7 +201,7 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
 
     public function getDebugInfo()
     {
-        return array (  185 => 65,  182 => 64,  177 => 31,  167 => 131,  100 => 66,  98 => 64,  62 => 32,  60 => 31,  34 => 8,  25 => 1,);
+        return array (  189 => 69,  186 => 68,  181 => 32,  171 => 135,  104 => 70,  102 => 68,  63 => 33,  61 => 32,  34 => 8,  25 => 1,);
     }
 
     public function getSourceContext()
@@ -224,13 +228,14 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
     <script src=\"//code.highcharts.com/stock/highstock.js\"></script>
     <script src=\"//code.highcharts.com/stock/highcharts-more.js\"></script>
 
+<!--
     <script type=\"text/javascript\" async src=\"https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML\">
         MathJax.Hub.Config({
           extensions: [\"tex2jax.js\"],
           jax: [\"input/TeX\",\"output/HTML-CSS\"]
         });
     </script>
-
+-->
 
     {% block staticlinks %}{% endblock %}
     {{ pageJS | raw }}
@@ -244,7 +249,7 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
             </div>
         </div>
         
-        <nav class=\"navbar navbar-expand-xl navbar-light\">
+        <nav class=\"navbar navbar-expand-xl navbar-dark bg-dark\" id=\"navbar\">
             <div class=\"container\">
                 <!--<a class=\"navbar-brand\" href=\"#\"></a>-->
                 <button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\"#collapsingNavbarLg\">
@@ -255,15 +260,18 @@ class __TwigTemplate_67552a73ce0761e65f5b7d5c91174c5c5f8b81ae993a8c7c3a3318eeaae
                         <li class=\"nav-item\">
                             <a class=\"nav-link\" href=\"/contagion\">Financial Contagion Index</a>
                         </li>
-                        <li class=\"nav-item\">
-                            <a class=\"nav-link\" href=\"/regions\">Cross-Regional Correlation</a>
+                        <li class=\"nav-item dropdown\">
+                            <a class=\"nav-link dropdown-toggle\" data-toggle=\"dropdown\" href=\"/regions\">Cross-Regional Correlation</a>
+                            <div class=\"dropdown-menu bg-dark\">
+                              <a class=\"dropdown-item\" href=\"/regions-hm\">Correlation Matrix</a>
+                              <a class=\"dropdown-item\" href=\"/regions-map\">Map</a>
+                              <a class=\"dropdown-item\" href=\"/regions-ts\">Historical Data</a>
+                            </div>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
-
-        
     </header>    
     {% block content %}
     {% endblock %}

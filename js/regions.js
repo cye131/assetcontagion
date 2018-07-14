@@ -10,6 +10,38 @@ $(document).ready(function() {
         var data = {};
         $('#overlay').show();
 
+        
+        /*
+        //Use locally stored data if it exists and has not expired yet (10 mins within fetch-time)
+        var browserStorage = localStorage.getItem('data');
+        var browserStorageExpTime = localStorage.getItem('data-exp-time');
+        if ( (browserStorage !== null && isJson(browserStorage) === true) && (browserStorageExpTime  !== null && new Date(parseInt(browserStorageExpTime)) > new Date()) ) {
+          $.extend(true,data,JSON.parse(localStorage.getItem('data')));
+          
+          if (data.tagsCorrel != null && data.specsCategories != null && data.tagsSeries != null && data.tagsCorrel != null && data.tagsGFI != null && data.hmDates.length != 0 && data.histCorrIndex.length != 0) {
+          
+            setCategoryOptions(data);
+  
+            if (window.location.href.indexOf('hm') !== -1) {
+              drawHeatMap(data.tagsSeries,data.tagsCorrel);
+              drawHeatMapDates(data.histCorrIndex);
+            }
+            else if (window.location.href.indexOf('map') !== -1) {
+              drawMaps(data.tagsGFI);
+              drawStrongCorrelations(data.tagsSeries,data.tagsCorrel,0.75);
+              drawStrongCorrelationsEurope(data.tagsSeries,data.tagsCorrel,0.75);
+            }
+            
+            setData(data);
+            $('#overlay').hide();
+            return; 
+          }
+          
+        }
+        */
+        
+        
+
         var d1 = $.Deferred(function(dfd) {
           var ajaxGetSpecsCategories = getAJAX(['get_specs_categories'],[],['specsCategories'],{'category': category, 'corr_type': corr_type, 'freq': freq, 'trail': trail},10000,1);
           var ajaxGetTagsSeries = getAJAX(['get_tags_series'],[],['tagsSeries'],{'category': category, 'corr_type': corr_type, 'freq': freq, 'trail': trail},10000,1);
@@ -27,12 +59,15 @@ $(document).ready(function() {
                   if (row.grouping_1 === 'World.' || row.grouping_2 === 'World.') data.tagsGFI.push(row);
               });
               setCategoryOptions(data);
-              drawHeatMap(data.tagsSeries,data.tagsCorrel);
-  
-              drawMaps(data.tagsGFI);
-              drawStrongCorrelations(data.tagsSeries,data.tagsCorrel,0.75);
-              drawStrongCorrelationsEurope(data.tagsSeries,data.tagsCorrel,0.75);
-              $("#highMapEurope > div").addClass('float-right').css('margin-top','-60px');
+              
+              if (window.location.href.indexOf('hm') !== -1) {
+                drawHeatMap(data.tagsSeries,data.tagsCorrel);
+              }
+              else if (window.location.href.indexOf('map') !== -1) {
+                var charts = drawMaps(data.tagsGFI);
+                drawStrongCorrelations(data.tagsSeries,data.tagsCorrel,0.75,charts[0]);
+                drawStrongCorrelations(data.tagsSeries,data.tagsCorrel,0.75,charts[1]);
+              }
               
               dfd.resolve(data);
               return dfd.promise();
@@ -40,11 +75,14 @@ $(document).ready(function() {
         });
         
         var d2 = $.Deferred(function(dfd) {
+          if (window.location.href.indexOf('hm') === -1) {
+            dfd.resolve(data);
+            return dfd.promise();
+          }
           var ajaxGetHistCorrIndex = getAJAX(['get_hist_corr_index'],[],['histCorrIndex'],{'category': category, 'corr_type': corr_type, 'freq': freq, 'trail': trail},10000,1);
           ajaxGetHistCorrIndex.done(function(res) {
             
               var histCorrIndex = JSON.parse(res).histCorrIndex;
-              drawHeatMapDates(histCorrIndex);
               
               var dates = [];
               $.each(histCorrIndex, function(i,row) {
@@ -54,13 +92,15 @@ $(document).ready(function() {
                 'hmDates': dates,
                 "playState": 'pause', // 1 -> not playing, 2-> playing
                 "playIndex": dates.length - 1,
+                "histCorrIndex": histCorrIndex
               });
-                
+              
+              drawHeatMapDates(histCorrIndex);
           });
-          
             dfd.resolve(data);
             return dfd.promise();
         });
+        
         
         $.when(d1,d2).done(function(data1,data2) {
           $.extend(true,data,data1,data2);
@@ -70,6 +110,7 @@ $(document).ready(function() {
 
           $('#overlay').hide();
         });
+              
 
     })();
     
@@ -130,7 +171,7 @@ $(document).ready(function() {
         $("#corrselector")[0].submit();
     });
 
-
+/*
     $('#corr-type-dropdown').on('click','a.corr-type', function(){
       $('#corr-type-dropdown-text').html( $(this).html() ).find('span').tooltip();
       $(this).hide()
@@ -142,7 +183,7 @@ $(document).ready(function() {
       var tooltip = $('#' + tooltipID);
       MathJax.Hub.Queue(["Typeset",MathJax.Hub,tooltip[0]]);
     });
-
+*/
 
 });
 
@@ -165,6 +206,7 @@ function setCategoryOptions(data) {
             $('#corr_type').append('<option value="' + corr_types[i] + '" ' +  (corr_types[i] === selectedcorr_type ? 'selected' : '') + ' >' + corr_type_str + '</option>');
         }
 
+        /*
         for (i=0;i<corr_types.length;i++) {
           var corr_type_str = getCorrName(corr_types[i]);
           if (corr_types[i] === selectedcorr_type) $('#corr-type-dropdown-text').html(corr_type_str + '&nbsp;<span href="#" data-toggle="tooltip" title="$$\tau = \sqrt{b^2} \\sum_{i} \sum_{j=1}$$" class="badge badge-primary">' + 'test' +'</span>');
@@ -172,7 +214,10 @@ function setCategoryOptions(data) {
           $('#corr-type-dropdown').append('<a class="dropdown-item corr-type" href="#" data-corr-type="' + corr_types[i] + '"  ' +  (corr_types[i] === selectedcorr_type ? 'style="display:none"' : '') + ' >' + corr_type_str + '&nbsp;<span href="#" data-toggle="tooltip" title="$$' + getCorrMath(corr_types[i]) + '$$" class="badge badge-primary">' + '[info]' +'</span>' + '</a>');
       }
       $('#corr-type-dropdown-text span[data-toggle="tooltip"], #corr-type-dropdown span[data-toggle="tooltip"]').tooltip();
+    */
     }
+    
+    
 }
 
 

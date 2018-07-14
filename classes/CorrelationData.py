@@ -1,6 +1,8 @@
 import collections
 import numpy as np
 from scipy import stats
+from minepy import MINE
+import pprint
 
 class CorrelationData:
     
@@ -38,8 +40,7 @@ class CorrelationData:
                 if ( tsDate not in list(data['timeseries'].keys())  ):
                     data['timeseries'][tsDate] = {}
                     data['timeseries'][tsDate]['date'] = tsDate
-                if tsRow[colUsed]: data['timeseries'][tsDate][level] = tsRow[colUsed]
-                else: data['timeseries'][tsDate][level] = None
+                if (tsRow[colUsed] != None ): data['timeseries'][tsDate][level] = tsRow[colUsed]
                 # print(data['timeseries'][tsDate])
             
                 i += 1
@@ -65,13 +66,13 @@ class CorrelationData:
         
             if len(data1_l) == self.trail:
                 corr = self.getCorr(data1_l,data2_l,self.corr_type)
-                data["timeseries"][date]['correlation'] = round(corr[0],8)
+                data["timeseries"][date]['correlation'] = round(corr,8)
                 data["timeseries"][date]['inputs_used'] = len(dates_l)
                 data["timeseries"][date]['earliest_input'] = dates_l[0]
             
         # print(data)
-        return data
-        
+        self.correlData = data
+        return
         
         
         
@@ -84,19 +85,43 @@ class CorrelationData:
         index['valuestocorrelate'] = [self.val_type_1,self.val_type_2]
         dates1 = []
         
-        #calculates first shared date
-        for date,row in self.combinedSeries[self.seriesNames[0]]:
+        for date,row in self.combinedSeries[self.seriesNames[0]].items():
             dates1.append(date)
             
-        for date,row in self.combinedSeries[self.seriesNames[1]]:
+        for date,row in self.combinedSeries[self.seriesNames[1]].items():
             if date in dates1:
                 index['firstshareddate'] = date
                 break
 
-        coutcorrelation = 0
+        countcorrelation = 0
+        # reverseddatearray = collections.OrderedDict( sorted(self.correlData['timeseries'].items(), key=lambda row: row[1]['date'], reverse=True))
+
+        reverseddatearray = collections.OrderedDict( sorted(self.correlData['timeseries'].items(), key=lambda row: row[0], reverse=True))
+
+        for date,row in reverseddatearray.items():
+            if ( 'correlation' in list(row.keys()) ):
+                countcorrelation += 1
+                if (countcorrelation == 1):
+                    index['correl_last_date'] = date
+                    index['correl_last_val'] = row['correlation']
+                    index['correl_last_earliestinput_date'] = row['earliest_input']
+                elif (countcorrelation == self.trail):
+                    index['correl_trail_date'] = date
+                
+                firstCorrelDate = date;
         
+        index['correl_first_date'] = firstCorrelDate or None;
+
+        index['correl_count'] = countcorrelation;
         
-        ######
+        if (countcorrelation >= 1):
+            index['UPDATED'] = True;
+        else:
+            index['UPDATED'] = False;
+        
+        self.correlIndex = index
+        return
+
 
     
     
@@ -110,9 +135,18 @@ class CorrelationData:
 
 
     def pearsonCorrelation(self,x, y) :
-        return stats.pearsonr(x,y)
+        res = stats.pearsonr(x,y)
+        return res[0]
     
+    def kendallsTau(self,x,y):
+        res = stats.kendalltau(x,y)
+        return res[0]
     
+    def MIC(self,x,y):
+        mine = MINE(alpha=0.6,c=15,est="mic_approx")
+        mine.compute_score(x,y)
+        return mine.mic()
+
     
     
         

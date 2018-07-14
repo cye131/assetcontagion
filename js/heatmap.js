@@ -1,5 +1,5 @@
 function drawHeatMap(tagsSeries,tagsCorrel,noChart) {
-    var hm = {"data":[], "info":{} };
+    var hm = {"data":[], "info":{}};
     var vals = [];
     var val;
     var lastDate = new Date('1970-01-01');
@@ -19,7 +19,7 @@ function drawHeatMap(tagsSeries,tagsCorrel,noChart) {
             "color": (x === y) ? 'rgba(20,20,20,.1)' : null,
             "tooltip": false
         };
-        
+		        
         $.each(tagsCorrel,function(index,tagRow) {
             if (
                 (tagRow.b_id_1 !== tagsSeries[x].b_id || tagRow.b_id_2 !== tagsSeries[y].b_id) &&
@@ -317,6 +317,7 @@ function drawHeatMap(tagsSeries,tagsCorrel,noChart) {
         
         
         //text and rectangles
+		
         (function() {
             if (group.grouping === 'World') return;
             

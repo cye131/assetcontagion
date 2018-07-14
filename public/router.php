@@ -56,7 +56,17 @@ if ($request === 'contagion') {
 
 elseif ($request === 'regions') {
   $title = 'Global Stock Market Correlations';
-  array_push($incJS,'regions','heatmap','mapGenerator'/*,'tsGenerator'*/);
+  array_push($incJS,'regions','heatmap','mapgenerator'/*,'tsGenerator'*/);
+}
+
+elseif ($request === 'regions-hm') {
+  $title = 'Global Stock Market Correlations';
+  array_push($incJS,'regions','heatmap');
+}
+
+elseif ($request === 'regions-map') {
+  $title = 'Global Stock Market Correlations';
+  array_push($incJS,'regions','mapgenerator','gradient');
 }
 
 elseif ($request == 'stocksectorcorrelation') {

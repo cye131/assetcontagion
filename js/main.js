@@ -1,15 +1,30 @@
 $(document).ready(function() {
 
     /* Highlights navigation bar menu item if it's active */
-    $(".nav-item").each(function(){
-        var a = $(this).find('a:first');
-        var link = a.attr("href");
-        var pathname = window.location.pathname;
-        if (link === pathname) {
-            $(this).addClass('active');
-            return;
-        }
-    });
+    (function(){
+      var pathname = window.location.pathname;
+      var dd = false;
+      var navbar = $('#navbar');
+      
+      navbar.find('a.dropdown-item').each(function(i,el) {
+          if ($(el).attr("href") === pathname) {
+            $(el).addClass('active');
+            $(el).closest('li.nav-item').addClass('active');
+            dd = true;
+            return false;
+          }
+        });
+        
+        if (dd === true) return;
+        
+        navbar.find('li.nav-item').each(function(i,el){
+          var a = $(el).find('a:first');
+          if (a.attr("href") === pathname) {
+              $(el).addClass('active');
+              return false;
+          }
+        });
+    })();
 
     
 });
@@ -25,6 +40,8 @@ function getData() {
 
 function setData(d) {
   $('#data').data(d);
+  //localStorage.setItem("data", JSON.stringify(d));
+  //localStorage.setItem("data-exp-time", new Date().getTime() + 10*60*1000);
 }
 
 

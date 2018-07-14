@@ -12,7 +12,10 @@ $(document).ready(function() {
         var d1 = $.Deferred(function(dfd) {
             var ajaxGetHistCorrIndex = getAJAX(['get_hist_corr_index'],[],['histCorrIndex'],{'category': null, 'corr_type': corr_type, 'freq': freq, 'trail': trail},10000,1);
             ajaxGetHistCorrIndex.done(function(res) {
+                console.log(res);
                 var histCorrIndex = JSON.parse(res).histCorrIndex;
+                console.log('test');
+                console.log(histCorrIndex);
                 data.histCorrIndex = histCorrIndex;
                 drawFCI(histCorrIndex);
               });
@@ -59,7 +62,7 @@ function drawFCI(histCorrIndex) {
             "high": 1
         });
     }
-    
+
     // Add one false date for padding
     hmcol.push({
         "x": hmcol[hmcol.length-1].x +1000*60*60*24,

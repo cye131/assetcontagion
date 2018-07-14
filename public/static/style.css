@@ -1,7 +1,16 @@
 /** Custom Classes **/
 .successmsg {
     margin-top: 10px;
-    
+
+}
+
+@keyframes dash {
+	from {
+		stroke-dasharray: 0 1000;
+	}
+	to {
+		stroke-dasharray: 1000 0;
+	}
 }
 
 
@@ -13,6 +22,9 @@ html {
 
 body {
   background-color: rgba(255, 235, 205,.1) !important;
+}
+
+main {
   font-family: Arial,"Helvetica Neue",Helvetica,sans-serif !important;
 }
 
@@ -21,33 +33,63 @@ body {
 }
 
 header {
-    margin-bottom:25px;
     background-color: rgba(245,245,248,1) !important;
 }
 
-nav.navbar {
+/** Navbar **/
+#navbar {
     padding:0px;
-    
     -webkit-box-shadow: 0 8px 6px -6px #999;
     -moz-box-shadow: 0 8px 6px -6px #999;
     box-shadow: 0 8px 6px -6px #999;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+}
+
+#navbar li.nav-item {
+  padding: .3rem 0;
+}
+#navbar li.nav-item.active > a.nav-link {
+  color: rgba(255,255,255,1) !important;
+  font-weight:600;
+}
+#navbar li.nav-item:not(.active) > a.nav-link {
+  color: rgba(255,255,255,0.8) !important;
+}
+
+#navbar li.nav-item:hover {
+  background-color: #3a4667;
+}
+
+#navbar div.dropdown-menu {
+  background-color: rgba(245,245,248,1) !important;
+  padding: 0;
+  margin-top: -.05rem;
+}
+
+#navbar div.dropdown-menu > a{
+  border-bottom:1px solid rgba(0,0,0,.1);
+  padding: .5rem .2rem .5rem 1rem;
+}
+#navbar div.dropdown-menu > a.active {
+  background-color: #0a1842;
+  font-weight: 600
+}
+#navbar div.dropdown-menu > a:hover{
+  background-color: #ced0d9;
 }
 
 
-li.nav-item{
-    padding-top:2px;
-}
-
-
-
-li.nav-item.active {
-    border-bottom:3px solid rgba(10, 24, 66,1);
-    font-weight:600;
-}
-
+/*
 a.nav-link {
     color:black !important;
 }
+*/
+
+nav div.dropdown-menu {
+  width:100%
+}
+
+/** Forms **/
 
 .form-inline .form-group label,
 .form-inline .form-group input,
@@ -92,7 +134,7 @@ ul.nav-tabs > li.nav-item > a.nav-link:not(.active) {
 
 .page-footer {
     color: rgba(220,220,250,1) !important;
-    
+
     -webkit-box-shadow: 0 -8px 6px -6px #999;
     -moz-box-shadow: 0 -8px 6px -6px #999;
     box-shadow: 0 -8px 6px -6px #999;
@@ -390,11 +432,12 @@ ul.nav-tabs > li.nav-item > a.nav-link:not(.active) {
 
 
 /** Highmaps **/
+/*
 .selectedLines {
   stroke : darkgreen;
   stroke-width: 4;
 }
-
+*/
 .highcharts-null-point {
   fill: rgba(255,255,255,0.2);
 }

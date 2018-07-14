@@ -69,7 +69,7 @@ class __TwigTemplate_872a55b1076dfeb6b7b454662dfd4c2afd29e830724cfae80e0a77b5559
                 <button class=\"btn btn-primary btn-sm\" type=\"submit\" id=\"submitcorrselector\" >Change</button>
             </div>
 
-            <div class=\"dropdown show\">
+<!--            <div class=\"dropdown show\">
                 <a class=\"btn btn-secondary dropdown-toggle\" href=\"#\" role=\"button\" id=\"corr-type-dropdown-text\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">Choose Correlation Type</a>
                 <div class=\"dropdown-menu\" id=\"corr-type-dropdown\" aria-labelledby=\"corr-type-dropdown-text\">
                   <a class=\"dropdown-item\" href=\"#\">Action</a>
@@ -77,7 +77,7 @@ class __TwigTemplate_872a55b1076dfeb6b7b454662dfd4c2afd29e830724cfae80e0a77b5559
                   <a class=\"dropdown-item\" href=\"#\">Something else here</a>
                 </div>
               </div>
-    
+-->
         </form>
 
     </section>
@@ -230,7 +230,7 @@ class __TwigTemplate_872a55b1076dfeb6b7b454662dfd4c2afd29e830724cfae80e0a77b5559
                 <button class=\"btn btn-primary btn-sm\" type=\"submit\" id=\"submitcorrselector\" >Change</button>
             </div>
 
-            <div class=\"dropdown show\">
+<!--            <div class=\"dropdown show\">
                 <a class=\"btn btn-secondary dropdown-toggle\" href=\"#\" role=\"button\" id=\"corr-type-dropdown-text\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">Choose Correlation Type</a>
                 <div class=\"dropdown-menu\" id=\"corr-type-dropdown\" aria-labelledby=\"corr-type-dropdown-text\">
                   <a class=\"dropdown-item\" href=\"#\">Action</a>
@@ -238,7 +238,7 @@ class __TwigTemplate_872a55b1076dfeb6b7b454662dfd4c2afd29e830724cfae80e0a77b5559
                   <a class=\"dropdown-item\" href=\"#\">Something else here</a>
                 </div>
               </div>
-    
+-->
         </form>
 
     </section>
